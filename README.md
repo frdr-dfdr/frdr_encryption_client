@@ -31,12 +31,12 @@ deactivate
 
 To encrypt a file or a directory
 ```sh
-$ python cryptor.py -e -i <path to the file or dir you want to encrypt> 
+$ python crypto.py -e -i <path to the file or dir you want to encrypt> 
 ```
 
 To decrypt a file or a directory
 ```sh
-$ python cryptor.py -d -i <path to the encrypted file or dir> -k <path to the key>
+$ python crypto.py -d -i <path to the encrypted file or dir> -k <path to the key>
 ```
 
 Options:
