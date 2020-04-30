@@ -2,15 +2,17 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    crypto.py -e -i <input_path> [-o <output_path>] [-k <key_path>]
-    crypto.py -d -i <input_path> -k <key_path> [-o <output_path>]     
+    crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [-k <key_path>] [--hvac <vault_addr>]
+    crypto.py -d -n <dataset_name> -i <input_path> [-k <key_path> | --hvac <vault_addr>] [-o <output_path>]     
 
 Options:
     -e --encrypt           encrypt
     -d --decrypt           decrypt
+    -n <dataset_name>, --name <dataset_name>
     -i <input_path>, --input <input_path>
     -o <output_path>, --output <output_path> 
     -k <key_path>, --key <key_path>
+    --hvac <vault_addr> using hashicorp vaults
 """
 from docopt import docopt
 import sys
@@ -18,9 +20,12 @@ import nacl.utils
 import nacl.secret
 import os
 from util.helper import make_dir
+import hvac
+from base64 import b64encode, b64decode
 
 version = '0.0.1'
 __version__ = version
+SECRET_BASE_DIR = "frdr"
 EXCLUDED_FILES = [".*", 
                   "Thumbs.db", 
                   ".DS_Store", 
@@ -35,11 +40,20 @@ EXCLUDED_FILES = [".*",
                   "NULLEXT"]
 
 class Cryptor():
-    def __init__(self, input_path, output_path=None, key_filename=None, password=None):
+    def __init__(self, arguments, name, input_path, output_path=None, key_filename=None, password=None):
+        self._arguments = arguments
+        self._dataset_name = name
         self._input = input_path
         self._output = output_path
         # TODO: set key using password
         self.password = password
+        if self._arguments["--hvac"]:
+            self.hvac_client = hvac.Client(url=self._arguments["--hvac"])
+            self.vault_secret_path = os.path.join(SECRET_BASE_DIR, self._dataset_name)
+            try:
+                self.hvac_client.sys.enable_secrets_engine(backend_type='transit')
+            except:
+                pass
         self.set_key(key_filename)
         self.box = nacl.secret.SecretBox(self.key)
 
@@ -104,7 +118,14 @@ class Cryptor():
     def set_key(self, key_filename):
         if key_filename is None:
             self._key_filename = "{}_key.pem".format(self._input)
-            self._key = None
+            if self._arguments["--encrypt"]:
+                self._key = None
+            elif self._arguments["--decrypt"]:
+                key_ciphertext = self.retrive_key_from_vault()
+                self._key = self.decrypt_key(key_ciphertext)
+            else:
+                #TODO: raise ERROR
+                pass
         else:
             self._key_filename = key_filename
             with open(key_filename, "rb") as f:
@@ -116,9 +137,29 @@ class Cryptor():
             self.generate_key()
         return self._key
     def generate_key(self):
-        self._key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
+        if self._arguments["--hvac"]:
+            self.hvac_client.secrets.transit.create_key(name=self._dataset_name)
+            gen_key_response = self.hvac_client.secrets.transit.generate_data_key(name=self._dataset_name, key_type='plaintext',)
+            self._key = b64decode(gen_key_response['data']['plaintext'].encode())
+            ciphertext = gen_key_response['data']['ciphertext']
+            self.save_key_to_vault(ciphertext)
+        else:
+            self._key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
         with open(self._key_filename, 'wb') as f:
             f.write(self._key)
+    
+    def save_key_to_vault(self, key):
+        self.hvac_client.secrets.kv.v2.create_or_update_secret(path=self.vault_secret_path, secret=dict(ciphertext=key))
+
+    def retrive_key_from_vault(self):
+        print (self.vault_secret_path)
+        read_secret_response = self.hvac_client.secrets.kv.v2.read_secret_version(path=self.vault_secret_path)
+        ciphertext = read_secret_response['data']['data']['ciphertext']
+        return ciphertext
+
+    def decrypt_key(self, ciphertext):
+        decrypt_data_response = self.hvac_client.secrets.transit.decrypt_data(name=self._dataset_name, ciphertext=ciphertext,)
+        return b64decode(decrypt_data_response['data']['plaintext'].encode())
 
     # get relative path of all files in the input dir
     # return relative paths of all files and subdirs in the dir
@@ -159,14 +200,17 @@ class Cryptor():
         return False 
 
 
+
+
 if __name__ == "__main__":
     if sys.version_info[0] < 3:
         raise Exception("Python 3 is required to run the local client.")
     arguments = docopt(__doc__, version=__version__)
+    name = arguments["--name"]
     input_path = arguments["--input"]
     output_path = arguments["--output"]
     key_path = arguments["--key"]
-    encryptor = Cryptor(input_path, output_path, key_path)
+    encryptor = Cryptor(arguments, name, input_path, output_path, key_path)
     if arguments["--encrypt"]:
         encryptor.encrypt()
     elif arguments["--decrypt"]:
