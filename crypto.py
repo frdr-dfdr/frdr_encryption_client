@@ -19,9 +19,9 @@ import sys
 import nacl.utils
 import nacl.secret
 import os
-from util.helper import make_dir
+from util.helper import make_dir, base64_to_byte
 import hvac
-from base64 import b64encode, b64decode
+from util.VaultClient import VaultClient
 
 version = '0.0.1'
 __version__ = version
@@ -40,19 +40,16 @@ EXCLUDED_FILES = [".*",
                   "NULLEXT"]
 
 class Cryptor(object):
-    def __init__(self, arguments):
+    def __init__(self, arguments, hvac_client=None):
         self._arguments = arguments
         self._dataset_name = self._arguments["--name"]
         self._input = self._arguments["--input"]
         self._output = self._arguments["--output"]
         self._key_filename = self._arguments["--key"]
         if self._arguments["--hvac"]:
-            self.hvac_client = hvac.Client(url=self._arguments["--hvac"])
+            self.hvac_client = hvac_client
+            self.hvac_client.enable_transit_engine()
             self.vault_secret_path = os.path.join(SECRET_BASE_DIR, self._dataset_name)
-            try:
-                self.hvac_client.sys.enable_secrets_engine(backend_type='transit')
-            except:
-                pass
         self.set_key()
         self.box = nacl.secret.SecretBox(self.key)
 
@@ -120,8 +117,9 @@ class Cryptor(object):
             if self._arguments["--encrypt"]:
                 self._key = None
             elif self._arguments["--decrypt"]:
-                key_ciphertext = self.retrive_key_from_vault()
-                self._key = self.decrypt_key(key_ciphertext)
+                key_ciphertext = self.hvac_client.retrive_key_from_vault(path=self.vault_secret_path)
+                key_plaintext = self.hvac_client.decrypt_key(name=self._dataset_name, ciphertext=key_ciphertext)
+                self._key = base64_to_byte(key_plaintext)
             else:
                 #TODO: raise ERROR
                 pass
@@ -136,27 +134,15 @@ class Cryptor(object):
         return self._key
     def generate_key(self):
         if self._arguments["--hvac"]:
-            self.hvac_client.secrets.transit.create_key(name=self._dataset_name)
-            gen_key_response = self.hvac_client.secrets.transit.generate_data_key(name=self._dataset_name, key_type='plaintext',)
-            self._key = b64decode(gen_key_response['data']['plaintext'].encode())
-            ciphertext = gen_key_response['data']['ciphertext']
-            self.save_key_to_vault(ciphertext)
+            self.hvac_client.create_transit_engine_key(name=self._dataset_name)
+            key_plaintext, key_ciphertext = self.hvac_client.generate_data_key(name=self._dataset_name)
+            self._key = base64_to_byte(key_plaintext)
+            self.hvac_client.save_key_to_vault(path=self.vault_secret_path, key=key_ciphertext)
         else:
+            #TODO: put writing to local file in a new class 
             self._key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
-        with open(self._key_filename, 'wb') as f:
-            f.write(self._key)
-    
-    def save_key_to_vault(self, key):
-        self.hvac_client.secrets.kv.v2.create_or_update_secret(path=self.vault_secret_path, secret=dict(ciphertext=key))
-
-    def retrive_key_from_vault(self):
-        read_secret_response = self.hvac_client.secrets.kv.v2.read_secret_version(path=self.vault_secret_path)
-        ciphertext = read_secret_response['data']['data']['ciphertext']
-        return ciphertext
-
-    def decrypt_key(self, ciphertext):
-        decrypt_data_response = self.hvac_client.secrets.transit.decrypt_data(name=self._dataset_name, ciphertext=ciphertext,)
-        return b64decode(decrypt_data_response['data']['plaintext'].encode())
+            with open(self._key_filename, 'wb') as f:
+                f.write(self._key)
 
     # get relative path of all files in the input dir
     # return relative paths of all files and subdirs in the dir
@@ -203,7 +189,11 @@ if __name__ == "__main__":
     if sys.version_info[0] < 3:
         raise Exception("Python 3 is required to run the local client.")
     arguments = docopt(__doc__, version=__version__)
-    encryptor = Cryptor(arguments)
+    if arguments["--hvac"]:
+        vault_client = VaultClient(arguments["--hvac"])
+    else:
+        vault_client = None
+    encryptor = Cryptor(arguments, vault_client)
     if arguments["--encrypt"]:
         encryptor.encrypt()
     elif arguments["--decrypt"]:
