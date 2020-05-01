@@ -152,7 +152,6 @@ class Cryptor():
         self.hvac_client.secrets.kv.v2.create_or_update_secret(path=self.vault_secret_path, secret=dict(ciphertext=key))
 
     def retrive_key_from_vault(self):
-        print (self.vault_secret_path)
         read_secret_response = self.hvac_client.secrets.kv.v2.read_secret_version(path=self.vault_secret_path)
         ciphertext = read_secret_response['data']['data']['ciphertext']
         return ciphertext
