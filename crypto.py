@@ -12,7 +12,7 @@ Options:
     -i <input_path>, --input <input_path>
     -o <output_path>, --output <output_path> 
     -k <key_path>, --key <key_path>
-    --hvac <vault_addr> using hashicorp vaults
+    --hvac <vault_addr> using hashicorp vault for key generation and storage
 """
 from docopt import docopt
 import sys
