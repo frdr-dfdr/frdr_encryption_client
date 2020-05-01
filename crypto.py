@@ -39,14 +39,13 @@ EXCLUDED_FILES = [".*",
                   "~$*", 
                   "NULLEXT"]
 
-class Cryptor():
-    def __init__(self, arguments, name, input_path, output_path=None, key_filename=None, password=None):
+class Cryptor(object):
+    def __init__(self, arguments):
         self._arguments = arguments
-        self._dataset_name = name
-        self._input = input_path
-        self._output = output_path
-        # TODO: set key using password
-        self.password = password
+        self._dataset_name = self._arguments["--name"]
+        self._input = self._arguments["--input"]
+        self._output = self._arguments["--output"]
+        self._key_filename = self._arguments["--key"]
         if self._arguments["--hvac"]:
             self.hvac_client = hvac.Client(url=self._arguments["--hvac"])
             self.vault_secret_path = os.path.join(SECRET_BASE_DIR, self._dataset_name)
@@ -54,7 +53,7 @@ class Cryptor():
                 self.hvac_client.sys.enable_secrets_engine(backend_type='transit')
             except:
                 pass
-        self.set_key(key_filename)
+        self.set_key()
         self.box = nacl.secret.SecretBox(self.key)
 
     def encrypt(self):
@@ -115,8 +114,8 @@ class Cryptor():
             with open(decrypted_filename, 'wb') as f:
                 f.write(decrypted)
     
-    def set_key(self, key_filename):
-        if key_filename is None:
+    def set_key(self):
+        if self._key_filename is None:
             self._key_filename = "{}_key.pem".format(self._input)
             if self._arguments["--encrypt"]:
                 self._key = None
@@ -127,8 +126,7 @@ class Cryptor():
                 #TODO: raise ERROR
                 pass
         else:
-            self._key_filename = key_filename
-            with open(key_filename, "rb") as f:
+            with open(self._key_filename, "rb") as f:
                 self._key = f.read()
 
     @property
@@ -205,11 +203,7 @@ if __name__ == "__main__":
     if sys.version_info[0] < 3:
         raise Exception("Python 3 is required to run the local client.")
     arguments = docopt(__doc__, version=__version__)
-    name = arguments["--name"]
-    input_path = arguments["--input"]
-    output_path = arguments["--output"]
-    key_path = arguments["--key"]
-    encryptor = Cryptor(arguments, name, input_path, output_path, key_path)
+    encryptor = Cryptor(arguments)
     if arguments["--encrypt"]:
         encryptor.encrypt()
     elif arguments["--decrypt"]:
