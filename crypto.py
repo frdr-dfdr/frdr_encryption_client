@@ -134,7 +134,7 @@ class Cryptor(object):
         return self._key
     def generate_key(self):
         if self._arguments["--hvac"]:
-            self.hvac_client.create_transit_engine_key(name=self._dataset_name)
+            self.hvac_client.create_transit_engine_key_ring(name=self._dataset_name)
             key_plaintext, key_ciphertext = self.hvac_client.generate_data_key(name=self._dataset_name)
             self._key = base64_to_byte(key_plaintext)
             self.hvac_client.save_key_to_vault(path=self.vault_secret_path, key=key_ciphertext)

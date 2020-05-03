@@ -21,7 +21,7 @@ class VaultClient(object):
             self.hvac_client.sys.enable_secrets_engine(backend_type='transit')
         except hvac.exceptions.InvalidRequest as e:
             pass
-    def create_transit_engine_key(self, name):
+    def create_transit_engine_key_ring(self, name):
         self.hvac_client.secrets.transit.create_key(name=name)
 
     def generate_data_key(self, name, key_type="plaintext"):
