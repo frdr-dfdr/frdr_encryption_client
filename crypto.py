@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [-k <key_path>] [--hvac <vault_addr>]
+    crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [--hvac <vault_addr>]
     crypto.py -d -n <dataset_name> -i <input_path> [-k <key_path> | --hvac <vault_addr>] [-o <output_path>]     
 
 Options:
@@ -22,6 +22,7 @@ import os
 from util.helper import make_dir, base64_to_byte
 import hvac
 from util.VaultClient import VaultClient
+from util.KeyGenerator import KeyManagementLocal, KeyManagementVault
 
 version = '0.0.1'
 __version__ = version
@@ -40,18 +41,24 @@ EXCLUDED_FILES = [".*",
                   "NULLEXT"]
 
 class Cryptor(object):
-    def __init__(self, arguments, hvac_client=None):
+    def __init__(self, arguments, key_manager, hvac_client=None):
         self._arguments = arguments
-        self._dataset_name = self._arguments["--name"]
+        self._key_manager = key_manager
+        self._dataset_name = self._arguments["--name"] # also used for vault transit secret engine key ring name
         self._input = self._arguments["--input"]
         self._output = self._arguments["--output"]
-        self._key_filename = self._arguments["--key"]
         if self._arguments["--hvac"]:
-            self.hvac_client = hvac_client
-            self.hvac_client.enable_transit_engine()
-            self.vault_secret_path = os.path.join(SECRET_BASE_DIR, self._dataset_name)
-        self.set_key()
-        self.box = nacl.secret.SecretBox(self.key)
+            self._secret_path = os.path.join(SECRET_BASE_DIR, self._dataset_name)
+        else:
+            self._secret_path = "{}_key.pem".format(self._dataset_name)
+        if self._arguments["--encrypt"]:
+            self._key_manager.generate_key()
+        elif self._arguments["--decrypt"]:
+            self._key_manager.read_key(self._secret_path)
+        else:
+            # raise error
+            pass
+        self.box = nacl.secret.SecretBox(self._key_manager.key)
 
     def encrypt(self):
         # encrypt each file in the dirname
@@ -64,6 +71,8 @@ class Cryptor(object):
                 self._encrypt_file(each_file)
         else:
             self._encrypt_file(self._input)
+        # save key
+        self._key_manager.save_key(self._secret_path)
 
     def decrypt(self):
         if self._output is None:
@@ -74,7 +83,7 @@ class Cryptor(object):
             for each_file in all_files:
                 self._decrypt_file(each_file)
         else:
-            self._decrypt_file(self._input)
+            self._decrypt_file(self._input)   
         
     def _encrypt_file(self, filename):
         if self._file_excluded(filename, EXCLUDED_FILES):
@@ -111,38 +120,6 @@ class Cryptor(object):
             with open(decrypted_filename, 'wb') as f:
                 f.write(decrypted)
     
-    def set_key(self):
-        if self._key_filename is None:
-            self._key_filename = "{}_key.pem".format(self._input)
-            if self._arguments["--encrypt"]:
-                self._key = None
-            elif self._arguments["--decrypt"]:
-                key_ciphertext = self.hvac_client.retrive_key_from_vault(path=self.vault_secret_path)
-                key_plaintext = self.hvac_client.decrypt_key(name=self._dataset_name, ciphertext=key_ciphertext)
-                self._key = base64_to_byte(key_plaintext)
-            else:
-                #TODO: raise ERROR
-                pass
-        else:
-            with open(self._key_filename, "rb") as f:
-                self._key = f.read()
-
-    @property
-    def key(self):
-        if self._key is None:
-            self.generate_key()
-        return self._key
-    def generate_key(self):
-        if self._arguments["--hvac"]:
-            self.hvac_client.create_transit_engine_key_ring(name=self._dataset_name)
-            key_plaintext, key_ciphertext = self.hvac_client.generate_data_key(name=self._dataset_name)
-            self._key = base64_to_byte(key_plaintext)
-            self.hvac_client.save_key_to_vault(path=self.vault_secret_path, key=key_ciphertext)
-        else:
-            #TODO: put writing to local file in a new class 
-            self._key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
-            with open(self._key_filename, 'wb') as f:
-                f.write(self._key)
 
     # get relative path of all files in the input dir
     # return relative paths of all files and subdirs in the dir
@@ -183,17 +160,16 @@ class Cryptor(object):
         return False 
 
 
-
-
 if __name__ == "__main__":
     if sys.version_info[0] < 3:
         raise Exception("Python 3 is required to run the local client.")
     arguments = docopt(__doc__, version=__version__)
     if arguments["--hvac"]:
         vault_client = VaultClient(arguments["--hvac"])
+        key_manager = KeyManagementVault(vault_client, arguments["--name"])
     else:
-        vault_client = None
-    encryptor = Cryptor(arguments, vault_client)
+        key_manager = KeyManagementLocal()
+    encryptor = Cryptor(arguments, key_manager)
     if arguments["--encrypt"]:
         encryptor.encrypt()
     elif arguments["--decrypt"]:
