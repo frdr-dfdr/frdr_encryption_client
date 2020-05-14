@@ -83,7 +83,7 @@ Write a secret to bob's secret path. He is the only user having access to it.
 ```sh
 vault kv put user-kv/bob_smith/dataset1 secret="12344567890"
 ```
-Log in as "alice", and try to read secret on path `user-kv/bob_smith/dataset1/secret`
+Log in as "alice", and try to read secret on path `user-kv/bob_smith/dataset1`
 ```sh
 vault login -method=userpass username="alice" password="training"
 vault kv get user-kv/bob_smith/dataset1
@@ -92,7 +92,7 @@ We can see from the output that "alice" does not have permission to the secret.
 ```
 Error reading user-kv/data/bob_smith/dataset1: Error making API request.
 
-URL: GET http://127.0.0.1:8200/v1/user-kv/data/bob_smith/dataset1/secret
+URL: GET http://127.0.0.1:8200/v1/user-kv/data/bob_smith/dataset1
 Code: 403. Errors:
 
 * 1 error occurred:
@@ -110,10 +110,6 @@ path "user-kv/data/bob_smith/dataset1" {
 bob-dataset1-admin-policy.hcl
 ```yaml
 # For Web UI usage
-path "group-kv/metadata" {
-  capabilities = ["list"]
-}
-
 path "identity/group/id" {
   capabilities = [ "list" ]
 }
@@ -137,7 +133,8 @@ vault write -format=json identity/group name="bob_dataset1_secret_share_group" p
 Now Bob is ready to add Alice to his `bob_dataset1_secret_share_group`.
 ```sh
 vault write identity/group/id/<bob_dataset1_secret_share_group id> \
-      member_entity_ids=<bob_smith_entity_id> member_entity_ids=<alice_smith_entity_id>"
+      member_entity_ids=<bob_smith_entity_id> \
+      member_entity_ids=<alice_smith_entity_id>"
 ```
 Log in as "alice", and try to read secret on path `user-kv/bob_smith/dataset1/secret`
 ```sh
