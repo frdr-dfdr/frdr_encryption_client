@@ -28,6 +28,7 @@ Retrieve the userpass mount accessor and save it in a file named `accessor.txt`.
 vault auth list -format=json | jq -r '.["userpass/"].accessor' > accessor.txt
 ```
 Create a new policy called `frdr-user`, which will be attached to the testing users.
+
 frdr-user.hcl
 ```yaml
 # Grant permissions on user specific path
@@ -62,12 +63,12 @@ Create new entities `bob_smith` and `alice_smith` for testing. "bob" and "alice"
 
 ```sh
 # Create a bob_smith entity and save the identity ID in the entity_id.txt.
-vault write -format=json identity/entity name="bob_smith" policies="frdr-user" | jq -r ".data.id" > entity_id.txt
+vault write -format=json identity/entity name="bob_smith" policies="frdr-user" | jq -r ".data.id" > bob_entity_id.txt
 # Add an entity alias for the bob_smith entity.
-vault write identity/entity-alias name="bob" canonical_id=$(cat entity_id.txt) mount_accessor=$(cat accessor.txt)
+vault write identity/entity-alias name="bob" canonical_id=$(cat bob_entity_id.txt) mount_accessor=$(cat accessor.txt)
 
-vault write -format=json identity/entity name="alice_smith" policies="frdr-user" | jq -r ".data.id" > entity_id.txt
-vault write identity/entity-alias name="alice" canonical_id=$(cat entity_id.txt) mount_accessor=$(cat accessor.txt)
+vault write -format=json identity/entity name="alice_smith" policies="frdr-user" | jq -r ".data.id" > alice_entity_id.txt
+vault write identity/entity-alias name="alice" canonical_id=$(cat alice_entity_id.txt) mount_accessor=$(cat accessor.txt)
 ```
 
 ## Test on Creating Groups and Adding memebers to Share Secrets
@@ -119,6 +120,10 @@ path "identity/group/id/{{identity.groups.names.bob_dataset1_secret_share_group.
   capabilities = [ "update", "read", "create", "delete", "list" ]
 }
 ```
+Log in as bob
+```sh
+vault login -method=userpass username="bob" password="training"
+```
 Depoly policies
 ```sh
 vault policy write bob-dataset1-share-policy bob-dataset1-share-policy.hcl
@@ -158,7 +163,7 @@ secret    12344567890
 
 ```
 
-## Creating Group Bug Reproduce Commands
+## Creating Group Bug Reproduce Commands (Ignore this for the demo)
 There is a bug we noticed on Vault. Here are how we can reproduce it.
 ```sh
 # login as bob
