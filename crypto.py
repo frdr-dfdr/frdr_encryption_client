@@ -23,6 +23,7 @@ from util.helper import make_dir, base64_to_byte
 import hvac
 from util.VaultClient import VaultClient
 from util.KeyGenerator import KeyManagementLocal, KeyManagementVault
+from appdirs import AppDirs
 
 version = '0.0.1'
 __version__ = version
@@ -39,6 +40,12 @@ EXCLUDED_FILES = [".*",
                   "*~", 
                   "~$*", 
                   "NULLEXT"]
+app_name = "frdr-crypto"
+app_author = "Compute Canada"
+dirs = AppDirs(app_name, app_author)
+os.makedirs(dirs.user_data_dir, exist_ok=True)
+tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
+
 
 class Cryptor(object):
     def __init__(self, arguments, key_manager, hvac_client=None):
@@ -165,7 +172,7 @@ if __name__ == "__main__":
         raise Exception("Python 3 is required to run the local client.")
     arguments = docopt(__doc__, version=__version__)
     if arguments["--hvac"]:
-        vault_client = VaultClient(arguments["--hvac"])
+        vault_client = VaultClient(arguments["--hvac"], tokenfile)
         key_manager = KeyManagementVault(vault_client, arguments["--name"])
     else:
         key_manager = KeyManagementLocal()

@@ -1,9 +1,12 @@
 import hvac
+import json
+import os
 class VaultClient(object):
-    def __init__(self, vault_addr, vault_token=None):
+    def __init__(self, vault_addr, tokenfile):
         # TODO: change to vault token path
         self._vault_addr = vault_addr
-        self._vault_token = vault_token
+        self._tokenfile = tokenfile
+        self._vault_token = None
         try:
             self.hvac_client = hvac.Client(
                 url=self._vault_addr, 
@@ -15,7 +18,23 @@ class VaultClient(object):
             # TODO: log error
             pass
         #TODO: log connected to vault successfully
-    
+
+    def login(self, username, password, auth_method):
+        if auth_method == "userpass":
+            pass
+    def load_token_from_file(self):
+        if os.path.exists(self._tokenfile):
+            with open(self._tokenfile) as f:
+                self._vault_token = json.load(f)
+            if self._vault_token.get("access"):
+                return True
+        return None
+    def write_token_to_file(self, authfile = None):
+        if not authfile:
+            authfile = self._tokenfile
+        with open(authfile, 'w') as f:
+            json.dump(self._vault_token, f)   
+   
     def enable_transit_engine(self):
         try:
             self.hvac_client.sys.enable_secrets_engine(backend_type='transit')
@@ -30,7 +49,7 @@ class VaultClient(object):
         key_ciphertext = gen_key_response['data']['ciphertext']
         return (key_plaintext, key_ciphertext)
 
-    def decrypt_key(self, name, ciphertext):
+    def decrypt_data_key(self, name, ciphertext):
         decrypt_data_response = self.hvac_client.secrets.transit.decrypt_data(name=name, ciphertext=ciphertext,)
         key_plaintext = decrypt_data_response['data']['plaintext']
         return key_plaintext
