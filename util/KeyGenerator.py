@@ -31,8 +31,11 @@ class KeyManagementVault(object):
         self._key_ciphertext = None
 
     def generate_key(self):
-        self._hvac_client.enable_transit_engine()
+        # enable transit engine should be done by vault admin
+        # self._hvac_client.enable_transit_engine()
+        # added create encryption key permission for frdr-user policy
         self._hvac_client.create_transit_engine_key_ring(self._key_ring_name)
+        # added generate data key permission for frdr-user policy
         key_plaintext, key_ciphertext = self._hvac_client.generate_data_key(self._key_ring_name)
         self._key = base64_to_byte(key_plaintext)
         self._key_ciphertext = key_ciphertext
@@ -42,8 +45,12 @@ class KeyManagementVault(object):
 
     def read_key(self, path):
         key_ciphertext = self._hvac_client.retrive_key_from_vault(path)
+         # added decrypt data permission for frdr-user policy
         key_plaintext = self._hvac_client.decrypt_data_key(self._key_ring_name, key_ciphertext)
         self._key = base64_to_byte(key_plaintext)
+
+    def get_vault_entity_id(self):
+        return self._hvac_client.entity_id
 
     @property
     def key(self):

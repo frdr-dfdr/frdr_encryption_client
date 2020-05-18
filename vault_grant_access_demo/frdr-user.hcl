@@ -17,3 +17,13 @@ path "identity/group" {
 path "sys/policies/acl/*" {
   capabilities = [ "create", "read", "update", "delete", "list" ]
 }
+
+# Create encryption key
+path "transit/keys/*" {
+  capabilities = [ "create", "read", "update", "list" ]
+}
+
+# Decrypt data
+path "transit/decrypt/*" {
+  capabilities = [ "create", "read", "update", "list" ]
+}

@@ -2,15 +2,19 @@ import hvac
 import json
 import os
 class VaultClient(object):
-    def __init__(self, vault_addr, tokenfile):
+    def __init__(self, vault_addr, vault_username, vault_passowrd, tokenfile):
         # TODO: change to vault token path
         self._vault_addr = vault_addr
         self._tokenfile = tokenfile
+        self._username = vault_username
+        self._password = vault_passowrd
+        self._vault_auth = None
         self._vault_token = None
+        self._entity_id = None
         try:
             self.hvac_client = hvac.Client(
                 url=self._vault_addr, 
-                token=self._vault_token
+                token=self.vault_token
                 )
             assert self.hvac_client.is_authenticated(), \
                    'Failed to authenticate with Vault, please check your Vault server URL and Vault token!'
@@ -19,27 +23,41 @@ class VaultClient(object):
             pass
         #TODO: log connected to vault successfully
 
-    def login(self, username, password, auth_method):
+    def login(self, username, password, auth_method="userpass"):
+        if username is None or password is None:
+            print("Unable to load auth tokens from file, while username and password also not supplied")
+            return "Error: You need to obtain a login token with your username and password the first time you use the app."
+        self.hvac_client = hvac.Client(url=self._vault_addr)
         if auth_method == "userpass":
-            pass
-    def load_token_from_file(self):
+            try:
+                response = self.hvac_client.auth.userpass.login(username, password)
+                self._vault_auth = response["auth"]
+                if self._tokenfile:
+                    self.write_auth_to_file()
+                # TODO: undetermined
+                return True
+            except:
+                #TODO, return False or raise error
+                raise
+        
+    def load_auth_from_file(self):
         if os.path.exists(self._tokenfile):
             with open(self._tokenfile) as f:
-                self._vault_token = json.load(f)
-            if self._vault_token.get("access"):
+                self._vault_auth = json.load(f)
+            if self._vault_auth.get("client_token"):
                 return True
         return None
-    def write_token_to_file(self, authfile = None):
-        if not authfile:
-            authfile = self._tokenfile
-        with open(authfile, 'w') as f:
-            json.dump(self._vault_token, f)   
+    
+    def write_auth_to_file(self):
+        with open(self._tokenfile, 'w') as f:
+            json.dump(self._vault_auth, f)   
    
     def enable_transit_engine(self):
         try:
             self.hvac_client.sys.enable_secrets_engine(backend_type='transit')
         except hvac.exceptions.InvalidRequest as e:
             pass
+
     def create_transit_engine_key_ring(self, name):
         self.hvac_client.secrets.transit.create_key(name=name)
 
@@ -61,3 +79,25 @@ class VaultClient(object):
         read_secret_response = self.hvac_client.secrets.kv.v2.read_secret_version(path=path)
         key_ciphertext = read_secret_response['data']['data']['ciphertext']
         return key_ciphertext
+    
+    @property
+    def vault_auth(self):
+        if self._vault_auth is None:
+            if self.load_auth_from_file():
+                print("Token loaded from file")
+            else:
+                self.login(self._username, self._password)
+        return self._vault_auth
+
+
+    @property
+    def vault_token(self):
+        if self._vault_token is None:
+            self._vault_token = self.vault_auth["client_token"]
+        return self._vault_token
+
+    @property
+    def entity_id(self):
+        if self._entity_id is None:
+            self._entity_id = self.vault_auth["entity_id"]
+        return self._entity_id

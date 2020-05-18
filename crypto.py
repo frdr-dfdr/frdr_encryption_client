@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [--hvac <vault_addr>]
+    crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [--hvac <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--logout]
     crypto.py -d -n <dataset_name> -i <input_path> [-k <key_path> | --hvac <vault_addr>] [-o <output_path>]     
 
 Options:
@@ -13,6 +13,9 @@ Options:
     -o <output_path>, --output <output_path> 
     -k <key_path>, --key <key_path>
     --hvac <vault_addr> using hashicorp vault for key generation and storage
+    -u <vault_username>, --username <vault_username>
+    -p <vault_password>, --password <vault_password>
+    --logout  Remove old vault tokens
 """
 from docopt import docopt
 import sys
@@ -27,7 +30,6 @@ from appdirs import AppDirs
 
 version = '0.0.1'
 __version__ = version
-SECRET_BASE_DIR = "frdr"
 EXCLUDED_FILES = [".*", 
                   "Thumbs.db", 
                   ".DS_Store", 
@@ -48,14 +50,14 @@ tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
 
 class Cryptor(object):
-    def __init__(self, arguments, key_manager, hvac_client=None):
+    def __init__(self, arguments, key_manager):
         self._arguments = arguments
         self._key_manager = key_manager
         self._dataset_name = self._arguments["--name"] # also used for vault transit secret engine key ring name
         self._input = self._arguments["--input"]
         self._output = self._arguments["--output"]
         if self._arguments["--hvac"]:
-            self._secret_path = os.path.join(SECRET_BASE_DIR, self._dataset_name)
+            self._secret_path = os.path.join(self._key_manager.get_vault_entity_id(), self._dataset_name)
         else:
             self._secret_path = "{}_key.pem".format(self._dataset_name)
         if self._arguments["--encrypt"]:
@@ -171,8 +173,15 @@ if __name__ == "__main__":
     if sys.version_info[0] < 3:
         raise Exception("Python 3 is required to run the local client.")
     arguments = docopt(__doc__, version=__version__)
+    if arguments['--logout']:
+        try:
+            os.remove(tokenfile)
+        except:
+            pass
+        print("Removed old auth tokens. Exiting.")
+        sys.exit()
     if arguments["--hvac"]:
-        vault_client = VaultClient(arguments["--hvac"], tokenfile)
+        vault_client = VaultClient(arguments["--hvac"], arguments["--username"], arguments["--password"], tokenfile)
         key_manager = KeyManagementVault(vault_client, arguments["--name"])
     else:
         key_manager = KeyManagementLocal()
