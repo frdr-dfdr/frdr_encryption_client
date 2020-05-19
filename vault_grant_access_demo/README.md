@@ -42,7 +42,7 @@ path "user-kv/metadata" {
 }
 
 # Create groups
-path "identity/group" {
+path "identity/group/name/{{identity.entity.name}}_*" {
   capabilities = [ "create", "update", "read", "delete", "list" ]
 }
 
@@ -99,25 +99,13 @@ Code: 403. Errors:
 * 1 error occurred:
 	* permission denied
 ```
-To share the secret of dataset1, Bob (or Admin, as it seems unsafe for frdr users to create policies) will create two policies and two groups . 
+To share the secret of dataset1, Bob will create a group to share the secret. The policy of this group will be created with root or admin token on the vault server, not by the user.  
  
 bob-dataset1-share-policy.hcl
 ```yaml
 # path in <user_uuid>/<dataset_uuid> format
 path "user-kv/data/bob_smith/dataset1" {
     capabilities = [ "read", "list" ]
-}
-```
-bob-dataset1-admin-policy.hcl
-```yaml
-# For Web UI usage
-path "identity/group/id" {
-  capabilities = [ "list" ]
-}
-
-# Group member can update the group information
-path "identity/group/id/{{identity.groups.names.bob_dataset1_secret_share_group.id}}" {
-  capabilities = [ "update", "read", "create", "delete", "list" ]
 }
 ```
 Log in as bob
@@ -127,19 +115,15 @@ vault login -method=userpass username="bob" password="training"
 Depoly policies
 ```sh
 vault policy write bob-dataset1-share-policy bob-dataset1-share-policy.hcl
-vault policy write bob-dataset1-admin-policy bob-dataset1-admin-policy.hcl
 ```
 
 Create groups
 ```sh
-vault write -format=json identity/group name="bob_dataset1_secret_admin_group" policies="bob-dataset1-admin-policy" member_entity_ids=<bob_smith_entity_id>
-vault write -format=json identity/group name="bob_dataset1_secret_share_group" policies="bob-dataset1-share-policy" member_entity_ids=<bob_smith_entity_id>
+vault write -format=json identity/group/name/bob_smith_dataset1_secret_share_group policies="bob-dataset1-share-policy"
 ```
-Now Bob is ready to add Alice to his `bob_dataset1_secret_share_group`.
+Now Bob is ready to add Alice to his `bob_smith_dataset1_secret_share_group`.
 ```sh
-vault write identity/group/id/<bob_dataset1_secret_share_group id> \
-      member_entity_ids=<bob_smith_entity_id> \
-      member_entity_ids=<alice_smith_entity_id>"
+vault write identity/group/name/bob_smith_dataset1_secret_share_group member_entity_ids=<alice_smith_entity_id>
 ```
 Log in as "alice", and try to read secret on path `user-kv/bob_smith/dataset1/secret`
 ```sh

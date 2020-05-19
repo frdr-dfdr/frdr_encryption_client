@@ -8,8 +8,7 @@ path "user-kv/metadata" {
   capabilities = ["list"]
 }
 
-# Create groups
-path "identity/group" {
+path "identity/group/name/{{identity.entity.name}}_*" {
   capabilities = [ "create", "update", "read", "delete", "list" ]
 }
 
