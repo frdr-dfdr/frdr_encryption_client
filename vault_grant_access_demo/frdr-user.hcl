@@ -1,28 +1,19 @@
 # Grant permissions on user specific path
-path "user-kv/data/{{identity.entity.name}}/*" {
+path "secret/data/{{identity.entity.name}}/*" {
     capabilities = [ "create", "update", "read", "delete", "list" ]
 }
 
-# For Web UI usage
-path "user-kv/metadata" {
-  capabilities = ["list"]
-}
-
+# Create and manage groups
 path "identity/group/name/{{identity.entity.name}}_*" {
-  capabilities = [ "create", "update", "read", "delete", "list" ]
+    capabilities = [ "create", "update", "read", "delete", "list" ]
 }
 
 # Create and manage policies
-path "sys/policies/acl/*" {
-  capabilities = [ "create", "read", "update", "delete", "list" ]
+path "sys/policy/{{identity.entity.name}}_*" {
+    capabilities = [ "create", "read", "update", "delete", "list" ]
 }
 
-# Create encryption key
-path "transit/keys/*" {
-  capabilities = [ "create", "read", "update", "list" ]
-}
-
-# Decrypt data
-path "transit/decrypt/*" {
-  capabilities = [ "create", "read", "update", "list" ]
+# Just use this for demo using CLI commands
+path "sys/policies/acl/{{identity.entity.name}}_*" {
+    capabilities = [ "create", "read", "update", "delete", "list" ] 
 }

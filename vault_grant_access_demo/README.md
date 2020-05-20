@@ -32,22 +32,17 @@ Create a new policy called `frdr-user`, which will be attached to the testing us
 frdr-user.hcl
 ```yaml
 # Grant permissions on user specific path
-path "user-kv/data/{{identity.entity.name}}/*" {
-  capabilities = [ "create", "update", "read", "delete", "list" ]
+path "secret/data/{{identity.entity.name}}/*" {
+    capabilities = [ "create", "update", "read", "delete", "list" ]
 }
 
-# For Web UI usage
-path "user-kv/metadata" {
-  capabilities = ["list"]
-}
-
-# Create groups
+# Create and manage groups
 path "identity/group/name/{{identity.entity.name}}_*" {
   capabilities = [ "create", "update", "read", "delete", "list" ]
 }
 
 # Create and manage policies
-path "sys/policies/acl/*" {
+path "sys/policy/{{identity.entity.name}}_*" {
   capabilities = [ "create", "read", "update", "delete", "list" ]
 }
 ```
@@ -72,28 +67,26 @@ vault write identity/entity-alias name="alice" canonical_id=$(cat alice_entity_i
 ```
 
 ## Test on Creating Groups and Adding memebers to Share Secrets
-Enable key/value v2 secrets engine at path `user-kv`.
-```sh
-vault secrets enable -path=user-kv kv-v2
-```
+A key/value v2 secrets engine at path `secret` has been enabled when starting the server in dev mode.
+
 Log in as bob
 ```sh
 vault login -method=userpass username="bob" password="training"
 ```
 Write a secret to bob's secret path. He is the only user having access to it.
 ```sh
-vault kv put user-kv/bob_smith/dataset1 secret="12344567890"
+vault kv put secret/bob_smith/dataset1 secret="12344567890"
 ```
-Log in as "alice", and try to read secret on path `user-kv/bob_smith/dataset1`
+Log in as "alice", and try to read secret on path `secret/bob_smith/dataset1`
 ```sh
 vault login -method=userpass username="alice" password="training"
-vault kv get user-kv/bob_smith/dataset1
+vault kv get secret/bob_smith/dataset1
 ```
 We can see from the output that "alice" does not have permission to the secret.
 ```
-Error reading user-kv/data/bob_smith/dataset1: Error making API request.
+Error reading secret/data/bob_smith/dataset1: Error making API request.
 
-URL: GET http://127.0.0.1:8200/v1/user-kv/data/bob_smith/dataset1
+URL: GET http://127.0.0.1:8200/v1/secret/data/bob_smith/dataset1
 Code: 403. Errors:
 
 * 1 error occurred:
@@ -104,7 +97,7 @@ To share the secret of dataset1, Bob will create a group to share the secret. Th
 bob-dataset1-share-policy.hcl
 ```yaml
 # path in <user_uuid>/<dataset_uuid> format
-path "user-kv/data/bob_smith/dataset1" {
+path "secret/data/bob_smith/dataset1" {
     capabilities = [ "read", "list" ]
 }
 ```
@@ -114,21 +107,21 @@ vault login -method=userpass username="bob" password="training"
 ```
 Depoly policies
 ```sh
-vault policy write bob-dataset1-share-policy bob-dataset1-share-policy.hcl
+vault policy write bob_smith_dataset1_share_policy bob-dataset1-share-policy.hcl
 ```
 
 Create groups
 ```sh
-vault write -format=json identity/group/name/bob_smith_dataset1_secret_share_group policies="bob-dataset1-share-policy"
+vault write -format=json identity/group/name/bob_smith_dataset1_secret_share_group policies="bob_smith_dataset1_share_policy"
 ```
 Now Bob is ready to add Alice to his `bob_smith_dataset1_secret_share_group`.
 ```sh
 vault write identity/group/name/bob_smith_dataset1_secret_share_group member_entity_ids=<alice_smith_entity_id>
 ```
-Log in as "alice", and try to read secret on path `user-kv/bob_smith/dataset1/secret`
+Log in as "alice", and try to read secret on path `secret/bob_smith/dataset1/secret`
 ```sh
 vault login -method=userpass username="alice" password="training"
-vault kv get user-kv/bob_smith/dataset1
+vault kv get secret/bob_smith/dataset1
 ```
 We can get the secret vaule from the output. 
 ```sh
