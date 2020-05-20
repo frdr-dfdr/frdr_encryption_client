@@ -2,7 +2,7 @@ import hvac
 import json
 import os
 class VaultClient(object):
-    def __init__(self, vault_addr, vault_username, vault_passowrd, tokenfile):
+    def __init__(self, vault_addr, vault_username=None, vault_passowrd=None, tokenfile=None):
         # TODO: change to vault token path
         self._vault_addr = vault_addr
         self._tokenfile = tokenfile
@@ -79,6 +79,24 @@ class VaultClient(object):
         read_secret_response = self.hvac_client.secrets.kv.v2.read_secret_version(path=path)
         key_ciphertext = read_secret_response['data']['data']['ciphertext']
         return key_ciphertext
+
+    def create_policy(self, policy_name, policy_string):
+        #TODO: reponse is 204 (empty body), raise error if not 
+        respone = self.hvac_client.sys.create_or_update_policy(name=policy_name, policy=policy_string,)
+        if respone.status_code != 204:
+            return False
+        else:
+            return True
+
+    def create_or_update_group_by_name(self, group_name, policy_name=None, member_entity_ids=None):
+        return self.hvac_client.secrets.identity.create_or_update_group_by_name(
+            name=group_name,
+            group_type="internal",
+            policies=policy_name,
+            member_entity_ids=member_entity_ids,
+        )
+    def read_group_by_name(self, group_name):
+        return self.hvac_client.secrets.identity.read_group_by_name(group_name)
     
     @property
     def vault_auth(self):
