@@ -10,7 +10,7 @@ class AccessGranter(object):
         self._add_member_to_group(group_name, requester_entity_id)
         
     def _create_share_policy(self, dataset_id):
-        policy_string = f="""
+        policy_string = """
             path "secret/data/{user_entity_id}/{dataset_id}" {{
                 capabilities = [ "read", "list", "delete"]
             }}
