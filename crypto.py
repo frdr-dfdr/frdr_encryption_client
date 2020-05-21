@@ -182,6 +182,7 @@ if __name__ == "__main__":
         sys.exit()
     if arguments["--hvac"]:
         vault_client = VaultClient(arguments["--hvac"], arguments["--username"], arguments["--password"], tokenfile)
+        #TODO: use dataset uuid instead of name
         key_manager = KeyManagementVault(vault_client, arguments["--name"])
     else:
         key_manager = KeyManagementLocal()
