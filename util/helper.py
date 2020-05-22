@@ -10,3 +10,9 @@ def make_dir(dir_name):
 
 def base64_to_byte(plaintext):
     return b64decode(plaintext.encode())
+
+def clean_dir_path(path):
+    if path.endswith(os.sep):
+        return path[:-1]
+    else:
+        return path

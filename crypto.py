@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [--hvac <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--logout]
-    crypto.py -d -n <dataset_name> -i <input_path> [-k <key_path> | --hvac <vault_addr>] [-o <output_path>]     
+    crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [--hvac <vault_addr>] [--username <vault_username>] [--password <vault_password>]
+    crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --hvac <vault_addr> --username <vault_username> --password <vault_password> --url <API_path>)
+    crypto.py --logout_vault
 
 Options:
     -e --encrypt           encrypt
@@ -15,14 +16,15 @@ Options:
     --hvac <vault_addr> using hashicorp vault for key generation and storage
     -u <vault_username>, --username <vault_username>
     -p <vault_password>, --password <vault_password>
-    --logout  Remove old vault tokens
+    --logout_vault  Remove old vault tokens
+    --url <API_path>  API Path to fetch secret on vault
 """
 from docopt import docopt
 import sys
 import nacl.utils
 import nacl.secret
 import os
-from util.helper import make_dir, base64_to_byte
+from util.helper import make_dir, base64_to_byte, clean_dir_path
 import hvac
 from util.VaultClient import VaultClient
 from util.KeyGenerator import KeyManagementLocal, KeyManagementVault
@@ -53,16 +55,20 @@ class Cryptor(object):
     def __init__(self, arguments, key_manager):
         self._arguments = arguments
         self._key_manager = key_manager
-        self._dataset_name = self._arguments["--name"] # also used for vault transit secret engine key ring name
-        self._input = self._arguments["--input"]
+        self._input = clean_dir_path(self._arguments["--input"])
         self._output = self._arguments["--output"]
-        if self._arguments["--hvac"]:
-            self._secret_path = os.path.join(self._key_manager.get_vault_entity_id(), self._dataset_name)
-        else:
-            self._secret_path = "{}_key.pem".format(self._dataset_name)
         if self._arguments["--encrypt"]:
+            dataset_name = self._arguments["--name"]
+            if self._arguments["--hvac"]:
+                self._secret_path = os.path.join(self._key_manager.get_vault_entity_id(), dataset_name)
+            else:
+                self._secret_path = "{}_key.pem".format(dataset_name)
             self._key_manager.generate_key()
         elif self._arguments["--decrypt"]:
+            if self._arguments["--hvac"]:
+                self._secret_path = "/".join(arguments["--url"].split("/")[-2:])
+            else: 
+                self._secret_path = self._arguments["--key"]
             self._key_manager.read_key(self._secret_path)
         else:
             # raise error
@@ -173,7 +179,7 @@ if __name__ == "__main__":
     if sys.version_info[0] < 3:
         raise Exception("Python 3 is required to run the local client.")
     arguments = docopt(__doc__, version=__version__)
-    if arguments['--logout']:
+    if arguments['--logout_vault']:
         try:
             os.remove(tokenfile)
         except:
@@ -183,7 +189,10 @@ if __name__ == "__main__":
     if arguments["--hvac"]:
         vault_client = VaultClient(arguments["--hvac"], arguments["--username"], arguments["--password"], tokenfile)
         #TODO: use dataset uuid instead of name
-        key_manager = KeyManagementVault(vault_client, arguments["--name"])
+        dataset_name = arguments["--name"]
+        if dataset_name is None:
+            dataset_name = arguments["--url"].split("/")[-1]
+        key_manager = KeyManagementVault(vault_client, dataset_name)
     else:
         key_manager = KeyManagementLocal()
     encryptor = Cryptor(arguments, key_manager)
