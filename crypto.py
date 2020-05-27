@@ -89,6 +89,10 @@ class Cryptor(object):
         # save key
         self._key_manager.save_key(self._secret_path)
 
+        # create dataset access policy and group if they don't exist
+        if self._arguments["--hvac"]:
+            self._key_manager.create_access_policy_and_group()
+
     def decrypt(self):
         if self._output is None:
             self._output = self._input + '_decrypted'
