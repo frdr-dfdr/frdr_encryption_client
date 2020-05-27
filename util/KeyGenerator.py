@@ -25,32 +25,32 @@ class KeyManagementLocal(object):
 
 class KeyManagementVault(object):
     def __init__(self, vault_client, key_ring_name):
-        self._hvac_client = vault_client
-        self._key_ring_name = key_ring_name
+        self._vault_client = vault_client
+        self._key_ring_name = key_ring_name #key_ring_name is the dataset_id
         self._key = None
         self._key_ciphertext = None
 
     def generate_key(self):
         # enable transit engine should be done by vault admin
-        # self._hvac_client.enable_transit_engine()
+        # self._vault_client.enable_transit_engine()
         # added create encryption key permission for frdr-user policy
-        self._hvac_client.create_transit_engine_key_ring(self._key_ring_name)
+        self._vault_client.create_transit_engine_key_ring(self._key_ring_name)
         # added generate data key permission for frdr-user policy
-        key_plaintext, key_ciphertext = self._hvac_client.generate_data_key(self._key_ring_name)
+        key_plaintext, key_ciphertext = self._vault_client.generate_data_key(self._key_ring_name)
         self._key = base64_to_byte(key_plaintext)
         self._key_ciphertext = key_ciphertext
 
     def save_key(self, path):
-        self._hvac_client.save_key_to_vault(path, self._key_ciphertext)
+        self._vault_client.save_key_to_vault(path, self._key_ciphertext)
 
     def read_key(self, path):
-        key_ciphertext = self._hvac_client.retrive_key_from_vault(path)
+        key_ciphertext = self._vault_client.retrive_key_from_vault(path)
          # added decrypt data permission for frdr-user policy
-        key_plaintext = self._hvac_client.decrypt_data_key(self._key_ring_name, key_ciphertext)
+        key_plaintext = self._vault_client.decrypt_data_key(self._key_ring_name, key_ciphertext)
         self._key = base64_to_byte(key_plaintext)
 
     def get_vault_entity_id(self):
-        return self._hvac_client.entity_id
+        return self._vault_client.entity_id
 
     @property
     def key(self):
