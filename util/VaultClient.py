@@ -88,6 +88,9 @@ class VaultClient(object):
         else:
             return True
 
+    def read_policy(self, policy_name):
+        return self.hvac_client.sys.read_policy(policy_name)
+
     def create_or_update_group_by_name(self, group_name, policy_name=None, member_entity_ids=None):
         return self.hvac_client.secrets.identity.create_or_update_group_by_name(
             name=group_name,
