@@ -82,8 +82,8 @@ class VaultClient(object):
 
     def create_policy(self, policy_name, policy_string):
         #TODO: reponse is 204 (empty body), raise error if not 
-        respone = self.hvac_client.sys.create_or_update_policy(name=policy_name, policy=policy_string,)
-        if respone.status_code != 204:
+        response = self.hvac_client.sys.create_or_update_policy(name=policy_name, policy=policy_string,)
+        if response.status_code != 204:
             return False
         else:
             return True
