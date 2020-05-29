@@ -1,4 +1,4 @@
-from util.VaultClient import VaultClient
+from modules.VaultClient import VaultClient
 class AccessGranter(object):
     def __init__(self, vault_client):
         self._vault_client = vault_client

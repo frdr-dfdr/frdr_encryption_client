@@ -14,8 +14,8 @@ Options:
 import os
 from docopt import docopt
 from appdirs import AppDirs
-from util.AccessGranter import AccessGranter
-from util.VaultClient import VaultClient
+from modules.AccessGranter import AccessGranter
+from modules.VaultClient import VaultClient
 from util import constants
 
 # TODO: put this block somewhere else

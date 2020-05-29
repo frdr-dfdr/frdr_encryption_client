@@ -24,10 +24,10 @@ import sys
 import nacl.utils
 import nacl.secret
 import os
-from util.helper import make_dir, base64_to_byte, clean_dir_path
+from util.util import Util
 import hvac
-from util.VaultClient import VaultClient
-from util.KeyGenerator import KeyManagementLocal, KeyManagementVault
+from modules.VaultClient import VaultClient
+from modules.KeyGenerator import KeyManagementLocal, KeyManagementVault
 from appdirs import AppDirs
 
 version = '0.0.1'
@@ -55,7 +55,7 @@ class Cryptor(object):
     def __init__(self, arguments, key_manager):
         self._arguments = arguments
         self._key_manager = key_manager
-        self._input = clean_dir_path(self._arguments["--input"])
+        self._input = Util.clean_dir_path(self._arguments["--input"])
         self._output = self._arguments["--output"]
         if self._arguments["--encrypt"]:
             dataset_name = self._arguments["--name"]
@@ -159,9 +159,9 @@ class Cryptor(object):
         return all_files, all_subdirs
     
     def _create_output_dirs(self, dirs):
-        make_dir(self._output)
+        Util.make_dir(self._output)
         for each_dir_rel_path in dirs:
-            make_dir(os.path.join(self._output, each_dir_rel_path))
+            Util.make_dir(os.path.join(self._output, each_dir_rel_path))
 
     def _file_excluded(self, filepath, excluded_list):
         """Return True if path or ext in excluded_files list """

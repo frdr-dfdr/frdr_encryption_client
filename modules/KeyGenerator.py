@@ -1,6 +1,6 @@
 import nacl
 import hvac
-from util.helper import base64_to_byte
+from util.util import Util
 
 class KeyManagementLocal(object):
     def __init__(self):
@@ -39,7 +39,7 @@ class KeyManagementVault(object):
         self._vault_client.create_transit_engine_key_ring(self._key_ring_name)
         # added generate data key permission for frdr-user policy
         key_plaintext, key_ciphertext = self._vault_client.generate_data_key(self._key_ring_name)
-        self._key = base64_to_byte(key_plaintext)
+        self._key = Util.base64_to_byte(key_plaintext)
         self._key_ciphertext = key_ciphertext
 
     def save_key(self, path):
@@ -49,7 +49,7 @@ class KeyManagementVault(object):
         key_ciphertext = self._vault_client.retrive_key_from_vault(path)
          # added decrypt data permission for frdr-user policy
         key_plaintext = self._vault_client.decrypt_data_key(self._key_ring_name, key_ciphertext)
-        self._key = base64_to_byte(key_plaintext)
+        self._key = Util.base64_to_byte(key_plaintext)
 
     def get_vault_entity_id(self):
         return self._vault_client.entity_id
