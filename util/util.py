@@ -2,15 +2,18 @@ import os
 import sys
 import logging
 from base64 import b64encode, b64decode
+
+logger = logging.getLogger("frdr-crypto.util")
+
 class Util(object):
     
     @classmethod
     def make_dir(cls, dir_name):
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
-            #TODO: log
+            logger.info("A new directory {} created.".format(dir_name))
         else:
-            #TODO: log already existed 
+            logger.info("Creating a new directory {} failed, already existed.".format(dir_name))
             pass
    
     @classmethod
@@ -39,7 +42,7 @@ class Util(object):
 
         logger.info("Log level: {}".format(log_level))
 
-        clean_logformatter = '%(message)s'
+        clean_logformatter = '%(asctime)s %(name)s [%(levelname)s] %(message)s'
         clean_formatter = logging.Formatter(clean_logformatter)
         console = logging.StreamHandler(sys.stdout)
         try:
@@ -53,7 +56,7 @@ class Util(object):
         
         # Create handlers
         if filepath:
-            logformatter = '%(asctime)s [%(levelname)s] %(message)s'
+            logformatter = '%(asctime)s %(name)s [%(levelname)s] %(message)s'
             formatter = logging.Formatter(logformatter, '%Y-%m-%d %H:%M:%S')
             file_handler = logging.FileHandler(filepath, encoding='utf-8')
             try:

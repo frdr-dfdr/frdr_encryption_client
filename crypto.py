@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [--hvac <vault_addr>] [--username <vault_username>] [--password <vault_password>]
-    crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --hvac <vault_addr> --username <vault_username> --password <vault_password> --url <API_path>)
+    crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [--hvac <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--loglevel=<loglevel>] 
+    crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --hvac <vault_addr> --username <vault_username> --password <vault_password> --url <API_path>) [--loglevel=<loglevel>] 
     crypto.py --logout_vault
 
 Options:
@@ -18,6 +18,7 @@ Options:
     -p <vault_password>, --password <vault_password>
     --logout_vault  Remove old vault tokens
     --url <API_path>  API Path to fetch secret on vault
+    -l --loglevel The logging level(debug, error, warning or info) [default: info]
 """
 from docopt import docopt
 import sys
@@ -29,6 +30,7 @@ import hvac
 from modules.VaultClient import VaultClient
 from modules.KeyGenerator import KeyManagementLocal, KeyManagementVault
 from appdirs import AppDirs
+import logging
 
 version = '0.0.1'
 __version__ = version
@@ -50,13 +52,13 @@ dirs = AppDirs(app_name, app_author)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
-
 class Cryptor(object):
-    def __init__(self, arguments, key_manager):
+    def __init__(self, arguments, key_manager, logger):
         self._arguments = arguments
         self._key_manager = key_manager
         self._input = Util.clean_dir_path(self._arguments["--input"])
         self._output = self._arguments["--output"]
+        self._logger = logger
         if self._arguments["--encrypt"]:
             dataset_name = self._arguments["--name"]
             if self._arguments["--hvac"]:
@@ -76,6 +78,7 @@ class Cryptor(object):
         self.box = nacl.secret.SecretBox(self._key_manager.key)
 
     def encrypt(self):
+        logger = logging.getLogger('frdr-crypto.encrypt')
         # encrypt each file in the dirname
         if self._output is None:
             self._output = self._input + '_encrypted'
@@ -83,9 +86,9 @@ class Cryptor(object):
             all_files, all_subdirs = self._get_files_list(self._input)
             self._create_output_dirs(all_subdirs)
             for each_file in all_files:
-                self._encrypt_file(each_file)
+                self._encrypt_file(each_file, logger)
         else:
-            self._encrypt_file(self._input)
+            self._encrypt_file(self._input, logger)
         # save key
         self._key_manager.save_key(self._secret_path)
 
@@ -94,17 +97,18 @@ class Cryptor(object):
             self._key_manager.create_access_policy_and_group()
 
     def decrypt(self):
+        logger = logging.getLogger('frdr-crypto.decrypt')
         if self._output is None:
             self._output = self._input + '_decrypted'
         if os.path.isdir(self._input):
             all_files, all_subdirs = self._get_files_list(self._input)
             self._create_output_dirs(all_subdirs)
             for each_file in all_files:
-                self._decrypt_file(each_file)
+                self._decrypt_file(each_file, logger)
         else:
-            self._decrypt_file(self._input)   
+            self._decrypt_file(self._input, logger)   
         
-    def _encrypt_file(self, filename):
+    def _encrypt_file(self, filename, logger):
         if self._file_excluded(filename, EXCLUDED_FILES):
             return False
         encrypted_filename = os.path.join(os.path.dirname(filename), os.path.basename(filename) + ".encrypted")
@@ -116,15 +120,16 @@ class Cryptor(object):
                 f.write(encrypted)
             # TODO: check this
             assert len(encrypted) == len(message) + self.box.NONCE_SIZE + self.box.MACBYTES
-            return True
         else:
             with open(filename, 'rb') as f:
                 message = f.read()
             encrypted = self.box.encrypt(message)
             with open(encrypted_filename, 'wb') as f:
-                f.write(encrypted)
+                f.write(encrypted) 
+        logger.info("File {} is encrypted.".format(filename))
+        return True
 
-    def _decrypt_file(self, filename):
+    def _decrypt_file(self, filename, logger):
         decrypted_filename = os.path.join(os.path.dirname(filename), '.'.join(os.path.basename(filename).split('.')[:-1]))
         if os.path.isdir(self._input):
             with open(os.path.join(self._input, filename), 'rb') as f:
@@ -138,7 +143,8 @@ class Cryptor(object):
             decrypted = self.box.decrypt(encrypted_message)
             with open(decrypted_filename, 'wb') as f:
                 f.write(decrypted)
-    
+        logger.info("File {} is decrypted.".format(filename))
+        return True
 
     # get relative path of all files in the input dir
     # return relative paths of all files and subdirs in the dir
@@ -178,17 +184,19 @@ class Cryptor(object):
             return True
         return False 
 
-
 if __name__ == "__main__":
     if sys.version_info[0] < 3:
         raise Exception("Python 3 is required to run the local client.")
     arguments = docopt(__doc__, version=__version__)
+    logger = Util.get_logger("frdr-crypto", 
+                             log_level=arguments["--loglevel"],
+                             filepath=os.path.join(dirs.user_data_dir, "frdr-crypto_log.txt"))
     if arguments['--logout_vault']:
         try:
             os.remove(tokenfile)
         except:
             pass
-        print("Removed old auth tokens. Exiting.")
+        logger.info("Removed old auth tokens. Exiting.")
         sys.exit()
     if arguments["--hvac"]:
         vault_client = VaultClient(arguments["--hvac"], arguments["--username"], arguments["--password"], tokenfile)
@@ -199,7 +207,7 @@ if __name__ == "__main__":
         key_manager = KeyManagementVault(vault_client, dataset_name)
     else:
         key_manager = KeyManagementLocal()
-    encryptor = Cryptor(arguments, key_manager)
+    encryptor = Cryptor(arguments, key_manager, logger)
     if arguments["--encrypt"]:
         encryptor.encrypt()
     elif arguments["--decrypt"]:

@@ -81,12 +81,7 @@ class VaultClient(object):
         return key_ciphertext
 
     def create_policy(self, policy_name, policy_string):
-        #TODO: reponse is 204 (empty body), raise error if not 
-        response = self.hvac_client.sys.create_or_update_policy(name=policy_name, policy=policy_string,)
-        if response.status_code != 204:
-            return False
-        else:
-            return True
+        return self.hvac_client.sys.create_or_update_policy(name=policy_name, policy=policy_string,)
 
     def read_policy(self, policy_name):
         return self.hvac_client.sys.read_policy(policy_name)
