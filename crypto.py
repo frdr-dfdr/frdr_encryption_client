@@ -72,8 +72,8 @@ class Cryptor(object):
                 self._secret_path = self._arguments["--key"]
             self._key_manager.read_key(self._secret_path)
         else:
-            # raise error
-            pass
+            self._logger.error("Argument (encrypt or decrypt) is not provided.")
+            raise Exception
         self.box = nacl.secret.SecretBox(self._key_manager.key)
 
     def encrypt(self):
@@ -187,12 +187,12 @@ class Cryptor(object):
 
 if __name__ == "__main__":
     try:
-        if sys.version_info[0] < 3:
-            raise Exception("Python 3 is required to run the local client.")
         arguments = docopt(__doc__, version=__version__)
         logger = Util.get_logger("frdr-crypto", 
                                 log_level=arguments["--loglevel"],
                                 filepath=os.path.join(dirs.user_data_dir, "frdr-crypto_log.txt"))
+        if sys.version_info[0] < 3:
+            raise Exception("Python 3 is required to run the local client.")
         if arguments['--logout_vault']:
             try:
                 os.remove(tokenfile)
@@ -202,7 +202,6 @@ if __name__ == "__main__":
             sys.exit()
         if arguments["--hvac"]:
             vault_client = VaultClient(arguments["--hvac"], arguments["--username"], arguments["--password"], tokenfile)
-            #TODO: keep this argument for now, we may not need these 
             if arguments["--encrypt"]:
                 dataset_name = str(uuid.uuid4()) 
             elif arguments["--decrypt"]:
@@ -220,4 +219,5 @@ if __name__ == "__main__":
         else:
             pass
     except Exception as e:
+        logger.error("Exception caught, exiting. {}".format(e))
         exit

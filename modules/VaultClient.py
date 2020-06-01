@@ -6,7 +6,6 @@ import logging
 class VaultClient(object):
     def __init__(self, vault_addr, vault_username=None, vault_passowrd=None, tokenfile=None):
         self._logger = logging.getLogger("frdr-crypto.vault-client")
-        # TODO: change to vault token path
         self._vault_addr = vault_addr
         self._tokenfile = tokenfile
         self._username = vault_username
@@ -20,13 +19,13 @@ class VaultClient(object):
                 token=self.vault_token
                 )
             assert self.hvac_client.is_authenticated(), \
-                   'Failed to authenticate with Vault, please check your Vault server URL and Vault token!'
+                   "Failed to authenticate with Vault."
         except AssertionError as error:
             self._logger.error(error)
-            raise Exception(error)
+            raise Exception
         except Exception as e:
-            self._logger.error('Failed to authenticate with Vault, please check your Vault server URL and Vault token!')
-            raise Exception from None
+            self._logger.error("Failed to authenticate with Vault.")
+            raise Exception
 
         self._logger.info("Authenticated with Vault successfully.")
 
@@ -41,11 +40,10 @@ class VaultClient(object):
                 self._vault_auth = response["auth"]
                 if self._tokenfile:
                     self.write_auth_to_file()
-                # TODO: undetermined
                 return True
-            except:
-                #TODO, return False or raise error
-                raise
+            except Exception:
+                self._logger.error("Failed to auth with userpass method.")
+                raise Exception
         # TODO: add other auth methods
         elif auth_method == "ldap":
             pass
@@ -59,27 +57,27 @@ class VaultClient(object):
         return None
     
     def write_auth_to_file(self):
-        with open(self._tokenfile, 'w') as f:
+        with open(self._tokenfile, "w") as f:
             json.dump(self._vault_auth, f)   
    
     def enable_transit_engine(self):
         try:
-            self.hvac_client.sys.enable_secrets_engine(backend_type='transit')
-        except hvac.exceptions.InvalidRequest as e:
-            pass
+            self.hvac_client.sys.enable_secrets_engine(backend_type="transit")
+        except hvac.exceptions.InvalidRequest:
+            self._logger.warning("Transit engine has been enabled.")
 
     def create_transit_engine_key_ring(self, name):
         self.hvac_client.secrets.transit.create_key(name=name)
 
     def generate_data_key(self, name, key_type="plaintext"):
         gen_key_response = self.hvac_client.secrets.transit.generate_data_key(name=name, key_type=key_type,)
-        key_plaintext = gen_key_response['data']['plaintext']
-        key_ciphertext = gen_key_response['data']['ciphertext']
+        key_plaintext = gen_key_response["data"]["plaintext"]
+        key_ciphertext = gen_key_response["data"]["ciphertext"]
         return (key_plaintext, key_ciphertext)
 
     def decrypt_data_key(self, name, ciphertext):
         decrypt_data_response = self.hvac_client.secrets.transit.decrypt_data(name=name, ciphertext=ciphertext,)
-        key_plaintext = decrypt_data_response['data']['plaintext']
+        key_plaintext = decrypt_data_response["data"]["plaintext"]
         return key_plaintext
 
     def save_key_to_vault(self, path, key):
@@ -87,7 +85,7 @@ class VaultClient(object):
     
     def retrive_key_from_vault(self, path):
         read_secret_response = self.hvac_client.secrets.kv.v2.read_secret_version(path=path)
-        key_ciphertext = read_secret_response['data']['data']['ciphertext']
+        key_ciphertext = read_secret_response["data"]["data"]["ciphertext"]
         return key_ciphertext
 
     def create_policy(self, policy_name, policy_string):
@@ -114,7 +112,6 @@ class VaultClient(object):
             else:
                 self.login(self._username, self._password)
         return self._vault_auth
-
 
     @property
     def vault_token(self):
