@@ -86,7 +86,10 @@ class Cryptor(object):
             all_files, all_subdirs = self._get_files_list(self._input)
             self._create_output_dirs(all_subdirs)
             for each_file in all_files:
-                self._encrypt_file(each_file, logger)
+                try:
+                    self._encrypt_file(each_file, logger)
+                except AssertionError:
+                    logger.warning("File {} was not encrypted successfully.".format(each_file))
         else:
             self._encrypt_file(self._input, logger)
         # save key
@@ -118,7 +121,6 @@ class Cryptor(object):
             encrypted = self.box.encrypt(message)
             with open(os.path.join(self._output, encrypted_filename), 'wb') as f:
                 f.write(encrypted)
-            # TODO: check this
             assert len(encrypted) == len(message) + self.box.NONCE_SIZE + self.box.MACBYTES
         else:
             with open(filename, 'rb') as f:
@@ -185,32 +187,35 @@ class Cryptor(object):
         return False 
 
 if __name__ == "__main__":
-    if sys.version_info[0] < 3:
-        raise Exception("Python 3 is required to run the local client.")
-    arguments = docopt(__doc__, version=__version__)
-    logger = Util.get_logger("frdr-crypto", 
-                             log_level=arguments["--loglevel"],
-                             filepath=os.path.join(dirs.user_data_dir, "frdr-crypto_log.txt"))
-    if arguments['--logout_vault']:
-        try:
-            os.remove(tokenfile)
-        except:
+    try:
+        if sys.version_info[0] < 3:
+            raise Exception("Python 3 is required to run the local client.")
+        arguments = docopt(__doc__, version=__version__)
+        logger = Util.get_logger("frdr-crypto", 
+                                log_level=arguments["--loglevel"],
+                                filepath=os.path.join(dirs.user_data_dir, "frdr-crypto_log.txt"))
+        if arguments['--logout_vault']:
+            try:
+                os.remove(tokenfile)
+            except:
+                pass
+            logger.info("Removed old auth tokens. Exiting.")
+            sys.exit()
+        if arguments["--hvac"]:
+            vault_client = VaultClient(arguments["--hvac"], arguments["--username"], arguments["--password"], tokenfile)
+            #TODO: use dataset uuid instead of name
+            dataset_name = arguments["--name"]
+            if dataset_name is None:
+                dataset_name = arguments["--url"].split("/")[-1]
+            key_manager = KeyManagementVault(vault_client, dataset_name)
+        else:
+            key_manager = KeyManagementLocal()
+        encryptor = Cryptor(arguments, key_manager, logger)
+        if arguments["--encrypt"]:
+            encryptor.encrypt()
+        elif arguments["--decrypt"]:
+            encryptor.decrypt()
+        else:
             pass
-        logger.info("Removed old auth tokens. Exiting.")
-        sys.exit()
-    if arguments["--hvac"]:
-        vault_client = VaultClient(arguments["--hvac"], arguments["--username"], arguments["--password"], tokenfile)
-        #TODO: use dataset uuid instead of name
-        dataset_name = arguments["--name"]
-        if dataset_name is None:
-            dataset_name = arguments["--url"].split("/")[-1]
-        key_manager = KeyManagementVault(vault_client, dataset_name)
-    else:
-        key_manager = KeyManagementLocal()
-    encryptor = Cryptor(arguments, key_manager, logger)
-    if arguments["--encrypt"]:
-        encryptor.encrypt()
-    elif arguments["--decrypt"]:
-        encryptor.decrypt()
-    else:
-        pass
+    except Exception as e:
+        exit

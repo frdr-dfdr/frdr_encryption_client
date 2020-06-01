@@ -1,8 +1,11 @@
 import hvac
 import json
 import os
+import logging 
+
 class VaultClient(object):
     def __init__(self, vault_addr, vault_username=None, vault_passowrd=None, tokenfile=None):
+        self._logger = logging.getLogger("frdr-crypto.vault-client")
         # TODO: change to vault token path
         self._vault_addr = vault_addr
         self._tokenfile = tokenfile
@@ -19,14 +22,18 @@ class VaultClient(object):
             assert self.hvac_client.is_authenticated(), \
                    'Failed to authenticate with Vault, please check your Vault server URL and Vault token!'
         except AssertionError as error:
-            # TODO: log error
-            pass
-        #TODO: log connected to vault successfully
+            self._logger.error(error)
+            raise Exception(error)
+        except Exception as e:
+            self._logger.error('Failed to authenticate with Vault, please check your Vault server URL and Vault token!')
+            raise Exception from None
+
+        self._logger.info("Authenticated with Vault successfully.")
 
     def login(self, username, password, auth_method="userpass"):
         if username is None or password is None:
-            print("Unable to load auth tokens from file, while username and password also not supplied")
-            return "Error: You need to obtain a login token with your username and password the first time you use the app."
+            self._logger.error("Unable to load auth tokens from file, while username and password also not supplied. You need to obtain a login token with your username and password the first time you use the app.")
+            return False
         self.hvac_client = hvac.Client(url=self._vault_addr)
         if auth_method == "userpass":
             try:
@@ -39,6 +46,9 @@ class VaultClient(object):
             except:
                 #TODO, return False or raise error
                 raise
+        # TODO: add other auth methods
+        elif auth_method == "ldap":
+            pass
         
     def load_auth_from_file(self):
         if os.path.exists(self._tokenfile):
@@ -100,7 +110,7 @@ class VaultClient(object):
     def vault_auth(self):
         if self._vault_auth is None:
             if self.load_auth_from_file():
-                print("Token loaded from file")
+                self._logger.info("Token loaded from file")
             else:
                 self.login(self._username, self._password)
         return self._vault_auth

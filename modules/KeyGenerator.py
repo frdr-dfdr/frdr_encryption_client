@@ -103,7 +103,6 @@ class KeyManagementVault(object):
     def _create_dataset_access_group(self):
         response = self._vault_client.create_or_update_group_by_name(group_name=self._dataset_access_group_name,
                                                                      policy_name=self._dataset_access_policy_name)
-        # TODO: check the return value
         try:
             group_name = response["data"]["name"]
             self._logger.info("Group {} is created.".format(self._dataset_access_group_name))
