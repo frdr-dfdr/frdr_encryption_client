@@ -197,6 +197,7 @@ if __name__ == "__main__":
             key_manager = KeyManagementVault(vault_client, dataset_name)
         else:
             key_manager = KeyManagementLocal()
+            dataset_name = str(uuid.uuid4()) 
         encryptor = Cryptor(arguments, key_manager, logger, dataset_name)
         if arguments["--encrypt"]:
             encryptor.encrypt()
