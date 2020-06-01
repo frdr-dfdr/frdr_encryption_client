@@ -31,13 +31,13 @@ deactivate
 ### Key Stored Locally
 To encrypt a file or a directory,
 ```sh
-$ python crypto.py -e -n <dataset name> -i <path to the file or dir you want to encrypt> -o <output path to the encrypted file or dir>
+$ python crypto.py -e -i <path to the file or dir you want to encrypt> -o <output path to the encrypted file or dir>
 ```
 The output path is optional.
 
 For example,
 ```sh
-$ python crypto.py -e -n test_dataset -i ./test_dataset  -o ./test_dataset_enc_local
+$ python crypto.py -e -i ./test_dataset  -o ./test_dataset_enc_local
 ```
 To decrypt a file or a directory,
 ```sh
@@ -47,17 +47,17 @@ The output path is optional.
 
 For example,
 ```sh
-$ python crypto.py -d -i ./test_dataset_enc_local -k test_dataset_key.pem
+$ python crypto.py -d -i ./test_dataset_enc_local -k e9d63a50-bbdb-42ec-b5dd-3a6ad88b58da_key.pem
 ```
 ### Use Hashicorp Vault for Key Management
 To encrypt a file or a directory,
 ```sh
-$ python crypto.py -e -n <dataset uuid> -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --hvac <vault server address> --username <vault username> --password <vault password>
+$ python crypto.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --hvac <vault server address> --username <vault username> --password <vault password>
 The output path is optional.
 ```
 For example,
 ```sh
-$ python crypto.py -e -n test_dataset -i ./test_dataset  -o ./test_dataset_enc_vault/ --hvac http://127.0.0.1:8200/ --username bob --password training
+$ python crypto.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --hvac http://127.0.0.1:8200/ --username bob --password training
 ```
 To decrypt a file or a directory,
 
@@ -70,9 +70,11 @@ For example,
 ```sh
 $ python crypto.py -d -i ./test_dataset_enc_vault/ --hvac http://127.0.0.1:8200/ --username bob --password training --url http://127.0.0.1:8200/v1/secret/data/4186db38-9ebe-0512-8c32-4552220324aa/test_dataset
 ```
+
+### CLI Usage Patterns
 Usage:
 ```sh
-python crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [--hvac <vault_addr>] [--username <vault_username>] [--password <vault_password>]
+python crypto.py -e -i <input_path> [-o <output_path>] [--hvac <vault_addr>] [--username <vault_username>] [--password <vault_password>]
 python crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --hvac <vault_addr> --username <vault_username> --password <vault_password> --url <API_path>)
 python crypto.py --logout_vault
 ```
@@ -80,7 +82,6 @@ Options:
 ```sh
 -e --encrypt           encrypt
 -d --decrypt           decrypt
--n <dataset_name>, --name <dataset_name>
 -i <input_path>, --input <input_path>
 -o <output_path>, --output <output_path> 
 -k <key_path>, --key <key_path>
