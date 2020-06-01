@@ -25,6 +25,7 @@ import nacl.utils
 import nacl.secret
 import os
 from util.util import Util
+from util import constants
 import hvac
 from modules.VaultClient import VaultClient
 from modules.KeyGenerator import KeyManagementLocal, KeyManagementVault
@@ -32,23 +33,8 @@ from appdirs import AppDirs
 import logging
 import uuid
 
-version = '0.0.1'
-__version__ = version
-EXCLUDED_FILES = [".*", 
-                  "Thumbs.db", 
-                  ".DS_Store", 
-                  "._.DS_Store", 
-                  ".localized", 
-                  "desktop.ini", 
-                  "*.pyc", 
-                  "*.swx",
-                  "*.swp", 
-                  "*~", 
-                  "~$*", 
-                  "NULLEXT"]
-app_name = "frdr-crypto"
-app_author = "Compute Canada"
-dirs = AppDirs(app_name, app_author)
+__version__ = constants.VERSION
+dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
@@ -111,7 +97,7 @@ class Cryptor(object):
             self._decrypt_file(self._input, logger)   
         
     def _encrypt_file(self, filename, logger):
-        if self._file_excluded(filename, EXCLUDED_FILES):
+        if self._file_excluded(filename, constants.EXCLUDED_FILES):
             return False
         encrypted_filename = os.path.join(os.path.dirname(filename), os.path.basename(filename) + ".encrypted")
         if os.path.isdir(self._input):

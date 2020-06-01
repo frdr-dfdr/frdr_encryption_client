@@ -18,15 +18,13 @@ from modules.AccessGranter import AccessGranter
 from modules.VaultClient import VaultClient
 from util import constants
 
-# TODO: put this block somewhere else
-app_name = "frdr-crypto"
-app_author = "Compute Canada"
-dirs = AppDirs(app_name, app_author)
+__version__ = constants.VERSION
+dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
 if __name__ == "__main__":
-    arguments = docopt(__doc__, version=constants.VERSION)
+    arguments = docopt(__doc__, version=__version__)
     vault_client = VaultClient(vault_addr=arguments["--hvac"], 
                                vault_username=arguments["--username"], 
                                vault_passowrd=arguments["--password"], 
