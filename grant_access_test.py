@@ -32,5 +32,4 @@ if __name__ == "__main__":
                                vault_passowrd=arguments["--password"], 
                                tokenfile=tokenfile)
     access_granter = AccessGranter(vault_client)
-    #TODO: use dataset uuid instead of name
     access_granter.grant_access(arguments["--requester"], arguments["--name"])  

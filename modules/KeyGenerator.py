@@ -66,7 +66,6 @@ class KeyManagementVault(object):
 
     def create_access_policy_and_group(self):
         if not self._dataset_access_policy_exists():
-            print ("create_policy")
             self._create_dataset_access_policy()
         if not self._dataset_access_group_exists():
             self._create_dataset_access_group()
