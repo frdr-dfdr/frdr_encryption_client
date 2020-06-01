@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    crypto.py -e -n <dataset_name> -i <input_path> [-o <output_path>] [--hvac <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--loglevel=<loglevel>] 
+    crypto.py -e -i <input_path> [-o <output_path>] [--hvac <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--loglevel=<loglevel>] 
     crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --hvac <vault_addr> --username <vault_username> --password <vault_password> --url <API_path>) [--loglevel=<loglevel>] 
     crypto.py --logout_vault
 
 Options:
     -e --encrypt           encrypt
     -d --decrypt           decrypt
-    -n <dataset_name>, --name <dataset_name>
     -i <input_path>, --input <input_path>
     -o <output_path>, --output <output_path> 
     -k <key_path>, --key <key_path>
@@ -31,6 +30,7 @@ from modules.VaultClient import VaultClient
 from modules.KeyGenerator import KeyManagementLocal, KeyManagementVault
 from appdirs import AppDirs
 import logging
+import uuid
 
 version = '0.0.1'
 __version__ = version
@@ -53,14 +53,13 @@ os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
 class Cryptor(object):
-    def __init__(self, arguments, key_manager, logger):
+    def __init__(self, arguments, key_manager, logger, dataset_name):
         self._arguments = arguments
         self._key_manager = key_manager
         self._input = Util.clean_dir_path(self._arguments["--input"])
         self._output = self._arguments["--output"]
         self._logger = logger
         if self._arguments["--encrypt"]:
-            dataset_name = self._arguments["--name"]
             if self._arguments["--hvac"]:
                 self._secret_path = os.path.join(self._key_manager.get_vault_entity_id(), dataset_name)
             else:
@@ -203,14 +202,17 @@ if __name__ == "__main__":
             sys.exit()
         if arguments["--hvac"]:
             vault_client = VaultClient(arguments["--hvac"], arguments["--username"], arguments["--password"], tokenfile)
-            #TODO: use dataset uuid instead of name
-            dataset_name = arguments["--name"]
-            if dataset_name is None:
+            #TODO: keep this argument for now, we may not need these 
+            if arguments["--encrypt"]:
+                dataset_name = str(uuid.uuid4()) 
+            elif arguments["--decrypt"]:
                 dataset_name = arguments["--url"].split("/")[-1]
+            else:
+                raise Exception
             key_manager = KeyManagementVault(vault_client, dataset_name)
         else:
             key_manager = KeyManagementLocal()
-        encryptor = Cryptor(arguments, key_manager, logger)
+        encryptor = Cryptor(arguments, key_manager, logger, dataset_name)
         if arguments["--encrypt"]:
             encryptor.encrypt()
         elif arguments["--decrypt"]:
