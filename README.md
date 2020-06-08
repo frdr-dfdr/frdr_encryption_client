@@ -27,6 +27,8 @@ To exit the virtual environment:
 deactivate
 ```
 
+The Electron GUI in /gui should work for development after runing  `npm install` and `npm start`.
+
 ## CLI Usage
 ### Key Stored Locally
 To encrypt a file or a directory,
@@ -52,30 +54,30 @@ $ python crypto.py -d -i ./test_dataset_enc_local -k e9d63a50-bbdb-42ec-b5dd-3a6
 ### Use Hashicorp Vault for Key Management
 To encrypt a file or a directory,
 ```sh
-$ python crypto.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --hvac <vault server address> --username <vault username> --password <vault password>
+$ python crypto.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --username <vault username> --password <vault password>
 The output path is optional.
 ```
 For example,
 ```sh
-$ python crypto.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --hvac http://127.0.0.1:8200/ --username bob --password training
+$ python crypto.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --username bob --password training
 ```
 To decrypt a file or a directory,
 
 ```sh
-$ python crypto.py -d -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --hvac <vault server address> --username <vault username> --password <vault password> --url <api path to fetch the secret>
+$ python crypto.py -d -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --username <vault username> --password <vault password> --url <api path to fetch the secret>
 ```
 The output path is optional.
 
 For example,
 ```sh
-$ python crypto.py -d -i ./test_dataset_enc_vault/ --hvac http://127.0.0.1:8200/ --username bob --password training --url http://127.0.0.1:8200/v1/secret/data/4186db38-9ebe-0512-8c32-4552220324aa/test_dataset
+$ python crypto.py -d -i ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --username bob --password training --url http://127.0.0.1:8200/v1/secret/data/4186db38-9ebe-0512-8c32-4552220324aa/test_dataset
 ```
 
 ### CLI Usage Patterns
 Usage:
 ```sh
-python crypto.py -e -i <input_path> [-o <output_path>] [--hvac <vault_addr>] [--username <vault_username>] [--password <vault_password>]
-python crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --hvac <vault_addr> --username <vault_username> --password <vault_password> --url <API_path>)
+python crypto.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>]
+python crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> --username <vault_username> --password <vault_password> --url <API_path>)
 python crypto.py --logout_vault
 ```
 Options:
@@ -85,13 +87,15 @@ Options:
 -i <input_path>, --input <input_path>
 -o <output_path>, --output <output_path> 
 -k <key_path>, --key <key_path>
---hvac <vault_addr> using hashicorp vault for key generation and storage
+--vault <vault_addr> using hashicorp vault for key generation and storage
 -u <vault_username>, --username <vault_username>
 -p <vault_password>, --password <vault_password>
 --logout_vault  Remove old vault tokens
 --url <API_path>  API Path to fetch secret on vault
 ```
 
+## GUI Usage
+ 
 ## Granting Access Test
 ```sh
 $ python grant_access_test.py --hvac <vault server address> --username <vault username> --password <vault password> -n <dataset uuid> --requester <requester entity id on vault>
