@@ -57,8 +57,10 @@ class VaultClient(object):
         return None
     
     def write_auth_to_file(self):
-        with open(self._tokenfile, "w") as f:
-            json.dump(self._vault_auth, f)   
+        #TODO: decide whether to save auth to file or not
+        pass
+        # with open(self._tokenfile, "w") as f:
+        #     json.dump(self._vault_auth, f)   
    
     def enable_transit_engine(self):
         try:
