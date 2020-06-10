@@ -32,6 +32,10 @@ from modules.KeyGenerator import KeyManagementLocal, KeyManagementVault
 from appdirs import AppDirs
 import logging
 import uuid
+import shutil
+import tempfile
+from zipfile import ZipFile
+import bagit
 
 __version__ = constants.VERSION
 dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
@@ -45,6 +49,7 @@ class Cryptor(object):
         self._input = Util.clean_dir_path(self._arguments["--input"])
         self._output = self._arguments["--output"]
         self._logger = logger
+        self._dataset_name = dataset_name
         if self._arguments["--encrypt"]:
             if self._arguments["--vault"]:
                 self._secret_path = os.path.join(self._key_manager.get_vault_entity_id(), dataset_name)
@@ -64,19 +69,41 @@ class Cryptor(object):
 
     def encrypt(self):
         logger = logging.getLogger('frdr-crypto.encrypt')
+        bag_dir_parent = tempfile.mkdtemp()
+        if os.path.isdir(bag_dir_parent):
+            shutil.rmtree(bag_dir_parent)
+        bag_dir = os.path.join(bag_dir_parent, 'bag')
+        #TODO: check the difference between makedirs and mkdir
+        os.makedirs(bag_dir)   
         # encrypt each file in the dirname
+        # TODO: move this to the init function
         if self._output is None:
-            self._output = self._input + '_encrypted'
+            # default output path is the desktop
+            self._output = os.path.expanduser("~/Desktop/")
+        
         if os.path.isdir(self._input):
-            all_files, all_subdirs = self._get_files_list(self._input)
-            self._create_output_dirs(all_subdirs)
-            for each_file in all_files:
-                try:
-                    self._encrypt_file(each_file, logger)
-                except AssertionError:
-                    logger.warning("File {} was not encrypted successfully.".format(each_file))
+            zip_filepath = self._compress_folder(self._input, bag_dir)
+            self._logger.info(zip_filepath) 
+            self._encrypt_file(zip_filepath, logger)
+            os.remove(zip_filepath)
         else:
             self._encrypt_file(self._input, logger)
+        
+        try:
+            bag = bagit.make_bag(bag_dir, None, 1, ['sha256'])
+            bag.info['Depositor-Entity-ID'] = self._key_manager.get_vault_entity_id()
+            bag.info['Datast-UUID'] = self._dataset_name
+            bag.save()
+        except (bagit.BagError, Exception) as e:
+            # TODO: log error
+            return False
+        
+        # zip bag dir and move it to the output path
+        bag_destination = os.path.join(str(bag_dir_parent), (os.path.basename(self._input)+"_bag"))
+        zipname = shutil.make_archive(bag_destination, 'zip', bag_dir)
+        shutil.rmtree(bag_dir)
+        shutil.move(zipname, os.path.join(self._output, os.path.basename(zipname)))
+
         # save key
         self._key_manager.save_key(self._secret_path)
 
@@ -89,51 +116,49 @@ class Cryptor(object):
     def decrypt(self):
         logger = logging.getLogger('frdr-crypto.decrypt')
         if self._output is None:
-            self._output = self._input + '_decrypted'
-        if os.path.isdir(self._input):
-            all_files, all_subdirs = self._get_files_list(self._input)
-            self._create_output_dirs(all_subdirs)
-            for each_file in all_files:
-                self._decrypt_file(each_file, logger)
+            # default output path is the desktop
+            self._output = os.path.expanduser("~/Desktop/")
+        # if the input is the decrypted package
+        if os.path.basename(self._input).endswith("encrypted"):
+            decrypted_filename = self._decrypt_file(self._input, logger)  
+            shutil.move(decrypted_filename, os.path.join(self._output, os.path.basename(decrypted_filename))) 
+        # if the input is the zipped bag
         else:
-            self._decrypt_file(self._input, logger)   
+            bag_dir_parent = tempfile.mkdtemp()
+            if os.path.isdir(bag_dir_parent):
+                shutil.rmtree(bag_dir_parent)
+            bag_dir = os.path.join(bag_dir_parent, 'bag')
+            shutil.unpack_archive(self._input, bag_dir, "zip")
+            for root, dirs, files in os.walk(os.path.join(bag_dir, "data")):
+                for filename in files:
+                    encrypted_filename = os.path.join(root, filename)
+            decrypted_filename = self._decrypt_file(encrypted_filename, logger)
+            shutil.move(decrypted_filename, os.path.join(self._output, os.path.basename(decrypted_filename)))
+            shutil.rmtree(bag_dir_parent)
+        return True
         
     def _encrypt_file(self, filename, logger):
         if self._file_excluded(filename, constants.EXCLUDED_FILES):
             return False
         encrypted_filename = os.path.join(os.path.dirname(filename), os.path.basename(filename) + ".encrypted")
-        if os.path.isdir(self._input):
-            with open(os.path.join(self._input, filename), 'rb') as f:
-                message = f.read()
-            encrypted = self.box.encrypt(message)
-            with open(os.path.join(self._output, encrypted_filename), 'wb') as f:
-                f.write(encrypted)
-            assert len(encrypted) == len(message) + self.box.NONCE_SIZE + self.box.MACBYTES
-        else:
-            with open(filename, 'rb') as f:
-                message = f.read()
-            encrypted = self.box.encrypt(message)
-            with open(encrypted_filename, 'wb') as f:
-                f.write(encrypted) 
+        with open(filename, 'rb') as f:
+            message = f.read()
+        encrypted = self.box.encrypt(message)
+        with open(encrypted_filename, 'wb') as f:
+            f.write(encrypted) 
+        assert len(encrypted) == len(message) + self.box.NONCE_SIZE + self.box.MACBYTES
         logger.info("File {} is encrypted.".format(filename))
         return True
 
     def _decrypt_file(self, filename, logger):
-        decrypted_filename = os.path.join(os.path.dirname(filename), '.'.join(os.path.basename(filename).split('.')[:-1]))
-        if os.path.isdir(self._input):
-            with open(os.path.join(self._input, filename), 'rb') as f:
-                encrypted_message = f.read()
-            decrypted = self.box.decrypt(encrypted_message)
-            with open(os.path.join(self._output, decrypted_filename), 'wb') as f:
-                f.write(decrypted)
-        else:
-            with open(filename, 'rb') as f:
-                encrypted_message = f.read()
-            decrypted = self.box.decrypt(encrypted_message)
-            with open(decrypted_filename, 'wb') as f:
-                f.write(decrypted)
+        decrypted_filename = os.path.join(os.path.dirname(filename), '.'.join(os.path.basename(filename).split('.')[:-1])) 
+        with open(filename, 'rb') as f:
+            encrypted_message = f.read()
+        decrypted = self.box.decrypt(encrypted_message)
+        with open(decrypted_filename, 'wb') as f:
+            f.write(decrypted)
         logger.info("File {} is decrypted.".format(filename))
-        return True
+        return decrypted_filename
 
     # get relative path of all files in the input dir
     # return relative paths of all files and subdirs in the dir
@@ -172,6 +197,26 @@ class Cryptor(object):
                 (filename.startswith('~$') and u'~$*' in excluded_list):
             return True
         return False 
+
+    def _compress_folder(self, input_path, output_path, filter=False):
+        if filter:
+            # for each file in the folder
+            all_files, all_subdirs = self._get_files_list(input_path)
+            zipfile_name = os.path.join(output_path, os.path.basename(input_path) + ".zip")
+            zip_obj = ZipFile(zipfile_name, "w")
+            for filename in all_files:
+                if self._file_excluded(filename, constants.EXCLUDED_FILES):
+                    pass
+                else:
+                    zip_obj.write(os.path.join(input_path, filename))
+            # Required as there can be subdirs with no files in them
+            for subdir in all_subdirs:
+                zip_obj.write(os.path.join(input_path, subdir))
+            zip_obj.close()
+        else:
+            zipfile_path = os.path.join(output_path, os.path.basename(input_path))
+            zipfile_name = shutil.make_archive(zipfile_path, 'zip', input_path)
+        return zipfile_name
 
 if __name__ == "__main__":
     try:
