@@ -24,13 +24,13 @@ const ipc = require('electron').ipcRenderer
 const selectDirBtn = document.getElementById('input_path')
 
 selectDirBtn.addEventListener('click', function (event) {
-     ipc.send('open-file-dialog')
+     ipc.send('open-dir-dialog')
 });
 
-//Getting back the information after selecting the file
-ipc.on('selected-file', function (event, path) {
+//Getting back the information after selecting the dir
+ipc.on('selected-dir', function (event, path) {
 //print the path selected
-document.getElementById('selected-file').innerHTML = `You selected: ${path}`
+document.getElementById('selected-dir').innerHTML = `You selected: ${path}`
 });
 
 document.getElementById("encrypt").addEventListener("click", encrypt);
