@@ -55,8 +55,6 @@ const createWindow = () => {
     backgroundColor: "#D6D8DC",
   });
 
-  mainWindow.setMenuBarVisibility(false);
-
   mainWindow.loadURL(require('url').format({
     pathname: path.join(__dirname, 'indexEncrypt.html'),
     protocol: 'file:',
@@ -187,8 +185,6 @@ const decrypt = () => {
     show: false
   })
 
-  decryptWindow.setMenuBarVisibility(false);
-
   decryptWindow.loadURL(require('url').format({
     pathname: path.join(__dirname, 'indexDecrypt.html'),
     protocol: 'file:',
@@ -215,8 +211,6 @@ const grantAccess = () => {
     backgroundColor: "#D6D8DC",
     show: false
   })
-
-  accessWindow.setMenuBarVisibility(false);
 
   accessWindow.loadURL(require('url').format({
     pathname: path.join(__dirname, 'indexAccess.html'),
@@ -247,8 +241,6 @@ const getConfigsetting = () => {
   })
 
   if (app.dock) { app.dock.show() }
-
-  configWindow.setMenuBarVisibility(false);
 
   configWindow.loadURL(require('url').format({
     pathname: path.join(__dirname, 'indexConfig.html'),
