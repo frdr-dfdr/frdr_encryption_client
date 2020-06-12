@@ -22,12 +22,9 @@ const PY_FOLDER = '..'
 const PY_MODULE = 'crypto_gui'
 
 let pythonChild = null
-let loginWindow = null
 let mainWindow = null
 //TODO: Add about window?
 let aboutWindow = null
-let decryptWindow = null
-let accessWindow = null
 let input_path = null;
 
 //TODO: this is for?
@@ -58,7 +55,7 @@ const createWindow = () => {
   mainWindow.setMenuBarVisibility(false);
 
   mainWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexEncrypt.html'),
+    pathname: path.join(__dirname, 'indexMain.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -106,97 +103,6 @@ let port = portfinder.getPort(function (err, port) {
 const exitCrypto = () => {
   pythonChild.kill()
   pythonChild = null
-}
-
-const decrypt = () => {
-  decryptWindow = new BrowserWindow({
-    width: 400,
-    height: 500,
-    backgroundColor: "#D6D8DC",
-    show: false
-  })
-
-  decryptWindow.setMenuBarVisibility(false);
-
-  decryptWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexDecrypt.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
-  decryptWindow.once('ready-to-show', () => {
-    decryptWindow.show()
-  })
-
-  decryptWindow.on('close', (event) => {
-    if (decryptWindow != null){
-      decryptWindow.hide();
-      event.preventDefault();
-    }
-    decryptWindow = null
-  })
-}
-
-const grantAccess = () => {
-  accessWindow = new BrowserWindow({
-    width: 400,
-    height: 500,
-    backgroundColor: "#D6D8DC",
-    show: false
-  })
-
-  accessWindow.setMenuBarVisibility(false);
-
-  accessWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexAccess.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
-  accessWindow.once('ready-to-show', () => {
-    accessWindow.show()
-  })
-
-  accessWindow.on('close', (event) => {
-    if (accessWindow != null){
-      accessWindow.hide();
-      event.preventDefault();
-    }
-    accessWindow = null
-  })
-}
-
-// TODO: decide whether we need a separate window for user to log into vault
-const getConfigsetting = () => {
-  configWindow = new BrowserWindow({
-    width: 400,
-    height: 500,
-    backgroundColor: "#D6D8DC",
-    show: false
-  })
-
-  if (app.dock) { app.dock.show() }
-
-  configWindow.setMenuBarVisibility(false);
-
-  configWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexConfig.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
-  configWindow.once('ready-to-show', () => {
-    configWindow.show()
-  })
-
-  configWindow.on('close', (event) => {
-    if (configWindow != null){
-      configWindow.hide();
-      event.preventDefault();
-    }
-    if (app.dock && loginWindow === null && mainWindow === null && aboutWindow === null) { app.dock.hide() }
-    configWindow = null
-  })
 }
 
 app.on("before-quit", ev => {

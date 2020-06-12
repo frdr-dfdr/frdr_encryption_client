@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>FRDR-Crypto</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <style>
+    #menu {
+      text-align: center;
+      margin-top: 5%;
+    }
+    .btn-secondary {
+      background-color: whitesmoke; 
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      /* margin-left: 2%;
+      margin-right: 2%; */
+    }
+    
+    #button-encrypt {
+      border-color: lightblue;
+      background-color: mediumblue;
+      color: white;
+      width: 80pt;
+    }
+
+    #button-decrypt {
+      border-color: lightcoral;
+      width: 80pt;
+    }
+    #button-grant-access {
+      border-color: lightseagreen;
+      width: 80pt;
+    }
+    </style>
+</head>
+
+<body>
+  <div id="menu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+    <button class="btn btn-secondary" id="button-encrypt" onclick="highlightButton(this)">Encrypt</button>
+    <button class="btn btn-secondary" id="button-decrypt" onclick="highlightButton(this)">Decrypt</button>
+    <button class="btn btn-secondary" id="button-grant-access" onclick="highlightButton(this)">Grant Access</button>  
+  </div>
+  <div id="container" class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+        <h3>Vault URL</h3>
+        <input name="vault address" id="hostname" type="text" size="40" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+        <h3>Username</h3>
+        <input name="username" id="username" type="text" size="40"/>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+        <h3>Password</h3>
+        <input name="password" id="password" type="password" size="40"/>
+      </div>
+    </div>
+
+    
+    <div id="div-encrypt-extra" style="display: block;">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+          <h3>Dataset Path</h3>
+          <button class="btn btn-secondary" id="input_path_dir">Select Directory</button>
+          <p id="selected-dir">No selection</p>
+        </div>
+      </div>
+
+      <br/><br/>
+
+      <div class="button">
+        <button class="btn btn-primary" type="submit" id="encrypt">Encrypt Data</button>
+      </div>
+    </div>
+
+    <div id="div-decrypt-extra" style="display: none;">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+          <h3>Encrypted Package Path</h3>
+          <button class="btn btn-secondary" id="input_path_file">Select File</button>
+          <p id="selected-file">No selection</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+          <h3>API Path URL</h3>
+          <input name="key_url" id="key_url" type="key_url" size="40"/>
+        </div>
+      </div>
+
+      <br/><br/>
+
+      <div class="button">
+        <button class="btn btn-primary" type="submit" id="decrypt">Decrypt Data</button>
+      </div>
+    </div>
+
+    <div id="div-grant-access-extra" style="display: none;">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+          <h3>Dataset ID</h3>
+          <input name="dataset" id="dataset" type="dataset" size="40"/>
+        </div>
+      </div>
+  
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+          <h3>Requester ID</h3>
+          <input name="requester" id="requester" type="requester" size="40"/>
+        </div>
+      </div>
+  
+      <br/><br/>
+  
+      <div class="button">
+        <button class="btn btn-primary" type="submit" id="GrantAccess">Grant Access</button>
+      </div>
+    </div>
+
+  </div>
+  <script src="windowMain.js" charset="utf-8"></script> 
+
+</body>
+
+</html>
