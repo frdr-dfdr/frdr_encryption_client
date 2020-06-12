@@ -106,14 +106,8 @@ const exitCrypto = () => {
 }
 
 app.on("before-quit", ev => {
-  if (loginWindow != null){
-    loginWindow.close();
-  }
   if (mainWindow != null){
     mainWindow.close();
-  }
-  if (decryptWindow != null){
-    decryptWindow.close();
   }
   top = null;
 });
