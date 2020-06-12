@@ -40,9 +40,6 @@ class CryptoGui(object):
     def encrypt(self, username, password, hostname):
         self._logger.info("Encrypt files in the path {}".format(self._input_path))
         vault_client = VaultClient(hostname, username, password, tokenfile)
-        login_status = vault_client.login(username, password)
-        if not login_status:
-            return "Unable to obtain token. Verify your credentials and Radiam URL."
         dataset_name = str(uuid.uuid4()) 
         key_manager = KeyManagementVault(vault_client, dataset_name)
         arguments = {"--input": self._input_path, 
@@ -59,9 +56,6 @@ class CryptoGui(object):
     def decrypt(self, username, password, hostname, url):
         self._logger.info("Decrypt files in the path {}".format(self._input_path))
         vault_client = VaultClient(hostname, username, password, tokenfile)
-        login_status = vault_client.login(username, password)
-        if not login_status:
-            return "Unable to obtain token. Verify your credentials and Radiam URL."
         dataset_name = url.split("/")[-1]
         key_manager = KeyManagementVault(vault_client, dataset_name)
         arguments = {"--input": self._input_path, 

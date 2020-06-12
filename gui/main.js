@@ -22,12 +22,9 @@ const PY_FOLDER = '..'
 const PY_MODULE = 'crypto_gui'
 
 let pythonChild = null
-let loginWindow = null
 let mainWindow = null
 //TODO: Add about window?
 let aboutWindow = null
-let decryptWindow = null
-let accessWindow = null
 let input_path = null;
 
 //TODO: this is for?
@@ -50,15 +47,15 @@ const getScriptPath = () => {
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 400,
-    height: 500,
+    width: 450,
+    height: 650,
     backgroundColor: "#D6D8DC",
   });
 
   mainWindow.setMenuBarVisibility(false);
 
   mainWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexEncrypt.html'),
+    pathname: path.join(__dirname, 'indexMain.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -71,77 +68,6 @@ const createWindow = () => {
     }
     mainWindow = null
   });
-  var menu = Menu.buildFromTemplate([
-    {
-      label: 'Menu',
-      submenu: [
-          {
-            label:'Encrypt',
-            click: (item, window, event) =>{
-              if(mainWindow === null){
-                createWindow()
-              }
-            }
-          },
-          {
-            label:'Decrypt',
-            click: (item, window, event) =>{
-              if(decryptWindow === null){
-                decrypt()
-              }
-            }
-          },
-          {
-            label:'Grant Access',
-            click: (item, window, event) =>{
-              if(accessWindow === null){
-                grantAccess()
-              }
-            }
-          },
-          {type: "separator"},
-          {role: "quit"}
-      ]
-    },
-    {
-      label: "Edit",
-      submenu: [
-        { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-        { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-        { type: "separator" },
-        { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-        { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-        { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-        { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-      ]
-    },
-    {
-      label: 'View',
-      submenu: [
-        { role: 'reload' },
-        { type: 'separator' },
-        { role: 'resetzoom' },
-        { role: 'zoomin' },
-        { role: 'zoomout' },
-        { type: 'separator' },
-        { role: 'togglefullscreen' }
-      ]
-   },  
-   {
-      role: 'window',
-      submenu: [
-        { role: 'minimize' },
-        {role: 'close' }
-      ]
-   },  
-   {
-      role: 'help',
-      submenu: [
-        { label: 'Learn More'}
-      ]
-   }
-  ]);
-  Menu.setApplicationMenu(menu); 
 }
 
 app.on('ready', () => {
@@ -179,106 +105,9 @@ const exitCrypto = () => {
   pythonChild = null
 }
 
-const decrypt = () => {
-  decryptWindow = new BrowserWindow({
-    width: 400,
-    height: 500,
-    backgroundColor: "#D6D8DC",
-    show: false
-  })
-
-  decryptWindow.setMenuBarVisibility(false);
-
-  decryptWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexDecrypt.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
-  decryptWindow.once('ready-to-show', () => {
-    decryptWindow.show()
-  })
-
-  decryptWindow.on('close', (event) => {
-    if (decryptWindow != null){
-      decryptWindow.hide();
-      event.preventDefault();
-    }
-    decryptWindow = null
-  })
-}
-
-const grantAccess = () => {
-  accessWindow = new BrowserWindow({
-    width: 400,
-    height: 500,
-    backgroundColor: "#D6D8DC",
-    show: false
-  })
-
-  accessWindow.setMenuBarVisibility(false);
-
-  accessWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexAccess.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
-  accessWindow.once('ready-to-show', () => {
-    accessWindow.show()
-  })
-
-  accessWindow.on('close', (event) => {
-    if (accessWindow != null){
-      accessWindow.hide();
-      event.preventDefault();
-    }
-    accessWindow = null
-  })
-}
-
-// TODO: decide whether we need a separate window for user to log into vault
-const getConfigsetting = () => {
-  configWindow = new BrowserWindow({
-    width: 400,
-    height: 500,
-    backgroundColor: "#D6D8DC",
-    show: false
-  })
-
-  if (app.dock) { app.dock.show() }
-
-  configWindow.setMenuBarVisibility(false);
-
-  configWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexConfig.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
-  configWindow.once('ready-to-show', () => {
-    configWindow.show()
-  })
-
-  configWindow.on('close', (event) => {
-    if (configWindow != null){
-      configWindow.hide();
-      event.preventDefault();
-    }
-    if (app.dock && loginWindow === null && mainWindow === null && aboutWindow === null) { app.dock.hide() }
-    configWindow = null
-  })
-}
-
 app.on("before-quit", ev => {
-  if (loginWindow != null){
-    loginWindow.close();
-  }
   if (mainWindow != null){
     mainWindow.close();
-  }
-  if (decryptWindow != null){
-    decryptWindow.close();
   }
   top = null;
 });
