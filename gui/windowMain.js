@@ -69,6 +69,23 @@ function decrypt() {
   });
 }
 
+function grantAccess() {
+  var hostname = document.getElementById("hostname").value;
+  var username = document.getElementById("username").value;
+  var password = document.getElementById("password").value;
+  var dataset = document.getElementById("dataset").value;
+  var requester = document.getElementById("requester").value;
+  client.invoke("grant_access", username, password, hostname, dataset, requester, function(error, res, more) {
+    if (res === true){
+      notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
+    } else {
+      notifier.notify({"title" : "FRDR-Crypto", "message" : "Error access granting."});
+    }
+  });
+}
+
+document.getElementById("GrantAccess").addEventListener("click", grantAccess);
+
 // Send a open directory selector dialog message from a renderer process to main process 
 const ipc = require('electron').ipcRenderer
 const selectDirBtn = document.getElementById('input_path_dir')
