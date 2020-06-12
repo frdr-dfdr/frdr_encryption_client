@@ -34,12 +34,10 @@ function selectMode(e) {
 var buttonClicked = document.getElementById("button-encrypt");
 function highlightButton(element) {
   if (buttonClicked != null) {
-    buttonClicked.style.background = "whitesmoke";
-    buttonClicked.style.color = "black";
+    buttonClicked.classList.remove("active")
   }
   buttonClicked = element;
-  buttonClicked.style.background = "mediumblue";
-  buttonClicked.style.color = "white";
+  buttonClicked.classList.add("active")
 }
 
 function encrypt() {

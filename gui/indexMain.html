@@ -4,48 +4,35 @@
 <head>
   <meta charset="utf-8">
   <title>FRDR-Crypto</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
   <style>
     #menu {
       text-align: center;
       margin-top: 5%;
     }
-    .btn-secondary {
-      background-color: whitesmoke; 
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      cursor: pointer;
-      /* margin-left: 2%;
-      margin-right: 2%; */
-    }
     
     /* set background color to this button to show that this option is selected by default */
     #button-encrypt {
-      border-color: mediumblue;
-      background-color: mediumblue;
-      color: white;
-      width: 80pt;
+      width: 95pt;
     }
 
     #button-decrypt {
-      border-color: mediumblue;
-      width: 80pt;
+      width: 95pt;
     }
     #button-grant-access {
-      border-color: mediumblue;
-      width: 80pt;
+      width: 95pt;
     }
-    </style>
+  </style>
 </head>
 
 <body>
   <div id="menu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-    <button class="btn btn-secondary" id="button-encrypt" onclick="highlightButton(this)">Encrypt</button>
-    <button class="btn btn-secondary" id="button-decrypt" onclick="highlightButton(this)">Decrypt</button>
-    <button class="btn btn-secondary" id="button-grant-access" onclick="highlightButton(this)">Grant Access</button>  
+    <button class="btn btn-outline-danger active" id="button-encrypt" onclick="highlightButton(this)">Encrypt</button>
+    <button class="btn btn-outline-success" id="button-decrypt" onclick="highlightButton(this)">Decrypt</button>
+    <button class="btn btn-outline-info" id="button-grant-access" onclick="highlightButton(this)">Grant Access</button>  
   </div>
+  <br/><br/>
   <div id="container" class="container-fluid">
     <div class="row">
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
