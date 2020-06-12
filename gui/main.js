@@ -51,7 +51,7 @@ const getScriptPath = () => {
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 400,
-    height: 500,
+    height: 600,
     backgroundColor: "#D6D8DC",
   });
 
