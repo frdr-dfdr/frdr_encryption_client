@@ -36,6 +36,7 @@ import shutil
 import tempfile
 from zipfile import ZipFile
 import bagit
+import click
 
 __version__ = constants.VERSION
 dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
@@ -114,6 +115,11 @@ class Cryptor(object):
         return True
 
     def decrypt(self):
+        warning_string = "You are tring to decrypt the dataset {dataset_id}"\
+                         .format(dataset_id=self._dataset_name)
+        print (Util.wrap_text(warning_string))
+        if not click.confirm("Do you want to continue?", default=False):
+            return False
         logger = logging.getLogger('frdr-crypto.decrypt')
         if self._output is None:
             # default output path is the desktop
