@@ -13,6 +13,11 @@ path "sys/policy/{{identity.entity.id}}_*" {
     capabilities = [ "create", "read", "update", "delete", "list" ]
 }
 
+# Read entity info of other users
+path "identity/entity/id/*" {
+  capabilities = [ "read"]
+}
+
 # Create encryption key
 path "transit/keys/*" {
     capabilities = [ "create", "read", "update", "list" ]
