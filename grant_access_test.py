@@ -33,7 +33,7 @@ if __name__ == "__main__":
                                tokenfile=tokenfile)
     access_granter = AccessGranter(vault_client)
     requester_name = vault_client.read_entity_by_id(arguments["--requester"])
-    warning_string = "You are tring to grant requester {requester_name} access to dataset {dataset_id}"\
+    warning_string = "You are trying to grant requester {requester_name} access to dataset {dataset_id}"\
                      .format(requester_name=requester_name, dataset_id=arguments["--name"])
     print (Util.wrap_text(warning_string))
     if click.confirm("Do you want to continue?", default=False):

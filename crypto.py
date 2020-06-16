@@ -250,7 +250,7 @@ if __name__ == "__main__":
         if arguments["--encrypt"]:
             encryptor.encrypt()
         elif arguments["--decrypt"]:
-            warning_string = "You are tring to decrypt the dataset {dataset_id}"\
+            warning_string = "You are trying to decrypt the dataset {dataset_id}"\
                              .format(dataset_id=dataset_name)
             print (Util.wrap_text(warning_string))
             if click.confirm("Do you want to continue?", default=False):  
