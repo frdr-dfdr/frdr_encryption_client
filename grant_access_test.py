@@ -17,6 +17,8 @@ from appdirs import AppDirs
 from modules.AccessGranter import AccessGranter
 from modules.VaultClient import VaultClient
 from util import constants
+from util.util import Util
+import click
 
 __version__ = constants.VERSION
 dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
@@ -30,4 +32,9 @@ if __name__ == "__main__":
                                vault_passowrd=arguments["--password"], 
                                tokenfile=tokenfile)
     access_granter = AccessGranter(vault_client)
-    access_granter.grant_access(arguments["--requester"], arguments["--name"])  
+    requester_name = vault_client.read_entity_by_id(arguments["--requester"])
+    warning_string = "You are tring to grant requester {requester_name} access to dataset {dataset_id}"\
+                     .format(requester_name=requester_name, dataset_id=arguments["--name"])
+    print (Util.wrap_text(warning_string))
+    if click.confirm("Do you want to continue?", default=False):
+        access_granter.grant_access(arguments["--requester"], arguments["--name"])  
