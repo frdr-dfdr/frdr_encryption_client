@@ -115,11 +115,6 @@ class Cryptor(object):
         return True
 
     def decrypt(self):
-        warning_string = "You are tring to decrypt the dataset {dataset_id}"\
-                         .format(dataset_id=self._dataset_name)
-        print (Util.wrap_text(warning_string))
-        if not click.confirm("Do you want to continue?", default=False):
-            return False
         logger = logging.getLogger('frdr-crypto.decrypt')
         if self._output is None:
             # default output path is the desktop
@@ -255,7 +250,11 @@ if __name__ == "__main__":
         if arguments["--encrypt"]:
             encryptor.encrypt()
         elif arguments["--decrypt"]:
-            encryptor.decrypt()
+            warning_string = "You are tring to decrypt the dataset {dataset_id}"\
+                             .format(dataset_id=dataset_name)
+            print (Util.wrap_text(warning_string))
+            if click.confirm("Do you want to continue?", default=False):  
+                encryptor.decrypt()
         else:
             pass
     except Exception as e:
