@@ -58,13 +58,24 @@ function decrypt() {
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
   var url = document.getElementById("key_url").value;
-  client.invoke("decrypt", username, password, hostname, url, function(error, res, more) {
-    if (res === true){
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted and placed on Desktop."});
-    } else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Error decrypting."});
-    }
-  });
+  var dataset = url.split("/").pop();
+  var options = {
+    type: "question",
+    buttons: ["Yes", "Cancel"],
+    defaultId: 1,
+    title: "Confirmation",
+    message: `You are trying to decrypt the dataset ${dataset}. \nDo you want to continue?`
+  }
+  const response = dialog.showMessageBox(options);
+  if (response == 0) {
+    client.invoke("decrypt", username, password, hostname, url, function(error, res, more) {
+      if (res === true){
+        notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted and placed on Desktop."});
+      } else {
+        notifier.notify({"title" : "FRDR-Crypto", "message" : "Error decrypting."});
+      }
+    });
+  }
 }
 
 function grantAccess() {
