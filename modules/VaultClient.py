@@ -105,6 +105,13 @@ class VaultClient(object):
         )
     def read_group_by_name(self, group_name):
         return self.hvac_client.secrets.identity.read_group_by_name(group_name)
+
+    def read_entity_by_id(self, entity_id):
+        try:
+            response = self.hvac_client.secrets.identity.read_entity(entity_id=entity_id)
+            return response["data"]["name"]
+        except Exception as e:
+            self._logger.info("error {}".format(e))
     
     @property
     def vault_auth(self):
