@@ -80,6 +80,12 @@ class CryptoGui(object):
     def set_input_path(self, input_path):
         self._logger.info("Setting input path.")
         self._input_path = input_path
+    
+    def get_entity_name(self, username, password, hostname, entity_id):
+        # Added for testing
+        return "alice"
+        vault_client = VaultClient(hostname, username, password, tokenfile)
+        return vault_client.read_entity_by_id(entity_id)
 
 if __name__ == "__main__":
     s = zerorpc.Server(CryptoGui(tokenfile=tokenfile))

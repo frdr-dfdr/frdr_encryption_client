@@ -1,5 +1,6 @@
 const notifier = require('node-notifier');
 const remote = require('electron').remote;
+const {dialog} = require('electron').remote;
 const tt = require('electron-tooltip');
 let client = remote.getGlobal('client');
 tt({position: 'right'})
@@ -78,19 +79,48 @@ function decrypt() {
   }
 }
 
+
+var nodeConsole = require('console');
+var myConsole = new nodeConsole.Console(process.stdout, process.stderr);
+
 function grantAccess() {
-  var hostname = document.getElementById("hostname").value;
-  var username = document.getElementById("username").value;
-  var password = document.getElementById("password").value;
-  var dataset = document.getElementById("dataset").value;
-  var requester = document.getElementById("requester").value;
-  client.invoke("grant_access", username, password, hostname, dataset, requester, function(error, res, more) {
-    if (res === true){
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
-    } else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Error access granting."});
-    }
+  // var hostname = document.getElementById("hostname").value;
+  // var username = document.getElementById("username").value;
+  // var password = document.getElementById("password").value;
+  // var dataset = document.getElementById("dataset").value;
+  // var requester = document.getElementById("requester").value;
+
+  // Just for testing, no need to type in these vaules
+  var hostname = "http://127.0.0.1:8200";
+  var username = "bob";
+  var password = "training";
+  var dataset = "4b3d7807-91e6-47f6-bf09-120998cd340a";
+  var requester = "9d32d549-69ac-8685-8abb-bc10b9bc31c4";
+
+  // Try commenting out this line, and clicking the grant access button twice, you will see the confirmation dialog we want
+  var requesterName = null;
+
+  client.invoke("get_entity_name", username, password, hostname, requester, function(error, res, more) {
+    myConsole.log(res)
+    requesterName = res;
   });
+  var options = {
+    type: "question",
+    buttons: ["Yes", "Cancel"],
+    defaultId: 1,
+    title: "Confirmation",
+    message: "Are you sure to grant access to " + requesterName
+  }
+  const response = dialog.showMessageBox(options);
+  if (response == 0){
+    client.invoke("grant_access", username, password, hostname, dataset, requester, function(error, res, more) {
+      if (res === true){
+        notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
+      } else {
+        notifier.notify({"title" : "FRDR-Crypto", "message" : "Error access granting."});
+      }
+    });
+  }
 }
 
 document.getElementById("GrantAccess").addEventListener("click", grantAccess);
