@@ -65,7 +65,7 @@ function decrypt() {
     buttons: ["Yes", "Cancel"],
     defaultId: 1,
     title: "Confirmation",
-    message: `You are trying to decrypt the dataset ${dataset}. \nDo you want to continue?`
+    message: `You are trying to decrypt the dataset ${dataset}. \n\nDo you want to continue?`
   }
   const response = dialog.showMessageBox(options);
   if (response == 0) {
