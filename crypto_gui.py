@@ -82,8 +82,6 @@ class CryptoGui(object):
         self._input_path = input_path
     
     def get_entity_name(self, username, password, hostname, entity_id):
-        # Added for testing
-        return "alice"
         vault_client = VaultClient(hostname, username, password, tokenfile)
         return vault_client.read_entity_by_id(entity_id)
 
