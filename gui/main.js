@@ -63,8 +63,6 @@ const createWindow = () => {
   mainWindow.on('close', (event) => {
     if (mainWindow != null){
       mainWindow.hide();
-      // TODO: decide whether need this
-      event.preventDefault();
     }
     mainWindow = null
   });
