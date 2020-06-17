@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 from base64 import b64encode, b64decode
+import textwrap
 
 logger = logging.getLogger("frdr-crypto.util")
 
@@ -68,3 +69,14 @@ class Util(object):
 
 
         return logger
+
+    @classmethod
+    def wrap_text(cls, text):
+        padding = 3  # 3 spaces from left and right
+        max_line_length = 58 - padding * 2  # 58 because 60 - 2*asterisks
+        lines = textwrap.wrap(text, max_line_length)
+        wrapped_text = 60 * '*' + '\n'
+        for line in lines:
+            wrapped_text += '*{pad}{text:{width}}{pad}*\n'.format(text=line, pad=' '*padding, width=max_line_length)
+        wrapped_text += 60 * '*'
+        return wrapped_text

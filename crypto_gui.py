@@ -50,8 +50,8 @@ class CryptoGui(object):
                      "--encrypt": True}
         self._logger.info(arguments)
         encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
-        encryptor.encrypt()
-        return True
+        bag_path = encryptor.encrypt()
+        return os.path.join(bag_path, "data")
 
     def decrypt(self, username, password, hostname, url):
         self._logger.info("Decrypt files in the path {}".format(self._input_path))
@@ -80,6 +80,10 @@ class CryptoGui(object):
     def set_input_path(self, input_path):
         self._logger.info("Setting input path.")
         self._input_path = input_path
+    
+    def get_entity_name(self, username, password, hostname, entity_id):
+        vault_client = VaultClient(hostname, username, password, tokenfile)
+        return vault_client.read_entity_by_id(entity_id)
 
 if __name__ == "__main__":
     s = zerorpc.Server(CryptoGui(tokenfile=tokenfile))

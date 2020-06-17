@@ -1,5 +1,7 @@
 from modules.VaultClient import VaultClient
+
 class AccessGranter(object):
+    # TODO: add logger in this class
     def __init__(self, vault_client):
         self._vault_client = vault_client
         self._depositor_entity_id = self._vault_client.entity_id

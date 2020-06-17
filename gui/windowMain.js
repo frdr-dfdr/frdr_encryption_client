@@ -1,5 +1,7 @@
 const notifier = require('node-notifier');
 const remote = require('electron').remote;
+const {dialog} = require('electron').remote;
+const {shell} = require('electron').remote;
 const tt = require('electron-tooltip');
 let client = remote.getGlobal('client');
 tt({position: 'right'})
@@ -45,8 +47,9 @@ function encrypt() {
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
   client.invoke("encrypt", username, password, hostname, function(error, res, more) {
-    if (res === true){
+    if (res){
       notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been encrypted and transfer package has been created on Desktop."});
+      shell.showItemInFolder(res)
     } else {
       notifier.notify({"title" : "FRDR-Crypto", "message" : "Error encrypting."});
     }
@@ -58,13 +61,24 @@ function decrypt() {
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
   var url = document.getElementById("key_url").value;
-  client.invoke("decrypt", username, password, hostname, url, function(error, res, more) {
-    if (res === true){
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted and placed on Desktop."});
-    } else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Error decrypting."});
-    }
-  });
+  var dataset = url.split("/").pop();
+  var options = {
+    type: "question",
+    buttons: ["Yes", "Cancel"],
+    defaultId: 1,
+    title: "Confirmation",
+    message: `You are trying to decrypt the dataset ${dataset}. \n\nDo you want to continue?`
+  }
+  const response = dialog.showMessageBox(options);
+  if (response == 0) {
+    client.invoke("decrypt", username, password, hostname, url, function(error, res, more) {
+      if (res === true){
+        notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted and placed on Desktop."});
+      } else {
+        notifier.notify({"title" : "FRDR-Crypto", "message" : "Error decrypting."});
+      }
+    });
+  }
 }
 
 function grantAccess() {
@@ -73,11 +87,24 @@ function grantAccess() {
   var password = document.getElementById("password").value;
   var dataset = document.getElementById("dataset").value;
   var requester = document.getElementById("requester").value;
-  client.invoke("grant_access", username, password, hostname, dataset, requester, function(error, res, more) {
-    if (res === true){
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
-    } else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Error access granting."});
+
+  client.invoke("get_entity_name", username, password, hostname, requester, function(error, res, more) {
+    var options = {
+      type: "question",
+      buttons: ["Yes", "Cancel"],
+      defaultId: 1,
+      title: "Confirmation",
+      message: `You are trying to grant requester ${res} access to dataset ${dataset}. \n\nDo you want to continue?`
+    }
+    const response = dialog.showMessageBox(options);
+    if (response == 0){
+      client.invoke("grant_access", username, password, hostname, dataset, requester, function(error, res, more) {
+        if (res === true){
+          notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
+        } else {
+          notifier.notify({"title" : "FRDR-Crypto", "message" : "Error access granting."});
+        }
+      });
     }
   });
 }
