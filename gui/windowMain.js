@@ -1,6 +1,7 @@
 const notifier = require('node-notifier');
 const remote = require('electron').remote;
 const {dialog} = require('electron').remote;
+const {shell} = require('electron').remote;
 const tt = require('electron-tooltip');
 let client = remote.getGlobal('client');
 tt({position: 'right'})
@@ -46,8 +47,9 @@ function encrypt() {
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
   client.invoke("encrypt", username, password, hostname, function(error, res, more) {
-    if (res === true){
+    if (res){
       notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been encrypted and transfer package has been created on Desktop."});
+      shell.showItemInFolder(res)
     } else {
       notifier.notify({"title" : "FRDR-Crypto", "message" : "Error encrypting."});
     }
