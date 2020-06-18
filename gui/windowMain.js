@@ -1,4 +1,5 @@
 const notifier = require('node-notifier');
+const path = require('path');
 const remote = require('electron').remote;
 const {dialog} = require('electron').remote;
 const {shell} = require('electron').remote;
@@ -46,8 +47,19 @@ function encrypt() {
   var hostname = document.getElementById("hostname").value;
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
+  var window = remote.getCurrentWindow();
+    var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
+    childWindow.loadURL(require('url').format({
+      pathname: path.join(__dirname, 'indexEncryptInProgress.html'),
+      protocol: 'file:',
+      slashes: true
+    }));
+    childWindow.once('ready-to-show', () => {
+      childWindow.show()
+    });
   client.invoke("encrypt", username, password, hostname, function(error, res, more) {
     if (res){
+      childWindow.close();
       notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been encrypted and transfer package has been created on Desktop."});
       shell.showItemInFolder(res)
     } else {
@@ -71,7 +83,18 @@ function decrypt() {
   }
   const response = dialog.showMessageBox(options);
   if (response == 0) {
+    var window = remote.getCurrentWindow();
+    var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
+    childWindow.loadURL(require('url').format({
+      pathname: path.join(__dirname, 'indexDecryptInProgress.html'),
+      protocol: 'file:',
+      slashes: true
+    }));
+    childWindow.once('ready-to-show', () => {
+      childWindow.show()
+    });
     client.invoke("decrypt", username, password, hostname, url, function(error, res, more) {
+      childWindow.close();
       if (res === true){
         notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted and placed on Desktop."});
       } else {
