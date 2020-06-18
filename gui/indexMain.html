@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <title>FRDR-Crypto</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
   <style>
     #menu {
@@ -14,23 +15,23 @@
     
     /* set background color to this button to show that this option is selected by default */
     #button-encrypt {
-      width: 95pt;
+      color: white;
     }
 
     #button-decrypt {
-      width: 95pt;
+      color: white;
     }
     #button-grant-access {
-      width: 95pt;
+      color: white;
     }
   </style>
 </head>
 
 <body>
-  <div id="menu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-    <button class="btn btn-outline-danger active" id="button-encrypt" onclick="highlightButton(this)">Encrypt</button>
-    <button class="btn btn-outline-success" id="button-decrypt" onclick="highlightButton(this)">Decrypt</button>
-    <button class="btn btn-outline-info" id="button-grant-access" onclick="highlightButton(this)">Grant Access</button>  
+  <div id="menu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 w3-bar w3-blue">
+    <button class="w3-bar-item btn btn-outline-danger active" id="button-encrypt" onclick="highlightButton(this)">Encrypt</button>
+    <button class="w3-bar-item btn btn-outline-success" id="button-decrypt" onclick="highlightButton(this)">Decrypt</button>
+    <button class="w3-bar-item btn btn-outline-warning" id="button-grant-access" onclick="highlightButton(this)">Grant Access</button>          
   </div>
   <br/><br/>
   <div id="container" class="container-fluid">
