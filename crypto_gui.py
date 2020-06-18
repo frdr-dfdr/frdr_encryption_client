@@ -51,7 +51,7 @@ class CryptoGui(object):
         self._logger.info(arguments)
         encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
         bag_path = encryptor.encrypt()
-        return os.path.join(bag_path, "data")
+        return bag_path
 
     def decrypt(self, username, password, hostname, url):
         self._logger.info("Decrypt files in the path {}".format(self._input_path))

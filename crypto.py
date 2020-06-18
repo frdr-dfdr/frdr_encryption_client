@@ -37,7 +37,6 @@ import tempfile
 from zipfile import ZipFile
 import bagit
 import click
-from distutils.dir_util import copy_tree
 
 __version__ = constants.VERSION
 dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
@@ -100,11 +99,12 @@ class Cryptor(object):
             # TODO: log error
             return False
         
-        # move bag to the output path
-        output_bag_name = os.path.basename(self._input)+"_bag"
-        output_bag_path = os.path.join(self._output, output_bag_name)
-        copy_tree(bag_dir, output_bag_path)
+        # zip bag dir and move it to the output path
+        bag_destination = os.path.join(str(bag_dir_parent), (os.path.basename(self._input)+"_bag"))
+        zipname = shutil.make_archive(bag_destination, 'zip', bag_dir)
         shutil.rmtree(bag_dir)
+        bag_output_path = os.path.join(self._output, os.path.basename(zipname))
+        shutil.move(zipname, bag_output_path)
 
         # save key
         self._key_manager.save_key(self._secret_path)
@@ -113,7 +113,7 @@ class Cryptor(object):
         if self._arguments["--vault"]:
             self._key_manager.create_access_policy_and_group()
         
-        return output_bag_path
+        return bag_output_path
 
     def decrypt(self):
         logger = logging.getLogger('frdr-crypto.decrypt')
