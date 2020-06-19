@@ -43,6 +43,20 @@ function highlightButton(element) {
   buttonClicked.classList.add("active")
 }
 
+function clearFields() {
+  var inputs = document.getElementsByTagName("input");
+  for(var i = 0; i < inputs.length; i++) {
+    inputs[i].value = "";
+  }
+  unsetInputPath();
+}
+
+function unsetInputPath() {
+  client.invoke("unset_input_path", function(error, res, more){});
+  document.getElementById("selected-dir").innerHTML = "No selection";
+  document.getElementById("selected-file").innerHTML = "No selection";
+}
+ 
 function encrypt() {
   var hostname = document.getElementById("hostname").value;
   var username = document.getElementById("username").value;
