@@ -51,14 +51,10 @@ function clearFields() {
   unsetInputPath();
 }
 
-var nodeConsole = require('console');
-var myConsole = new nodeConsole.Console(process.stdout, process.stderr);
-
 function unsetInputPath() {
   client.invoke("unset_input_path", function(error, res, more){});
   document.getElementById("selected-dir").innerHTML = "No selection";
   document.getElementById("selected-file").innerHTML = "No selection";
-  myConsole.log(document.getElementById("selected-file").value);
 }
  
 function encrypt() {
