@@ -81,6 +81,10 @@ class CryptoGui(object):
         self._logger.info("Setting input path.")
         self._input_path = input_path
     
+    def unset_input_path(self):
+        self._logger.info("Clearing input path.")
+        self._input_path = None
+    
     def get_entity_name(self, username, password, hostname, entity_id):
         vault_client = VaultClient(hostname, username, password, tokenfile)
         return vault_client.read_entity_by_id(entity_id)
