@@ -147,7 +147,6 @@ function grantAccess() {
 }
 
 document.getElementById("GrantAccess").addEventListener("click", grantAccess);
-document.getElementById("GrantAccess").addEventListener("click", clearFields);
 
 // Send a open directory selector dialog message from a renderer process to main process 
 const ipc = require('electron').ipcRenderer
@@ -163,7 +162,6 @@ document.getElementById('selected-dir').innerHTML = `You selected: ${path}`
 
 
 document.getElementById("encrypt").addEventListener("click", encrypt);
-document.getElementById("encrypt").addEventListener("click", clearFields);
 
 // Send a open file selector dialog message from a renderer process to main process
 const selectFileBtn = document.getElementById('input_path_file')
@@ -177,5 +175,4 @@ document.getElementById('selected-file').innerHTML = `You selected: ${path}`
 });
 
 document.getElementById("decrypt").addEventListener("click", decrypt);
-document.getElementById("decrypt").addEventListener("click", clearFields);
 
