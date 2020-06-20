@@ -72,8 +72,8 @@ function encrypt() {
       childWindow.show()
     });
   client.invoke("encrypt", username, password, hostname, function(error, res, more) {
+    childWindow.close();
     if (res){
-      childWindow.close();
       notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been encrypted and transfer package has been created on Desktop."});
       shell.showItemInFolder(res)
     } else {
