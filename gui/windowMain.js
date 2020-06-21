@@ -72,6 +72,9 @@ function encrypt() {
   if (response == 0) {
     var output_path = dialog.showOpenDialog({properties: ['openDirectory']});
   }
+  if (typeof(output_path) == "undefined") {
+    return;
+  }
   var window = remote.getCurrentWindow();
   var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
   childWindow.loadURL(require('url').format({
@@ -118,6 +121,9 @@ function decrypt() {
     const selectOutputMessageResponse = dialog.showMessageBox(selectOutputMessageOptions);
     if (selectOutputMessageResponse == 0) {
       var output_path = dialog.showOpenDialog({properties: ['openDirectory']});
+    }
+    if (typeof(output_path) == "undefined") {
+      return;
     }
     var window = remote.getCurrentWindow();
     var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
