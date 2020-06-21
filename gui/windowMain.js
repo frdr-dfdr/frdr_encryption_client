@@ -73,15 +73,15 @@ function encrypt() {
     var output_path = dialog.showOpenDialog({properties: ['openDirectory']});
   }
   var window = remote.getCurrentWindow();
-    var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
-    childWindow.loadURL(require('url').format({
-      pathname: path.join(__dirname, 'indexEncryptInProgress.html'),
-      protocol: 'file:',
-      slashes: true
-    }));
-    childWindow.once('ready-to-show', () => {
-      childWindow.show()
-    });
+  var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
+  childWindow.loadURL(require('url').format({
+    pathname: path.join(__dirname, 'indexEncryptInProgress.html'),
+    protocol: 'file:',
+    slashes: true
+  }));
+  childWindow.once('ready-to-show', () => {
+    childWindow.show()
+  });
   client.invoke("encrypt", username, password, hostname,output_path[0], function(error, res, more) {
     childWindow.close();
     if (res){
