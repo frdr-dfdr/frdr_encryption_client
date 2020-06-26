@@ -17,20 +17,30 @@ function selectMode(e) {
   var encryptExtraBlock = document.getElementById("div-encrypt-extra");
   var decryptExtraBlock = document.getElementById("div-decrypt-extra");
   var grantAccessExtraBlock = document.getElementById("div-grant-access-extra");
+  var reviewSharesExtraBlock = document.getElementById("div-review-shares-extra");
   if (e.target.id == "button-encrypt") {
     encryptExtraBlock.style.display = "block";
     decryptExtraBlock.style.display = "none";
     grantAccessExtraBlock.style.display = "none";
+    reviewSharesExtraBlock.style.display = "none";
   }
   else if (e.target.id == "button-decrypt") {
     decryptExtraBlock.style.display = "block";
     encryptExtraBlock.style.display = "none";
     grantAccessExtraBlock.style.display = "none";
+    reviewSharesExtraBlock.style.display = "none";
   }
   else if (e.target.id == "button-grant-access") {
     decryptExtraBlock.style.display = "none";
     encryptExtraBlock.style.display = "none";
     grantAccessExtraBlock.style.display = "block";
+    reviewSharesExtraBlock.style.display = "none";
+  }
+  else if (e.target.id == "button-review-shares") {
+    decryptExtraBlock.style.display = "none";
+    encryptExtraBlock.style.display = "none";
+    grantAccessExtraBlock.style.display = "none";
+    reviewSharesExtraBlock.style.display = "block";
   }
 }
 
