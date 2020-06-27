@@ -113,6 +113,13 @@ class VaultClient(object):
         except Exception as e:
             self._logger.info("error {}".format(e))
     
+    def list_secrets(self, entity_id):
+        try:
+            response = self.hvac_client.secrets.kv.v2.list_secrets(entity_id)
+            return response["data"]["keys"]
+        except Exception as e:
+            self._logger.info("error {}".format(e))
+
     @property
     def vault_auth(self):
         if self._vault_auth is None:
