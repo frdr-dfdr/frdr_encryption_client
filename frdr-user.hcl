@@ -18,6 +18,11 @@ path "identity/entity/id/*" {
   capabilities = [ "read"]
 }
 
+# List secrets belong to user
+path "secret/metadata/{{identity.entity.id}}" {
+  capabilities = ["list" ]
+}
+
 # Create encryption key
 path "transit/keys/*" {
     capabilities = [ "create", "read", "update", "list" ]
