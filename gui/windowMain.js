@@ -1,3 +1,5 @@
+"use strict";
+
 const notifier = require('node-notifier');
 const path = require('path');
 const remote = require('electron').remote;
@@ -155,6 +157,28 @@ function grantAccess() {
     }
   });
 }
+
+function reviewShares() {
+  var hostname = document.getElementById("hostname").value;
+  var username = document.getElementById("username").value;
+  var password = document.getElementById("password").value;
+  client.invoke("create_access_granter", username, password, hostname, function(error, res, more) {
+    if (res) {
+      var window = remote.getCurrentWindow();
+      var reviewWindow = new remote.BrowserWindow({parent:window, show: false, width: 600, height: 500});
+      reviewWindow.loadURL(require('url').format({
+        pathname: path.join(__dirname, 'indexReview.html'),
+        protocol: 'file:',
+        slashes: true
+      }));
+      reviewWindow.once('ready-to-show', () => {
+        reviewWindow.show()
+      });
+    }
+  });
+}
+
+document.getElementById("ReviewShares").addEventListener("click", reviewShares);
 
 document.getElementById("GrantAccess").addEventListener("click", grantAccess);
 

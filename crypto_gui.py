@@ -77,6 +77,20 @@ class CryptoGui(object):
         access_granter.grant_access(requester_id, dataset_name)
         return True
 
+    def create_access_granter(self, username, password, hostname):
+        vault_client = VaultClient(hostname, username, password, tokenfile)
+        # TODO: add another method to set self._access_granter to null when the review window is closed
+        access_granter = AccessGranter(vault_client)
+        self._access_granter = access_granter
+        return True
+
+    def review_shares(self):
+        return self._access_granter.list_members()
+
+    def revoke_access(self, dataset_name, requester_id):
+        self._access_granter.revoke_access(requester_id, dataset_name)
+        return True
+
     def set_input_path(self, input_path):
         self._logger.info("Setting input path.")
         self._input_path = input_path
