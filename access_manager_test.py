@@ -15,7 +15,7 @@ Options:
 import os
 from docopt import docopt
 from appdirs import AppDirs
-from modules.AccessGranter import AccessGranter
+from modules.AccessManager import AccessManager
 from modules.VaultClient import VaultClient
 from util import constants
 from util.util import Util
@@ -32,7 +32,7 @@ if __name__ == "__main__":
                                vault_username=arguments["--username"], 
                                vault_passowrd=arguments["--password"], 
                                tokenfile=tokenfile)
-    access_granter = AccessGranter(vault_client)
+    access_granter = AccessManager(vault_client)
     if arguments["--mode"] == "review-shares":
         print (access_granter.list_members())
     else:

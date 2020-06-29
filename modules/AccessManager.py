@@ -1,7 +1,7 @@
 from modules.VaultClient import VaultClient
 import json
 
-class AccessGranter(object):
+class AccessManager(object):
     # TODO: add logger in this class
     def __init__(self, vault_client):
         self._vault_client = vault_client

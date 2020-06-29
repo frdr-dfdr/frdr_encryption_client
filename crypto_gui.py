@@ -6,7 +6,7 @@ from tempfile import mkstemp, gettempdir
 from shutil import move
 import json
 from modules.VaultClient import VaultClient
-from modules.AccessGranter import AccessGranter
+from modules.AccessManager import AccessManager
 from util import constants
 import logging
 from util.util import Util
@@ -73,14 +73,14 @@ class CryptoGui(object):
 
     def grant_access(self, username, password, hostname, dataset_name, requester_id):
         vault_client = VaultClient(hostname, username, password, tokenfile)
-        access_granter = AccessGranter(vault_client)
+        access_granter = AccessManager(vault_client)
         access_granter.grant_access(requester_id, dataset_name)
         return True
 
     def create_access_granter(self, username, password, hostname):
         vault_client = VaultClient(hostname, username, password, tokenfile)
         # TODO: add another method to set self._access_granter to null when the review window is closed
-        access_granter = AccessGranter(vault_client)
+        access_granter = AccessManager(vault_client)
         self._access_granter = access_granter
         return True
 
