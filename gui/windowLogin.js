@@ -16,7 +16,7 @@ function login() {
       }
       notifier.notify({"title" : "FRDR-Crypto", "message" : res});
     } else {
-      setTimeout(notifier.notify({"title" : "FRDR-Crypto", "message" : "No response from server. Is it running and configured properly?"}), 1000)
+      setTimeout(notifier.notify({"title" : "FRDR-Crypto", "message" : "No response from server. Please contact FRDR support."}), 1000)
     }
   });
 }
