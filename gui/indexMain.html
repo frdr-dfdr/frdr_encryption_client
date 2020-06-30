@@ -17,11 +17,13 @@
     #button-encrypt {
       color: white;
     }
-
     #button-decrypt {
       color: white;
     }
     #button-grant-access {
+      color: white;
+    }
+    #button-review-shares {
       color: white;
     }
   </style>
@@ -32,6 +34,7 @@
     <button class="w3-bar-item btn btn-outline-danger active" id="button-encrypt" onclick="highlightButton(this); clearFields();">Encrypt</button>
     <button class="w3-bar-item btn btn-outline-success" id="button-decrypt" onclick="highlightButton(this); clearFields();">Decrypt</button>
     <button class="w3-bar-item btn btn-outline-warning" id="button-grant-access" onclick="highlightButton(this); clearFields();">Grant Access</button>          
+    <button class="w3-bar-item btn btn-outline-secondary" id="button-review-shares" onclick="highlightButton(this); clearFields();">Review Shares</button>          
   </div>
   <br/><br/>
   <div id="container" class="container-fluid">
@@ -121,6 +124,14 @@
   
       <div class="button">
         <button class="btn btn-primary" type="submit" id="GrantAccess">Grant Access</button>
+      </div>
+    </div>
+
+    <div id="div-review-shares-extra" style="display: none;">
+      <br/><br/>
+
+      <div class="button">
+        <button class="btn btn-primary" type="submit" id="ReviewShares">Review Shares</button>
       </div>
     </div>
 

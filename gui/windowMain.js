@@ -1,3 +1,5 @@
+"use strict";
+
 const notifier = require('node-notifier');
 const path = require('path');
 const remote = require('electron').remote;
@@ -17,20 +19,30 @@ function selectMode(e) {
   var encryptExtraBlock = document.getElementById("div-encrypt-extra");
   var decryptExtraBlock = document.getElementById("div-decrypt-extra");
   var grantAccessExtraBlock = document.getElementById("div-grant-access-extra");
+  var reviewSharesExtraBlock = document.getElementById("div-review-shares-extra");
   if (e.target.id == "button-encrypt") {
     encryptExtraBlock.style.display = "block";
     decryptExtraBlock.style.display = "none";
     grantAccessExtraBlock.style.display = "none";
+    reviewSharesExtraBlock.style.display = "none";
   }
   else if (e.target.id == "button-decrypt") {
     decryptExtraBlock.style.display = "block";
     encryptExtraBlock.style.display = "none";
     grantAccessExtraBlock.style.display = "none";
+    reviewSharesExtraBlock.style.display = "none";
   }
   else if (e.target.id == "button-grant-access") {
     decryptExtraBlock.style.display = "none";
     encryptExtraBlock.style.display = "none";
     grantAccessExtraBlock.style.display = "block";
+    reviewSharesExtraBlock.style.display = "none";
+  }
+  else if (e.target.id == "button-review-shares") {
+    decryptExtraBlock.style.display = "none";
+    encryptExtraBlock.style.display = "none";
+    grantAccessExtraBlock.style.display = "none";
+    reviewSharesExtraBlock.style.display = "block";
   }
 }
 
@@ -93,7 +105,7 @@ function decrypt() {
     buttons: ["Yes", "Cancel"],
     defaultId: 1,
     title: "Confirmation",
-    message: `You are trying to decrypt the dataset ${dataset}. \n\nDo you want to continue?`
+    message: `You are trying to decrypt the dataset ${dataset}. \n\nYou should only do this if you're on a trusted computer, as the risk\n\nof this data being accessed by another party may be very high.\n\nDo you want to continue?`
   }
   const response = dialog.showMessageBox(options);
   if (response == 0) {
@@ -110,7 +122,7 @@ function decrypt() {
     client.invoke("decrypt", username, password, hostname, url, function(error, res, more) {
       childWindow.close();
       if (res === true){
-        notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted and placed on Desktop."});
+        notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted for access."});
       } else {
         notifier.notify({"title" : "FRDR-Crypto", "message" : "Error decrypting."});
       }
@@ -139,12 +151,34 @@ function grantAccess() {
         if (res === true){
           notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
         } else {
-          notifier.notify({"title" : "FRDR-Crypto", "message" : "Error access granting."});
+          notifier.notify({"title" : "FRDR-Crypto", "message" : "Error granting access."});
         }
       });
     }
   });
 }
+
+function reviewShares() {
+  var hostname = document.getElementById("hostname").value;
+  var username = document.getElementById("username").value;
+  var password = document.getElementById("password").value;
+  client.invoke("create_access_granter", username, password, hostname, function(error, res, more) {
+    if (res) {
+      var window = remote.getCurrentWindow();
+      var reviewWindow = new remote.BrowserWindow({parent:window, show: false, width: 600, height: 500});
+      reviewWindow.loadURL(require('url').format({
+        pathname: path.join(__dirname, 'indexReview.html'),
+        protocol: 'file:',
+        slashes: true
+      }));
+      reviewWindow.once('ready-to-show', () => {
+        reviewWindow.show()
+      });
+    }
+  });
+}
+
+document.getElementById("ReviewShares").addEventListener("click", reviewShares);
 
 document.getElementById("GrantAccess").addEventListener("click", grantAccess);
 
