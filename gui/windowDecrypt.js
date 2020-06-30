@@ -14,7 +14,7 @@ function decrypt() {
     if (res === true){
       var window = remote.getCurrentWindow();
       window.close();
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted and transfer package has been created."});
+      notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted for access."});
     } else {
       notifier.notify({"title" : "FRDR-Crypto", "message" : "Error decrypting."});
     }

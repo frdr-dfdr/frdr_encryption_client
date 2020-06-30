@@ -27,7 +27,7 @@ function revoke() {
         notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Revoked"});
         window.location.reload();
       } else {
-        notifier.notify({"title" : "FRDR-Crypto", "message" : "Error access revoking."});
+        notifier.notify({"title" : "FRDR-Crypto", "message" : "Error revoking access."});
       }
     });
   }

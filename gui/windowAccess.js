@@ -16,7 +16,7 @@ function grantAccess() {
       window.close();
       notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
     } else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Error access granting."});
+      notifier.notify({"title" : "FRDR-Crypto", "message" : "Error granting access."});
     }
   });
 }
