@@ -73,17 +73,31 @@ function encrypt() {
   var hostname = document.getElementById("hostname").value;
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
+  var options = {
+    type: "question",
+    buttons: ["Select Output Directory"],
+    defaultId: 1,
+    title: "Confirmation",
+    message: `Please select an output path for the encrypted package.`
+  }
+  const response = dialog.showMessageBox(options);
+  if (response == 0) {
+    var output_path = dialog.showOpenDialog({properties: ['openDirectory']});
+  }
+  if (typeof(output_path) == "undefined") {
+    return;
+  }
   var window = remote.getCurrentWindow();
-    var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
-    childWindow.loadURL(require('url').format({
-      pathname: path.join(__dirname, 'indexEncryptInProgress.html'),
-      protocol: 'file:',
-      slashes: true
-    }));
-    childWindow.once('ready-to-show', () => {
-      childWindow.show()
-    });
-  client.invoke("encrypt", username, password, hostname, function(error, res, more) {
+  var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
+  childWindow.loadURL(require('url').format({
+    pathname: path.join(__dirname, 'indexEncryptInProgress.html'),
+    protocol: 'file:',
+    slashes: true
+  }));
+  childWindow.once('ready-to-show', () => {
+    childWindow.show()
+  });
+  client.invoke("encrypt", username, password, hostname,output_path[0], function(error, res, more) {
     childWindow.close();
     if (res){
       notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been encrypted and transfer package has been created on Desktop."});
@@ -109,6 +123,20 @@ function decrypt() {
   }
   const response = dialog.showMessageBox(options);
   if (response == 0) {
+    var selectOutputMessageOptions = {
+      type: "question",
+      buttons: ["Select Output Directory"],
+      defaultId: 1,
+      title: "Confirmation",
+      message: `Please select an output path for the decrypted package.`
+    }
+    const selectOutputMessageResponse = dialog.showMessageBox(selectOutputMessageOptions);
+    if (selectOutputMessageResponse == 0) {
+      var output_path = dialog.showOpenDialog({properties: ['openDirectory']});
+    }
+    if (typeof(output_path) == "undefined") {
+      return;
+    }
     var window = remote.getCurrentWindow();
     var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
     childWindow.loadURL(require('url').format({
@@ -119,7 +147,7 @@ function decrypt() {
     childWindow.once('ready-to-show', () => {
       childWindow.show()
     });
-    client.invoke("decrypt", username, password, hostname, url, function(error, res, more) {
+    client.invoke("decrypt", username, password, hostname, url, output_path[0], function(error, res, more) {
       childWindow.close();
       if (res === true){
         notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted for access."});
