@@ -122,7 +122,7 @@ function decrypt() {
     client.invoke("decrypt", username, password, hostname, url, function(error, res, more) {
       childWindow.close();
       if (res === true){
-        notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted and placed on Desktop."});
+        notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted for access."});
       } else {
         notifier.notify({"title" : "FRDR-Crypto", "message" : "Error decrypting."});
       }
