@@ -84,12 +84,14 @@ function encrypt() {
       childWindow.show()
     });
   client.invoke("encrypt", username, password, hostname, function(error, res, more) {
+    var success = res[0];
+    var result = res[1];
     childWindow.close();
-    if (res){
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been encrypted and transfer package has been created on Desktop."});
-      shell.showItemInFolder(res)
+    if (success){
+      notifier.notify({"title" : "FRDR-Crypto", "message" : `Dataset has been encrypted and transfer package has been created on ${result}.`});
+      shell.showItemInFolder(result)
     } else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Error encrypting."});
+      notifier.notify({"title" : "FRDR-Crypto", "message" : `Error encrypting. ${result}`});
     }
   });
 }

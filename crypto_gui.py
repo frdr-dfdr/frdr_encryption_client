@@ -38,20 +38,23 @@ class CryptoGui(object):
             return "Unable to obtain token. Verify your credentials and Vault URL."
 
     def encrypt(self, username, password, hostname):
-        self._logger.info("Encrypt files in the path {}".format(self._input_path))
-        vault_client = VaultClient(hostname, username, password, tokenfile)
-        dataset_name = str(uuid.uuid4()) 
-        key_manager = KeyManagementVault(vault_client, dataset_name)
-        arguments = {"--input": self._input_path, 
-                     "--output": None,
-                     "--username": username,
-                     "--password": password, 
-                     "--vault": hostname,
-                     "--encrypt": True}
-        self._logger.info(arguments)
-        encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
-        bag_path = encryptor.encrypt()
-        return bag_path
+        try:
+            self._logger.info("Encrypt files in the path {}".format(self._input_path))
+            vault_client = VaultClient(hostname, username, password, tokenfile)
+            dataset_name = str(uuid.uuid4()) 
+            key_manager = KeyManagementVault(vault_client, dataset_name)
+            arguments = {"--input": self._input_path, 
+                        "--output": None,
+                        "--username": username,
+                        "--password": password, 
+                        "--vault": hostname,
+                        "--encrypt": True}
+            self._logger.info(arguments)
+            encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
+            bag_path = encryptor.encrypt()
+            return (True, bag_path)
+        except Exception as e:
+            return (False, str(e))
 
     def decrypt(self, username, password, hostname, url):
         self._logger.info("Decrypt files in the path {}".format(self._input_path))
