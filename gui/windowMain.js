@@ -73,6 +73,20 @@ function encrypt() {
   var hostname = document.getElementById("hostname").value;
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
+  var options = {
+    type: "question",
+    buttons: ["Select Output Directory"],
+    defaultId: 1,
+    title: "Confirmation",
+    message: `Please select an output path for the encrypted package.`
+  }
+  const response = dialog.showMessageBox(options);
+  if (response == 0) {
+    var output_path = dialog.showOpenDialog({properties: ['openDirectory']});
+  }
+  if (typeof(output_path) == "undefined") {
+    return;
+  }
   var window = remote.getCurrentWindow();
     var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
     childWindow.loadURL(require('url').format({
@@ -83,7 +97,7 @@ function encrypt() {
     childWindow.once('ready-to-show', () => {
       childWindow.show()
     });
-  client.invoke("encrypt", username, password, hostname, function(error, res, more) {
+  client.invoke("encrypt", username, password, hostname, output_path[0], function(error, res, more) {
     var success = res[0];
     var result = res[1];
     childWindow.close();
@@ -107,10 +121,24 @@ function decrypt() {
     buttons: ["Yes", "Cancel"],
     defaultId: 1,
     title: "Confirmation",
-    message: `You are trying to decrypt the dataset ${dataset}. \n\nDo you want to continue?`
+    message: `You are trying to decrypt the dataset ${dataset}. \n\nYou should only do this if you're on a trusted computer, as the risk\n\nof this data being accessed by another party may be very high.\n\nDo you want to continue?`
   }
   const response = dialog.showMessageBox(options);
   if (response == 0) {
+    var selectOutputMessageOptions = {
+      type: "question",
+      buttons: ["Select Output Directory"],
+      defaultId: 1,
+      title: "Confirmation",
+      message: `Please select an output path for the decrypted package.`
+    }
+    const selectOutputMessageResponse = dialog.showMessageBox(selectOutputMessageOptions);
+    if (selectOutputMessageResponse == 0) {
+      var output_path = dialog.showOpenDialog({properties: ['openDirectory']});
+    }
+    if (typeof(output_path) == "undefined") {
+      return;
+    }
     var window = remote.getCurrentWindow();
     var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
     childWindow.loadURL(require('url').format({
@@ -121,10 +149,10 @@ function decrypt() {
     childWindow.once('ready-to-show', () => {
       childWindow.show()
     });
-    client.invoke("decrypt", username, password, hostname, url, function(error, res, more) {
+    client.invoke("decrypt", username, password, hostname, url, output_path[0], function(error, res, more) {
       childWindow.close();
       if (res === true){
-        notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted and placed on Desktop."});
+        notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted for access."});
       } else {
         notifier.notify({"title" : "FRDR-Crypto", "message" : "Error decrypting."});
       }
@@ -153,7 +181,7 @@ function grantAccess() {
         if (res === true){
           notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
         } else {
-          notifier.notify({"title" : "FRDR-Crypto", "message" : "Error access granting."});
+          notifier.notify({"title" : "FRDR-Crypto", "message" : "Error granting access."});
         }
       });
     }

@@ -37,14 +37,14 @@ class CryptoGui(object):
         else:
             return "Unable to obtain token. Verify your credentials and Vault URL."
 
-    def encrypt(self, username, password, hostname):
+    def encrypt(self, username, password, hostname, output_path):
         try:
             self._logger.info("Encrypt files in the path {}".format(self._input_path))
             vault_client = VaultClient(hostname, username, password, tokenfile)
             dataset_name = str(uuid.uuid4()) 
             key_manager = KeyManagementVault(vault_client, dataset_name)
             arguments = {"--input": self._input_path, 
-                        "--output": None,
+                        "--output": output_path,
                         "--username": username,
                         "--password": password, 
                         "--vault": hostname,
@@ -56,13 +56,13 @@ class CryptoGui(object):
         except Exception as e:
             return (False, str(e))
 
-    def decrypt(self, username, password, hostname, url):
+    def decrypt(self, username, password, hostname, url, output_path):
         self._logger.info("Decrypt files in the path {}".format(self._input_path))
         vault_client = VaultClient(hostname, username, password, tokenfile)
         dataset_name = url.split("/")[-1]
         key_manager = KeyManagementVault(vault_client, dataset_name)
         arguments = {"--input": self._input_path, 
-                     "--output": None,
+                     "--output": output_path,
                      "--username": username,
                      "--password": password, 
                      "--vault": hostname,
