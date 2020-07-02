@@ -22,10 +22,10 @@ class VaultClient(object):
                    "Failed to authenticate with Vault."
         except AssertionError as error:
             self._logger.error(error)
-            raise Exception
+            raise Exception(error)
         except Exception as e:
             self._logger.error("Failed to authenticate with Vault.")
-            raise Exception
+            raise Exception("Failed to authenticate with Vault.")
 
         self._logger.info("Authenticated with Vault successfully.")
 

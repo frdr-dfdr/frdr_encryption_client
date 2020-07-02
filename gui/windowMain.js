@@ -88,22 +88,24 @@ function encrypt() {
     return;
   }
   var window = remote.getCurrentWindow();
-  var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
-  childWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexEncryptInProgress.html'),
-    protocol: 'file:',
-    slashes: true
-  }));
-  childWindow.once('ready-to-show', () => {
-    childWindow.show()
-  });
-  client.invoke("encrypt", username, password, hostname,output_path[0], function(error, res, more) {
+    var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
+    childWindow.loadURL(require('url').format({
+      pathname: path.join(__dirname, 'indexEncryptInProgress.html'),
+      protocol: 'file:',
+      slashes: true
+    }));
+    childWindow.once('ready-to-show', () => {
+      childWindow.show()
+    });
+  client.invoke("encrypt", username, password, hostname, output_path[0], function(error, res, more) {
+    var success = res[0];
+    var result = res[1];
     childWindow.close();
-    if (res){
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been encrypted and transfer package has been created on Desktop."});
-      shell.showItemInFolder(res)
+    if (success){
+      notifier.notify({"title" : "FRDR-Crypto", "message" : `Dataset has been encrypted and transfer package has been created on ${result}.`});
+      shell.showItemInFolder(result)
     } else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : "Error encrypting."});
+      notifier.notify({"title" : "FRDR-Crypto", "message" : `Error encrypting. ${result}`});
     }
   });
 }
@@ -119,7 +121,7 @@ function decrypt() {
     buttons: ["Yes", "Cancel"],
     defaultId: 1,
     title: "Confirmation",
-    message: `You are trying to decrypt the dataset ${dataset}. \n\nYou should only do this if you're on a trusted computer, as the risk\n\nof this data being accessed by another party may be very high.\n\nDo you want to continue?`
+    message: `You are trying to decrypt the dataset ${dataset}. \n\nYou should only do this if you're on a trusted computer, as the risk of this data being accessed by another party may be very high.\n\nDo you want to continue?`
   }
   const response = dialog.showMessageBox(options);
   if (response == 0) {
@@ -149,10 +151,12 @@ function decrypt() {
     });
     client.invoke("decrypt", username, password, hostname, url, output_path[0], function(error, res, more) {
       childWindow.close();
-      if (res === true){
+      var success = res[0];
+      var errMessage = res[1];
+      if (success){
         notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted for access."});
       } else {
-        notifier.notify({"title" : "FRDR-Crypto", "message" : "Error decrypting."});
+        notifier.notify({"title" : "FRDR-Crypto", "message" : `Error decrypting. ${errMessage}`});
       }
     });
   }
@@ -166,22 +170,29 @@ function grantAccess() {
   var requester = document.getElementById("requester").value;
 
   client.invoke("get_entity_name", username, password, hostname, requester, function(error, res, more) {
-    var options = {
-      type: "question",
-      buttons: ["Yes", "Cancel"],
-      defaultId: 1,
-      title: "Confirmation",
-      message: `You are trying to grant requester ${res} access to dataset ${dataset}. \n\nDo you want to continue?`
+    var success = res[0];
+    var result = res[1];
+    if (success) {
+      var options = {
+        type: "question",
+        buttons: ["Yes", "Cancel"],
+        defaultId: 1,
+        title: "Confirmation",
+        message: `You are trying to grant requester ${result} access to dataset ${dataset}. \n\nDo you want to continue?`
+      }
+      const response = dialog.showMessageBox(options);
+      if (response == 0){
+        client.invoke("grant_access", username, password, hostname, dataset, requester, function(error, res, more) {
+          if (success){
+            notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
+          } else {
+            notifier.notify({"title" : "FRDR-Crypto", "message" : `Error granting access. ${result}`});
+          }
+        });
+      }
     }
-    const response = dialog.showMessageBox(options);
-    if (response == 0){
-      client.invoke("grant_access", username, password, hostname, dataset, requester, function(error, res, more) {
-        if (res === true){
-          notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
-        } else {
-          notifier.notify({"title" : "FRDR-Crypto", "message" : "Error granting access."});
-        }
-      });
+    else {
+      notifier.notify({"title" : "FRDR-Crypto", "message" : `Error finding the User in Vault. \n${result}`});
     }
   });
 }
@@ -191,7 +202,9 @@ function reviewShares() {
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
   client.invoke("create_access_granter", username, password, hostname, function(error, res, more) {
-    if (res) {
+    var success = res[0];
+    var errMessage = res[1];
+    if (success) {
       var window = remote.getCurrentWindow();
       var reviewWindow = new remote.BrowserWindow({parent:window, show: false, width: 600, height: 500});
       reviewWindow.loadURL(require('url').format({
@@ -202,6 +215,9 @@ function reviewShares() {
       reviewWindow.once('ready-to-show', () => {
         reviewWindow.show()
       });
+    }
+    else {
+      notifier.notify({"title" : "FRDR-Crypto", "message" : `Error reviewing shares. \n${errMessage}`});
     }
   });
 }
