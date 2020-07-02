@@ -121,7 +121,7 @@ function decrypt() {
     buttons: ["Yes", "Cancel"],
     defaultId: 1,
     title: "Confirmation",
-    message: `You are trying to decrypt the dataset ${dataset}. \n\nYou should only do this if you're on a trusted computer, as the risk\n\nof this data being accessed by another party may be very high.\n\nDo you want to continue?`
+    message: `You are trying to decrypt the dataset ${dataset}. \n\nYou should only do this if you're on a trusted computer, as the risk of this data being accessed by another party may be very high.\n\nDo you want to continue?`
   }
   const response = dialog.showMessageBox(options);
   if (response == 0) {
@@ -183,7 +183,7 @@ function grantAccess() {
       const response = dialog.showMessageBox(options);
       if (response == 0){
         client.invoke("grant_access", username, password, hostname, dataset, requester, function(error, res, more) {
-          if (res === true){
+          if (success){
             notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
           } else {
             notifier.notify({"title" : "FRDR-Crypto", "message" : `Error granting access. ${result}`});
