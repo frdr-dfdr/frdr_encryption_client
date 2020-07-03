@@ -207,6 +207,7 @@ function reviewShares() {
     if (success) {
       var window = remote.getCurrentWindow();
       var reviewWindow = new remote.BrowserWindow({parent:window, show: false, width: 600, height: 500});
+      reviewWindow.setMenuBarVisibility(false);
       reviewWindow.loadURL(require('url').format({
         pathname: path.join(__dirname, 'indexReview.html'),
         protocol: 'file:',
