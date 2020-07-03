@@ -73,7 +73,7 @@ For example,
 $ python crypto.py -d -i ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --username bob --password training --url http://127.0.0.1:8200/v1/secret/data/4186db38-9ebe-0512-8c32-4552220324aa/test_dataset
 ```
 
-### CLI Usage Patterns
+#### CLI Usage Patterns
 Usage:
 ```sh
 python crypto.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>]
@@ -94,6 +94,32 @@ Options:
 --url <API_path>  API Path to fetch secret on vault
 ```
 
+### Grant Access, Review Shares, and Revoke Access
+```sh
+$ python access_manager_test.py --mode <access manager mode> --vault <vault server address> --username <vault username> --password <vault password> [--name <dataset uuid>] [--requester <requester entity id on vault>]
+```
+For example, to grant access
+```sh
+$ python access_manager_test.py --mode grant-access --vault http://127.0.0.1:8200/ --username "bob" --password "training" --requester 9d32d549-69ac-8685-8abb-bc10b9bc31c4 --name 104a3f2b-de39-4132-9bd6-f2a32499d647
+```
+To review existing shares
+```sh
+python access_manager_test.py --mode review-shares --vault http://127.0.0.1:8200/ --username "bob" --password "training"
+```
+#### CLI Usage Patterns
+Usage:
+```sh
+access_manager_test.py --mode <mode> --vault <vault_addr> --username <vault_username> --password <vault_password> [--requester <requester_vault_entity_id>] [--name <dataset_name>]
+```
+Options:
+```sh
+-m <mode>, --mode <mode> grant-access, revoke-access or review-shares
+--vault <vault_addr> 
+-u <vault_username>, --username <vault_username>
+-p <vault_password>, --password <vault_password>
+-r <requester_vault_entity_id>, --requester <requester_vault_entity_id>
+-n <dataset_name>, --name <dataset_name>
+```
 ## GUI Usage
 
 ![encrypt](img/encrypt.png)
@@ -103,12 +129,3 @@ Options:
 ![access](img/access.png)
 
 ![shares](img/shares.png) 
-
-## Granting Access Test
-```sh
-$ python grant_access_test.py --hvac <vault server address> --username <vault username> --password <vault password> -n <dataset uuid> --requester <requester entity id on vault>
-```
-For example, 
-```sh
-$ python grant_access_test.py --hvac http://127.0.0.1:8200/ --username "bob" --password "training" -n "test_dataset" --requester "9d32d549-69ac-8685-8abb-bc10b9bc31c4"
-```
