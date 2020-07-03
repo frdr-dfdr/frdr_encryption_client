@@ -129,3 +129,5 @@ Options:
 ![access](img/access.png)
 
 ![shares](img/shares.png) 
+
+![revoke](img/revoke.png)
