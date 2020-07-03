@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-Python 3 is required to run the Radiam agent from the command line. Ensure that the output of `python3 --version` shows 3.6 or higher.  
+Python 3 is required to run the FRDR Vault client from the command line. Ensure that the output of `python3 --version` shows 3.6 or higher.  
 
 You may want to run inside a virutal environment (see below) before running this command.
 ```sh
@@ -27,7 +27,7 @@ To exit the virtual environment:
 deactivate
 ```
 
-The Electron GUI in /gui should work for development after runing  `npm install` and `npm start`.
+The Electron GUI in /gui should work for development after runing  `cd gui` and `npm install` and `npm start`.
 
 ## CLI Usage
 ### Key Stored Locally
@@ -95,7 +95,15 @@ Options:
 ```
 
 ## GUI Usage
- 
+
+![encrypt](img/encrypt.png)
+
+![decrypt](img/decrypt.png)
+
+![access](img/access.png)
+
+![shares](img/shares.png) 
+
 ## Granting Access Test
 ```sh
 $ python grant_access_test.py --hvac <vault server address> --username <vault username> --password <vault password> -n <dataset uuid> --requester <requester entity id on vault>
