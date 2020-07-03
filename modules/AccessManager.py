@@ -33,6 +33,8 @@ class AccessManager(object):
         members["entity_id"] = self._depositor_entity_id
         members["data"] = []
         depositor_datasets = self._list_datasets()
+        if depositor_datasets is None:
+            return None
         for each_dataset_id in depositor_datasets:
             group_name = "_".join((self._depositor_entity_id, each_dataset_id, "share_group"))
             each_dataset_members = {}
