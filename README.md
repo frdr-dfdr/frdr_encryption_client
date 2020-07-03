@@ -122,12 +122,21 @@ Options:
 ```
 ## GUI Usage
 
+The GUI is divided into four features -- encrypting a package, decrypting a package, granting access to another user, and reviewing/revoking existing shares. In order to do any of these, you'll need to provide the URL of the Vault instance, as well as a username and password.
+
 ![encrypt](img/encrypt.png)
+
+The **Encrypt** menu option allows you to encrypt any directory on your computer by automatically generating encryption keys, sending them to Vault with your credentials, using those keys to secure the package, and wrapping it in a metadata container called *bagit*. When clicking `Encrypt Data` you'll be prompted to pick a destination for the package, which you can then upload to a repository such as FRDR.
 
 ![decrypt](img/decrypt.png)
 
+The **Decrypt** menu option allows you to decrypt an encrypted package for access. Assuming you've already downloaded the package, clicking `Decrypt Data`will retrieve its decryption keys from a Vault API endpoint URL (which will be normally be provided to you upon acceptance of an access request) and decrypt the package. You should only decrypt packages on trusted computers, as their contents may be very sensitive.
+
 ![access](img/access.png)
 
-![shares](img/shares.png) 
+The **Grant Access** menu option allows you to grant access to a package's encryption keys on Vault to another user who has requested access. You will need the requester's ID and the package/dataset ID, both of which will normally be included in a private message to you along with an access request.
 
+![shares](img/shares.png) 
 ![revoke](img/revoke.png)
+
+The **Review Shares** menu option allows you to review all of the other users to whom you have granted access to individual packages, and if desired, revoke their access to those packages from a separate menu that appears on authentication.
