@@ -2,12 +2,14 @@
 
 if(require('electron-squirrel-startup')) return;
 const {app, dialog, Menu, BrowserWindow} = require("electron");
-//Does not allow a second instance
-const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
-  notifier.notify({"title" : "FRDR-Crypto", "message" : "FRDR-Crypto is already running."});
-});
-if (isSecondInstance) {
+// Does not allow a second instance
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
   app.quit();
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    notifier.notify({"title" : "FRDR-Crypto", "message" : "FRDR-Crypto is already running."});
+  });
 }
 
 require('update-electron-app')();
@@ -50,6 +52,9 @@ const createWindow = () => {
     width: 500,
     height: 650,
     backgroundColor: "#D6D8DC",
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
 
   mainWindow.setMenuBarVisibility(false);
@@ -101,6 +106,7 @@ let port = portfinder.getPort(function (err, port) {
 const exitCrypto = () => {
   pythonChild.kill()
   pythonChild = null
+  global.client.close();
 }
 
 app.on("before-quit", ev => {
@@ -143,17 +149,17 @@ let top = {};
 // Main process to open a file/folder selector dialog
 const ipc = require('electron').ipcMain
 ipc.on('open-file-dialog', function (event) {
-  input_path = dialog.showOpenDialog({properties: ['openFile']});
+  input_path = dialog.showOpenDialogSync({properties: ['openFile']});
   if (input_path) {
     client.invoke("set_input_path", input_path[0], function(error, res, more) {} );
-    event.sender.send('selected-file', input_path)
+    event.reply('selected-file', input_path)
   }
 })
 
 ipc.on('open-dir-dialog', function (event) {
-  input_path = dialog.showOpenDialog({properties: ['openDirectory']});
+  input_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
   if (input_path) {
     client.invoke("set_input_path", input_path[0], function(error, res, more) {} );
-    event.sender.send('selected-dir', input_path)
+    event.reply('selected-dir', input_path)
   }
 })

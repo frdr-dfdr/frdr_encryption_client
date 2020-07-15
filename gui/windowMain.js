@@ -80,15 +80,24 @@ function encrypt() {
     title: "Confirmation",
     message: `Please select an output path for the encrypted package.`
   }
-  const response = dialog.showMessageBox(options);
+  const response = dialog.showMessageBoxSync(options);
   if (response == 0) {
-    var output_path = dialog.showOpenDialog({properties: ['openDirectory']});
+    var output_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
   }
   if (typeof(output_path) == "undefined") {
     return;
   }
   var window = remote.getCurrentWindow();
-    var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
+    var childWindow = new remote.BrowserWindow({ 
+      parent: window, 
+      modal: true, 
+      show: false, 
+      width: 200, 
+      height: 100, 
+      webPreferences: {
+        nodeIntegration: true
+      }
+    });
     childWindow.loadURL(require('url').format({
       pathname: path.join(__dirname, 'indexEncryptInProgress.html'),
       protocol: 'file:',
@@ -123,7 +132,7 @@ function decrypt() {
     title: "Confirmation",
     message: `You are trying to decrypt the dataset ${dataset}. \n\nYou should only do this if you're on a trusted computer, as the risk of this data being accessed by another party may be very high.\n\nDo you want to continue?`
   }
-  const response = dialog.showMessageBox(options);
+  const response = dialog.showMessageBoxSync(options);
   if (response == 0) {
     var selectOutputMessageOptions = {
       type: "question",
@@ -132,15 +141,24 @@ function decrypt() {
       title: "Confirmation",
       message: `Please select an output path for the decrypted package.`
     }
-    const selectOutputMessageResponse = dialog.showMessageBox(selectOutputMessageOptions);
+    const selectOutputMessageResponse = dialog.showMessageBoxSync(selectOutputMessageOptions);
     if (selectOutputMessageResponse == 0) {
-      var output_path = dialog.showOpenDialog({properties: ['openDirectory']});
+      var output_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
     }
     if (typeof(output_path) == "undefined") {
       return;
     }
     var window = remote.getCurrentWindow();
-    var childWindow = new remote.BrowserWindow({ parent: window, modal: true, show: false, width: 200, height: 100, });
+    var childWindow = new remote.BrowserWindow({ 
+      parent: window, 
+      modal: true, 
+      show: false, 
+      width: 200, 
+      height: 100,
+      webPreferences: {
+        nodeIntegration: true
+      } 
+    });
     childWindow.loadURL(require('url').format({
       pathname: path.join(__dirname, 'indexDecryptInProgress.html'),
       protocol: 'file:',
@@ -180,7 +198,7 @@ function grantAccess() {
         title: "Confirmation",
         message: `You are trying to grant requester ${result} access to dataset ${dataset}. \n\nDo you want to continue?`
       }
-      const response = dialog.showMessageBox(options);
+      const response = dialog.showMessageBoxSync(options);
       if (response == 0){
         client.invoke("grant_access", username, password, hostname, dataset, requester, function(error, res, more) {
           if (success){
@@ -206,7 +224,15 @@ function reviewShares() {
     var errMessage = res[1];
     if (success) {
       var window = remote.getCurrentWindow();
-      var reviewWindow = new remote.BrowserWindow({parent:window, show: false, width: 600, height: 500});
+      var reviewWindow = new remote.BrowserWindow({
+        parent: window, 
+        show: false, 
+        width: 600, 
+        height: 500,       
+        webPreferences: {
+          nodeIntegration: true
+        }
+      });
       reviewWindow.setMenuBarVisibility(false);
       reviewWindow.loadURL(require('url').format({
         pathname: path.join(__dirname, 'indexReview.html'),

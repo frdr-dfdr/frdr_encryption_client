@@ -20,7 +20,7 @@ function revoke() {
     title: "Confirmation",
     message: `You are trying to revoke requester ${entityName} access to dataset ${datasetId}. \n\nDo you want to continue?`
   }
-  const response = dialog.showMessageBox(options);
+  const response = dialog.showMessageBoxSync(options);
   if (response == 0){
     client.invoke("revoke_access", datasetId, entityId, function(error, res, more) {
       if (res === true){
