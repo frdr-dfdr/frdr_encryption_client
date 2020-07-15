@@ -11,6 +11,7 @@
     #menu {
       text-align: center;
       margin-top: 5%;
+      background-color: #007BFF;
     }
     
     /* set background color to this button to show that this option is selected by default */
@@ -30,7 +31,7 @@
 </head>
 
 <body>
-  <div id="menu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 w3-bar w3-blue">
+  <div id="menu" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 w3-bar">
     <button class="w3-bar-item btn btn-outline-danger active" id="button-encrypt" onclick="highlightButton(this); clearFields();">Encrypt</button>
     <button class="w3-bar-item btn btn-outline-success" id="button-decrypt" onclick="highlightButton(this); clearFields();">Decrypt</button>
     <button class="w3-bar-item btn btn-outline-warning" id="button-grant-access" onclick="highlightButton(this); clearFields();">Grant Access</button>          
