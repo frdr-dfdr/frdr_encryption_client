@@ -5,9 +5,7 @@ const path = require('path');
 const remote = require('electron').remote;
 const {dialog} = require('electron').remote;
 const {shell} = require('electron').remote;
-const tt = require('electron-tooltip');
 let client = remote.getGlobal('client');
-tt({position: 'right'})
 
 window.onload = myMain;
 
