@@ -61,3 +61,15 @@ class AccessManager(object):
 
     def _list_datasets(self):        
         return self._vault_client.list_secrets(self._depositor_entity_id)
+
+    def expire_shares(self):
+        groups = self._vault_client.list_groups()
+        for each_group in groups:
+            read_group_response = self._vault_client.read_group_by_name(each_group)
+            metadata = read_group_response["data"]["metadata"]
+            if metadata is None:
+                continue
+            for key, value in metadata.items():
+                expiry_date = datetime.datetime.strptime(value, "%Y-%m-%d").date()
+                if expiry_date <= datetime.date.today():
+                    self._remove_member_from_group(each_group, key)

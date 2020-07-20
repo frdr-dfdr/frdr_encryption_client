@@ -4,14 +4,14 @@ import os
 import logging 
 
 class VaultClient(object):
-    def __init__(self, vault_addr, vault_username=None, vault_passowrd=None, tokenfile=None):
+    def __init__(self, vault_addr, vault_username=None, vault_passowrd=None, tokenfile=None, vault_token=None):
         self._logger = logging.getLogger("frdr-crypto.vault-client")
         self._vault_addr = vault_addr
         self._tokenfile = tokenfile
         self._username = vault_username
         self._password = vault_passowrd
         self._vault_auth = None
-        self._vault_token = None
+        self._vault_token = vault_token
         self._entity_id = None
         try:
             self.hvac_client = hvac.Client(
@@ -123,6 +123,16 @@ class VaultClient(object):
                 self._logger.info(str(e))
             else:
                 self._logger.error("error {}".format(e))
+    
+    def list_groups(self):
+        try:
+            response = self.hvac_client.secrets.identity.list_groups_by_name()
+            return response["data"]["keys"]
+        except Exception as e:
+            if str(e).startswith("None"):
+                self._logger.info(str(e))
+            else:
+                self._logger.error("error {}".format(e))
 
     @property
     def vault_auth(self):
@@ -142,5 +152,8 @@ class VaultClient(object):
     @property
     def entity_id(self):
         if self._entity_id is None:
-            self._entity_id = self.vault_auth["entity_id"]
+            try:
+                self._entity_id = self.vault_auth["entity_id"]
+            except:
+                self._entity_id = None
         return self._entity_id
