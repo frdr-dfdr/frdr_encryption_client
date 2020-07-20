@@ -96,12 +96,13 @@ class VaultClient(object):
     def read_policy(self, policy_name):
         return self.hvac_client.sys.read_policy(policy_name)
 
-    def create_or_update_group_by_name(self, group_name, policy_name=None, member_entity_ids=None):
+    def create_or_update_group_by_name(self, group_name, policy_name=None, member_entity_ids=None, metadata=None):
         return self.hvac_client.secrets.identity.create_or_update_group_by_name(
             name=group_name,
             group_type="internal",
             policies=policy_name,
             member_entity_ids=member_entity_ids,
+            metadata=metadata,
         )
     def read_group_by_name(self, group_name):
         return self.hvac_client.secrets.identity.read_group_by_name(group_name)

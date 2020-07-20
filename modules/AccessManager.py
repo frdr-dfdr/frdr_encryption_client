@@ -1,22 +1,27 @@
 from modules.VaultClient import VaultClient
 import json
+import datetime
 
 class AccessManager(object):
     # TODO: add logger in this class
     def __init__(self, vault_client):
         self._vault_client = vault_client
         self._depositor_entity_id = self._vault_client.entity_id
-    def grant_access(self, requester_entity_id, dataset_id):
+    def grant_access(self, requester_entity_id, dataset_id, expiry_date=(datetime.date.today() + datetime.timedelta(days=7))):
         group_name = "_".join((self._depositor_entity_id, dataset_id, "share_group"))
-        self._add_member_to_group(group_name, requester_entity_id)
+        self._add_member_to_group(group_name, requester_entity_id, expiry_date)
     
-    def _add_member_to_group(self, group_name, requester_entity_id):
+    def _add_member_to_group(self, group_name, requester_entity_id, expiry_date):
         read_group_response = self._vault_client.read_group_by_name(group_name)
         member_entity_ids = read_group_response["data"]["member_entity_ids"]
         member_entity_ids.append(requester_entity_id)
         policies = read_group_response["data"]["policies"]
-        self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids)
-    
+        metadata = read_group_response["data"]["metadata"]
+        if metadata is None:
+            metadata = {}
+        metadata[requester_entity_id] = expiry_date.strftime("%Y-%m-%d")
+        self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
+
     def revoke_access(self, requester_entity_id, dataset_id):
         group_name = "_".join((self._depositor_entity_id, dataset_id, "share_group"))
         self._remove_member_from_group(group_name, requester_entity_id)
@@ -26,7 +31,9 @@ class AccessManager(object):
         member_entity_ids = read_group_response["data"]["member_entity_ids"]
         member_entity_ids.remove(requester_entity_id)
         policies = read_group_response["data"]["policies"]
-        self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids)
+        metadata = read_group_response["data"]["metadata"]
+        metadata.pop(requester_entity_id, None)
+        self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
 
     def list_members(self):
         members = {}
