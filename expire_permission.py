@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    expire_permission.py --vault <vault_addr> 
+    expire_permission.py --vault <vault_addr> --tokenfile <root_tokenfile>
 
 Options:
     --vault <vault_addr> using hashicorp vault for key generation and storage
+    --tokenfile <root_tokenfile>
 """
 
 import datetime
@@ -18,8 +19,7 @@ __version__ = constants.VERSION
 
 if __name__ == "__main__":
     arguments = docopt(__doc__, version=__version__)
-    root_token_file = "./vault_root_token"
-    with open(root_token_file) as f:
+    with open(arguments["--tokenfile"]) as f:
         vault_root_token = f.read()
     vault_client = VaultClient(vault_addr=arguments["--vault"], 
                                vault_token=vault_root_token)
