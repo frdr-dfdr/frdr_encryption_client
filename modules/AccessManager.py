@@ -7,7 +7,7 @@ class AccessManager(object):
     def __init__(self, vault_client):
         self._vault_client = vault_client
         self._depositor_entity_id = self._vault_client.entity_id
-    def grant_access(self, requester_entity_id, dataset_id, expiry_date=(datetime.date.today() + datetime.timedelta(days=7))):
+    def grant_access(self, requester_entity_id, dataset_id, expiry_date=(datetime.date.today() + datetime.timedelta(days=7)).strftime("%Y-%m-%d")):
         group_name = "_".join((self._depositor_entity_id, dataset_id, "share_group"))
         self._add_member_to_group(group_name, requester_entity_id, expiry_date)
     
@@ -19,7 +19,7 @@ class AccessManager(object):
         metadata = read_group_response["data"]["metadata"]
         if metadata is None:
             metadata = {}
-        metadata[requester_entity_id] = expiry_date.strftime("%Y-%m-%d")
+        metadata[requester_entity_id] = expiry_date
         self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
 
     def revoke_access(self, requester_entity_id, dataset_id):
