@@ -1,6 +1,7 @@
 from modules.VaultClient import VaultClient
 import json
 import datetime
+from collections import defaultdict
 
 class AccessManager(object):
     # TODO: add logger in this class
@@ -49,9 +50,12 @@ class AccessManager(object):
             each_dataset_members = {}
             each_dataset_members["dataset_id"] = each_dataset_id
             each_dataset_members["members"] = []
+            read_group_response = self._vault_client.read_group_by_name(group_name)
+            metadata = read_group_response["data"]["metadata"]
+            metadata_defaultdict = defaultdict(lambda: 'None', metadata)
             for each_member_id in self._list_members_per_group(group_name):
                 each_member_name = self._vault_client.read_entity_by_id(each_member_id)
-                each_member = {"entity_id": each_member_id, "entity_name": each_member_name}
+                each_member = {"entity_id": each_member_id, "entity_name": each_member_name, "expiry_date": metadata_defaultdict[each_member_id]}
                 each_dataset_members["members"].append(each_member)
             members["data"].append(each_dataset_members)
         return json.dumps(members)
