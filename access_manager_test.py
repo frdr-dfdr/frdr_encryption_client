@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    access_manager_test.py --mode <mode> --vault <vault_addr> --username <vault_username> --password <vault_password> [--requester <requester_vault_entity_id>] [--name <dataset_name> --expire <expiry_date>]
+    access_manager_test.py --mode <mode> --vault <vault_addr> --username <vault_username> --password <vault_password> [--requester <requester_vault_entity_id>] [--name <dataset_name>] [--expire <expiry_date>]
 
 Options:
     -m <mode>, --mode <mode> grant-access, revoke-access or review-shares
