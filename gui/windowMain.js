@@ -13,6 +13,10 @@ function myMain() {
   document.getElementById("menu").onclick = selectMode;
 }
 
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+})
+
 function selectMode(e) {
   var encryptExtraBlock = document.getElementById("div-encrypt-extra");
   var decryptExtraBlock = document.getElementById("div-decrypt-extra");
