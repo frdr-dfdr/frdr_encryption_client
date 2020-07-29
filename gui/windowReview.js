@@ -42,22 +42,26 @@ function load() {
         row.className = "row";                   
         document.getElementById("data").appendChild(row);  
         var col1 = document.createElement("DIV");
-        col1.className = "col-sm-5 col-md-5 col-lg-5";
+        col1.className = "col-sm-4 col-md-4 col-lg-4";
         col1.innerHTML = json["data"][i]["dataset_id"];
         var col2 = document.createElement("DIV");
-        col2.className = "col-sm-5 col-md-5 col-lg-5";
+        col2.className = "col-sm-3 col-md-3 col-lg-3";
         col2.innerHTML = json["data"][i]["members"][j]["entity_name"];
         var entityId = document.createElement("DIV");
         entityId.innerHTML = json["data"][i]["members"][j]["entity_id"];
         entityId.style.display = "none";
         var col3 = document.createElement("div");
-        col3.className = "btn btn-primary";
-        col3.innerHTML = "Revoke";
-        col3.addEventListener("click", revoke);
+        col3.className = "col-sm-3 col-md-3 col-lg-3";
+        col3.innerHTML = json["data"][i]["members"][j]["expiry_date"];
+        var col4 = document.createElement("div");
+        col4.className = "btn btn-primary";
+        col4.innerHTML = "Revoke";
+        col4.addEventListener("click", revoke);
         row.appendChild(col1);
         row.appendChild(col2);
         row.appendChild(entityId);
         row.appendChild(col3);
+        row.appendChild(col4);
       }
     }
   });

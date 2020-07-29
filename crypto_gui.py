@@ -77,11 +77,11 @@ class CryptoGui(object):
         except Exception as e:
             return (False, str(e))
 
-    def grant_access(self, username, password, hostname, dataset_name, requester_id):
+    def grant_access(self, username, password, hostname, dataset_name, requester_id, expiry_date):
         try:
             vault_client = VaultClient(hostname, username, password, tokenfile)
             access_granter = AccessManager(vault_client)
-            access_granter.grant_access(requester_id, dataset_name)
+            access_granter.grant_access(requester_id, dataset_name, expiry_date)
             return (True, None)
         except Exception as e:
             return (False, str(e))

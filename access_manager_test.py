@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    access_manager_test.py --mode <mode> --vault <vault_addr> --username <vault_username> --password <vault_password> [--requester <requester_vault_entity_id>] [--name <dataset_name>]
+    access_manager_test.py --mode <mode> --vault <vault_addr> --username <vault_username> --password <vault_password> [--requester <requester_vault_entity_id>] [--name <dataset_name>] [--expire <expiry_date>]
 
 Options:
     -m <mode>, --mode <mode> grant-access, revoke-access or review-shares
@@ -11,6 +11,7 @@ Options:
     -p <vault_password>, --password <vault_password>
     -r <requester_vault_entity_id>, --requester <requester_vault_entity_id>
     -n <dataset_name>, --name <dataset_name>
+    --expire <expiry date> the permission expiry date in format YYYY-mm-dd
 """
 import os
 from docopt import docopt
@@ -32,9 +33,9 @@ if __name__ == "__main__":
                                vault_username=arguments["--username"], 
                                vault_passowrd=arguments["--password"], 
                                tokenfile=tokenfile)
-    access_granter = AccessManager(vault_client)
+    access_manager = AccessManager(vault_client)
     if arguments["--mode"] == "review-shares":
-        print (access_granter.list_members())
+        print (access_manager.list_members())
     else:
         requester_name = vault_client.read_entity_by_id(arguments["--requester"])
         if arguments["--mode"] == "grant-access":
@@ -42,10 +43,10 @@ if __name__ == "__main__":
                             .format(requester_name=requester_name, dataset_id=arguments["--name"])
             print (Util.wrap_text(warning_string))
             if click.confirm("Do you want to continue?", default=False):
-                access_granter.grant_access(arguments["--requester"], arguments["--name"])  
+                access_manager.grant_access(arguments["--requester"], arguments["--name"], arguments["--expire"])  
         elif arguments["--mode"] == "revoke-access":
             warning_string = "You are trying to revoke requester {requester_name} access to dataset {dataset_id}"\
                             .format(requester_name=requester_name, dataset_id=arguments["--name"])
             print (Util.wrap_text(warning_string))
             if click.confirm("Do you want to continue?", default=False):
-                access_granter.revoke_access(arguments["--requester"], arguments["--name"])  
+                access_manager.revoke_access(arguments["--requester"], arguments["--name"])  

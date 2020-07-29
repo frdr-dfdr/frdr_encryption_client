@@ -109,7 +109,7 @@ python access_manager_test.py --mode review-shares --vault http://127.0.0.1:8200
 #### CLI Usage Patterns
 Usage:
 ```sh
-access_manager_test.py --mode <mode> --vault <vault_addr> --username <vault_username> --password <vault_password> [--requester <requester_vault_entity_id>] [--name <dataset_name>]
+access_manager_test.py --mode <mode> --vault <vault_addr> --username <vault_username> --password <vault_password> [--requester <requester_vault_entity_id>] [--name <dataset_name>] [--name <dataset_name>] [--expire <expiry_date>]
 ```
 Options:
 ```sh
@@ -119,6 +119,7 @@ Options:
 -p <vault_password>, --password <vault_password>
 -r <requester_vault_entity_id>, --requester <requester_vault_entity_id>
 -n <dataset_name>, --name <dataset_name>
+--expire <expiry date> the permission expiry date in format YYYY-mm-dd
 ```
 ## GUI Usage
 
@@ -140,3 +141,9 @@ The **Grant Access** menu option allows you to grant access to a package's encry
 ![revoke](img/revoke.png)
 
 The **Review Shares** menu option allows you to review all of the other users to whom you have granted access to individual packages, and if desired, revoke their access to those packages from a separate menu that appears on authentication.
+
+# Set Permission to Expire Script
+## CLI Usage
+```sh
+python expire_permission.py --vault <vault_addr> --tokenfile <vault root token file path> 
+```

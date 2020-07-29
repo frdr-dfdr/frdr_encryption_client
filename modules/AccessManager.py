@@ -1,22 +1,30 @@
 from modules.VaultClient import VaultClient
 import json
+import datetime
+from collections import defaultdict
 
 class AccessManager(object):
     # TODO: add logger in this class
     def __init__(self, vault_client):
         self._vault_client = vault_client
         self._depositor_entity_id = self._vault_client.entity_id
-    def grant_access(self, requester_entity_id, dataset_id):
+    def grant_access(self, requester_entity_id, dataset_id, expiry_date=None):
+        if expiry_date is None:
+            expiry_date = (datetime.date.today() + datetime.timedelta(days=14)).strftime("%Y-%m-%d")
         group_name = "_".join((self._depositor_entity_id, dataset_id, "share_group"))
-        self._add_member_to_group(group_name, requester_entity_id)
+        self._add_member_to_group(group_name, requester_entity_id, expiry_date)
     
-    def _add_member_to_group(self, group_name, requester_entity_id):
+    def _add_member_to_group(self, group_name, requester_entity_id, expiry_date):
         read_group_response = self._vault_client.read_group_by_name(group_name)
         member_entity_ids = read_group_response["data"]["member_entity_ids"]
         member_entity_ids.append(requester_entity_id)
         policies = read_group_response["data"]["policies"]
-        self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids)
-    
+        metadata = read_group_response["data"]["metadata"]
+        if metadata is None:
+            metadata = {}
+        metadata[requester_entity_id] = expiry_date
+        self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
+
     def revoke_access(self, requester_entity_id, dataset_id):
         group_name = "_".join((self._depositor_entity_id, dataset_id, "share_group"))
         self._remove_member_from_group(group_name, requester_entity_id)
@@ -26,7 +34,9 @@ class AccessManager(object):
         member_entity_ids = read_group_response["data"]["member_entity_ids"]
         member_entity_ids.remove(requester_entity_id)
         policies = read_group_response["data"]["policies"]
-        self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids)
+        metadata = read_group_response["data"]["metadata"]
+        metadata.pop(requester_entity_id, None)
+        self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
 
     def list_members(self):
         members = {}
@@ -40,9 +50,12 @@ class AccessManager(object):
             each_dataset_members = {}
             each_dataset_members["dataset_id"] = each_dataset_id
             each_dataset_members["members"] = []
+            read_group_response = self._vault_client.read_group_by_name(group_name)
+            metadata = read_group_response["data"]["metadata"]
+            metadata_defaultdict = defaultdict(lambda: 'None', metadata)
             for each_member_id in self._list_members_per_group(group_name):
                 each_member_name = self._vault_client.read_entity_by_id(each_member_id)
-                each_member = {"entity_id": each_member_id, "entity_name": each_member_name}
+                each_member = {"entity_id": each_member_id, "entity_name": each_member_name, "expiry_date": metadata_defaultdict[each_member_id]}
                 each_dataset_members["members"].append(each_member)
             members["data"].append(each_dataset_members)
         return json.dumps(members)
@@ -54,3 +67,15 @@ class AccessManager(object):
 
     def _list_datasets(self):        
         return self._vault_client.list_secrets(self._depositor_entity_id)
+
+    def expire_shares(self):
+        groups = self._vault_client.list_groups()
+        for each_group in groups:
+            read_group_response = self._vault_client.read_group_by_name(each_group)
+            metadata = read_group_response["data"]["metadata"]
+            if metadata is None:
+                continue
+            for key, value in metadata.items():
+                expiry_date = datetime.datetime.strptime(value, "%Y-%m-%d").date()
+                if expiry_date <= datetime.date.today():
+                    self._remove_member_from_group(each_group, key)

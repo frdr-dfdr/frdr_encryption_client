@@ -5,7 +5,21 @@ const path = require('path');
 const remote = require('electron').remote;
 const {dialog} = require('electron').remote;
 const {shell} = require('electron').remote;
+const flatpickr = require('flatpickr');
 let client = remote.getGlobal('client');
+
+var expiryDate = null;
+var defaultDate = new Date().fp_incr(14);
+var defaultDateStr = defaultDate.toISOString().substring(0, 10);
+document.getElementById("expiry_date").value = defaultDateStr;
+const picker = flatpickr('#expiry_date', {
+  minDate: "today",
+  defaultDate: defaultDate,
+  onChange: function(selectedDates, dateStr, instance) {
+    expiryDate = dateStr;
+  }
+});
+
 
 window.onload = myMain;
 
@@ -60,6 +74,10 @@ function highlightButton(element) {
 function clearFields() {
   var inputs = document.getElementsByTagName("input");
   for(var i = 0; i < inputs.length; i++) {
+    if (inputs[i].id == "expiry_date") {
+      inputs[i].value = defaultDateStr;
+      continue;
+    }
     inputs[i].value = "";
   }
   unsetInputPath();
@@ -202,7 +220,7 @@ function grantAccess() {
       }
       const response = dialog.showMessageBoxSync(options);
       if (response == 0){
-        client.invoke("grant_access", username, password, hostname, dataset, requester, function(error, res, more) {
+        client.invoke("grant_access", username, password, hostname, dataset, requester, expiryDate, function(error, res, more) {
           if (success){
             notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
           } else {
