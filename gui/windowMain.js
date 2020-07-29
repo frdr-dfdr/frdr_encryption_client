@@ -5,10 +5,8 @@ const path = require('path');
 const remote = require('electron').remote;
 const {dialog} = require('electron').remote;
 const {shell} = require('electron').remote;
-const tt = require('electron-tooltip');
 const flatpickr = require('flatpickr');
 let client = remote.getGlobal('client');
-tt({position: 'right'})
 
 var expiryDate = null;
 var defaultDate = new Date().fp_incr(7);
