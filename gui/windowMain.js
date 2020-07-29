@@ -20,11 +20,16 @@ const picker = flatpickr('#expiry_date', {
   }
 });
 
+
 window.onload = myMain;
 
 function myMain() {
   document.getElementById("menu").onclick = selectMode;
 }
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+})
 
 function selectMode(e) {
   var encryptExtraBlock = document.getElementById("div-encrypt-extra");
