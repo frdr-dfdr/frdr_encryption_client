@@ -9,7 +9,7 @@ const flatpickr = require('flatpickr');
 let client = remote.getGlobal('client');
 
 var expiryDate = null;
-var defaultDate = new Date().fp_incr(7);
+var defaultDate = new Date().fp_incr(14);
 var defaultDateStr = defaultDate.toISOString().substring(0, 10);
 document.getElementById("expiry_date").value = defaultDateStr;
 const picker = flatpickr('#expiry_date', {
