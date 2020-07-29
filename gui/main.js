@@ -49,8 +49,8 @@ const getScriptPath = () => {
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 500,
-    height: 650,
+    width: 530,
+    height: 750,
     backgroundColor: "#D6D8DC",
     webPreferences: {
       nodeIntegration: true
