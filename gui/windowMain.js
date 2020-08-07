@@ -83,6 +83,35 @@ function clearFields() {
   unsetInputPath();
 }
 
+$('#oauth2_login').hide();
+$("#loginSwitch").on('change', function() {
+  $('#userpass_login, #oauth2_login').toggle();
+});
+
+function openVaultUI() {
+  var vaultURL = document.getElementById("hostname").value;
+  if (vaultURL.length == 0) {
+    var options = {
+      type: "warning",
+      title: "Warning",
+      message: "Please fill in Vault URL first."
+    }
+   dialog.showMessageBoxSync(options);
+    return;
+  } 
+  var hostURL = require('url').parse(document.getElementById("hostname").value);
+  const win = new remote.BrowserWindow({width: 800, height: 600});
+  var url = require('url').format({
+    hostname: hostURL.hostname,
+    pathname: '/ui/vault/auth?with=oidc',
+    slashes: true,
+    protocol: 'http',
+    port: hostURL.port
+  });
+  win.loadURL(url);
+}
+
+
 function unsetInputPath() {
   client.invoke("unset_input_path", function(error, res, more){});
   document.getElementById("selected-dir").innerHTML = "No selection";
@@ -93,6 +122,7 @@ function encrypt() {
   var hostname = document.getElementById("hostname").value;
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
+  var token = document.getElementById("token").value;
   var options = {
     type: "question",
     buttons: ["Select Output Directory"],
@@ -126,7 +156,7 @@ function encrypt() {
     childWindow.once('ready-to-show', () => {
       childWindow.show()
     });
-  client.invoke("encrypt", username, password, hostname, output_path[0], function(error, res, more) {
+  client.invoke("encrypt", username, password, token, hostname, output_path[0], function(error, res, more) {
     var success = res[0];
     var result = res[1];
     childWindow.close();
@@ -143,6 +173,7 @@ function decrypt() {
   var hostname = document.getElementById("hostname").value;
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
+  var token = document.getElementById("token").value;
   var url = document.getElementById("key_url").value;
   var dataset = url.split("/").pop();
   var options = {
@@ -187,7 +218,7 @@ function decrypt() {
     childWindow.once('ready-to-show', () => {
       childWindow.show()
     });
-    client.invoke("decrypt", username, password, hostname, url, output_path[0], function(error, res, more) {
+    client.invoke("decrypt", username, password, token, hostname, url, output_path[0], function(error, res, more) {
       childWindow.close();
       var success = res[0];
       var errMessage = res[1];
@@ -204,10 +235,11 @@ function grantAccess() {
   var hostname = document.getElementById("hostname").value;
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
+  var token = document.getElementById("token").value;
   var dataset = document.getElementById("dataset").value;
   var requester = document.getElementById("requester").value;
 
-  client.invoke("get_entity_name", username, password, hostname, requester, function(error, res, more) {
+  client.invoke("get_entity_name", username, password, token, hostname, requester, function(error, res, more) {
     var success = res[0];
     var result = res[1];
     if (success) {
@@ -239,7 +271,8 @@ function reviewShares() {
   var hostname = document.getElementById("hostname").value;
   var username = document.getElementById("username").value;
   var password = document.getElementById("password").value;
-  client.invoke("create_access_granter", username, password, hostname, function(error, res, more) {
+  var token = document.getElementById("token").value;
+  client.invoke("create_access_granter", username, password, token, hostname, function(error, res, more) {
     var success = res[0];
     var errMessage = res[1];
     if (success) {

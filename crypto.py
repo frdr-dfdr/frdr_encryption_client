@@ -236,7 +236,10 @@ if __name__ == "__main__":
             logger.info("Removed old auth tokens. Exiting.")
             sys.exit()
         if arguments["--vault"]:
-            vault_client = VaultClient(arguments["--vault"], arguments["--username"], arguments["--password"], tokenfile)
+            if arguments["--username"]:
+                vault_client = VaultClient(arguments["--vault"], arguments["--username"], arguments["--password"], tokenfile)
+            elif arguments["--token"]:
+                vault_client = VaultClient(arguments["--vault"], arguments["--token"], tokenfile)
             if arguments["--encrypt"]:
                 dataset_name = str(uuid.uuid4()) 
             elif arguments["--decrypt"]:
