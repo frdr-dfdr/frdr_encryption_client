@@ -103,7 +103,10 @@ function openVaultUI() {
   const win = new remote.BrowserWindow({width: 800, height: 600});
   var url = require('url').format({
     hostname: hostURL.hostname,
-    pathname: '/ui/vault/auth?with=oidc',
+    pathname: '/ui/vault/auth',
+    query: {
+      with: 'oidc'
+    },
     slashes: true,
     protocol: 'http',
     port: hostURL.port
