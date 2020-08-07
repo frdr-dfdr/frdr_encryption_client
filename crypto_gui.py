@@ -47,7 +47,6 @@ class CryptoGui(object):
                         "--output": output_path,
                         "--username": username,
                         "--password": password,
-                        "--token": vault_token, 
                         "--vault": hostname,
                         "--encrypt": True}
             encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
@@ -67,7 +66,6 @@ class CryptoGui(object):
                         "--output": output_path,
                         "--username": username,
                         "--password": password, 
-                        "--token": vault_token, 
                         "--vault": hostname,
                         "--url": url,
                         "--decrypt": True,
