@@ -17,6 +17,7 @@ const notifier = require("node-notifier");
 const zerorpc = require("zerorpc");
 global.client = new zerorpc.Client();
 const portfinder = require("portfinder");
+const session = require('electron').session;
 
 const path = require('path')
 const PY_CRYPTO_GUI_FOLDER = 'crypto_gui'
@@ -74,7 +75,12 @@ const createWindow = () => {
 }
 
 app.on('ready', () => {
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    details.requestHeaders["User-Agent"] = "Chrome";
+    callback({ cancel: false, requestHeaders: details.requestHeaders });
+  });
   createWindow();
+  mainWindow.webContents.session.clearStorageData();
 })
 
 portfinder.basePort = 4242;
