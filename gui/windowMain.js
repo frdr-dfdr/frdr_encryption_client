@@ -255,7 +255,7 @@ function grantAccess() {
       }
       const response = dialog.showMessageBoxSync(options);
       if (response == 0){
-        client.invoke("grant_access", username, password, hostname, dataset, requester, expiryDate, function(error, res, more) {
+        client.invoke("grant_access", username, password, token, hostname, dataset, requester, expiryDate, function(error, res, more) {
           if (success){
             notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
           } else {
