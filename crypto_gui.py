@@ -50,7 +50,6 @@ class CryptoGui(object):
                         "--token": vault_token, 
                         "--vault": hostname,
                         "--encrypt": True}
-            self._logger.info(arguments)
             encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
             bag_path = encryptor.encrypt()
             return (True, bag_path)
@@ -73,7 +72,6 @@ class CryptoGui(object):
                         "--url": url,
                         "--decrypt": True,
                         "--encrypt": False}
-            self._logger.info(arguments)
             encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
             encryptor.decrypt()
             return (True, None)
