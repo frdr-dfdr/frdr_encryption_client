@@ -110,7 +110,10 @@ class VaultClient(object):
     def read_entity_by_id(self, entity_id):
         try:
             response = self.hvac_client.secrets.identity.read_entity(entity_id=entity_id)
-            return response["data"]["name"]
+            if (len(response["data"]["aliases"]) > 0):
+                return response["data"]["aliases"][0]["name"]
+            else:
+                return response["data"]["name"]
         except Exception as e:
             self._logger.error("error {}".format(e))
     
