@@ -58,9 +58,9 @@ class VaultClient(object):
     
     def write_token_to_file(self):
         #TODO: decide whether to save auth to file or not
-        # pass
-        with open(self._tokenfile, "w") as f:
-            f.write(self._vault_token)  
+        pass
+        # with open(self._tokenfile, "w") as f:
+        #     f.write(self._vault_token)  
    
     def enable_transit_engine(self):
         try:
