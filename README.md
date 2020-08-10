@@ -54,12 +54,19 @@ $ python crypto.py -d -i ./test_dataset_enc_local -k e9d63a50-bbdb-42ec-b5dd-3a6
 ### Use Hashicorp Vault for Key Management
 To encrypt a file or a directory,
 ```sh
+# log into vault with username and password
 $ python crypto.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --username <vault username> --password <vault password>
-The output path is optional.
+# or log into vault with oauth
+$ python crypto.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --oauth
 ```
+The output path is optional.
 For example,
 ```sh
+# log into vault with username and password
 $ python crypto.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --username bob --password training
+# or log into vault with oauth
+$ python crypto.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --oauth
+
 ```
 To decrypt a file or a directory,
 
@@ -76,31 +83,37 @@ $ python crypto.py -d -i ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200
 #### CLI Usage Patterns
 Usage:
 ```sh
-python crypto.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>]
-python crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> --username <vault_username> --password <vault_password> --url <API_path>)
-python crypto.py --logout_vault
+crypto.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--oauth] [--loglevel=<loglevel>] 
+crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> (--username <vault_username> --password <vault_password> | --oauth) --url <API_path>) [--loglevel=<loglevel>] 
+crypto.py --logout_vault
 ```
 Options:
 ```sh
 -e --encrypt           encrypt
 -d --decrypt           decrypt
+--oauth 
 -i <input_path>, --input <input_path>
 -o <output_path>, --output <output_path> 
 -k <key_path>, --key <key_path>
 --vault <vault_addr> using hashicorp vault for key generation and storage
 -u <vault_username>, --username <vault_username>
 -p <vault_password>, --password <vault_password>
+--token <vault_token> 
 --logout_vault  Remove old vault tokens
 --url <API_path>  API Path to fetch secret on vault
+-l --loglevel The logging level(debug, error, warning or info) [default: info]
 ```
 
 ### Grant Access, Review Shares, and Revoke Access
 ```sh
-$ python access_manager_test.py --mode <access manager mode> --vault <vault server address> --username <vault username> --password <vault password> [--name <dataset uuid>] [--requester <requester entity id on vault>]
+$ python access_manager_test.py --mode <access manager mode> --vault <vault server address> (--username <vault_username> --password <vault_password> | --oauth) [--name <dataset uuid>] [--requester <requester entity id on vault>]
 ```
 For example, to grant access
 ```sh
+# log into vault with username and password
 $ python access_manager_test.py --mode grant-access --vault http://127.0.0.1:8200/ --username "bob" --password "training" --requester 9d32d549-69ac-8685-8abb-bc10b9bc31c4 --name 104a3f2b-de39-4132-9bd6-f2a32499d647
+# or log into vault with oauth
+$ python access_manager_test.py --mode grant-access --vault http://127.0.0.1:8200/ --oauth --requester 9d32d549-69ac-8685-8abb-bc10b9bc31c4 --name 104a3f2b-de39-4132-9bd6-f2a32499d647
 ```
 To review existing shares
 ```sh
@@ -109,14 +122,16 @@ python access_manager_test.py --mode review-shares --vault http://127.0.0.1:8200
 #### CLI Usage Patterns
 Usage:
 ```sh
-access_manager_test.py --mode <mode> --vault <vault_addr> --username <vault_username> --password <vault_password> [--requester <requester_vault_entity_id>] [--name <dataset_name>] [--name <dataset_name>] [--expire <expiry_date>]
+access_manager_test.py --mode <mode> --vault <vault_addr> (--username <vault_username> --password <vault_password> | --oauth) [--requester <requester_vault_entity_id>] [--name <dataset_name>] [--expire <expiry_date>]
+
 ```
 Options:
 ```sh
 -m <mode>, --mode <mode> grant-access, revoke-access or review-shares
---vault <vault_addr> 
+--vault <vault_addr> using hashicorp vault for key generation and storage
 -u <vault_username>, --username <vault_username>
 -p <vault_password>, --password <vault_password>
+--oauth
 -r <requester_vault_entity_id>, --requester <requester_vault_entity_id>
 -n <dataset_name>, --name <dataset_name>
 --expire <expiry date> the permission expiry date in format YYYY-mm-dd
