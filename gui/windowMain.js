@@ -283,7 +283,7 @@ function reviewShares() {
       var reviewWindow = new remote.BrowserWindow({
         parent: window, 
         show: false, 
-        width: 600, 
+        width: 800, 
         height: 500,       
         webPreferences: {
           nodeIntegration: true
