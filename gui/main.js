@@ -67,10 +67,7 @@ const createWindow = () => {
   }))
 
   mainWindow.on('close', (event) => {
-    if (mainWindow != null){
-      mainWindow.hide();
-    }
-    mainWindow = null
+    app.quit();
   });
 }
 
