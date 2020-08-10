@@ -149,8 +149,8 @@ class VaultClient(object):
 
     @property
     def vault_token(self):
-        if self._vault_token is None:
-            # self._vault_token = self.vault_auth["client_token"]
+        # self._vault_token is an empty string, not None
+        if not self._vault_token:
             if self.load_token_from_file():
                 self._logger.info("Token loaded from file")
             else:
