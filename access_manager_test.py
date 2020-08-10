@@ -9,6 +9,7 @@ Options:
     --vault <vault_addr> using hashicorp vault for key generation and storage
     -u <vault_username>, --username <vault_username>
     -p <vault_password>, --password <vault_password>
+    --oauth
     -r <requester_vault_entity_id>, --requester <requester_vault_entity_id>
     -n <dataset_name>, --name <dataset_name>
     --expire <expiry date> the permission expiry date in format YYYY-mm-dd
