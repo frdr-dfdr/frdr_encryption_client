@@ -15,7 +15,11 @@ if (!gotTheLock) {
 require('update-electron-app')();
 const notifier = require("node-notifier");
 const zerorpc = require("zerorpc");
-global.client = new zerorpc.Client();
+const constLargeEnoughHeartbeat = 60 * 60 * 24 * 30 * 12 // 1 Year
+const clientOptions = {
+  "heartbeatInterval": constLargeEnoughHeartbeat,
+}
+global.client = new zerorpc.Client(clientOptions)
 const portfinder = require("portfinder");
 const session = require('electron').session;
 
