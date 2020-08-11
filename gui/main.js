@@ -15,7 +15,7 @@ if (!gotTheLock) {
 require('update-electron-app')();
 const notifier = require("node-notifier");
 const zerorpc = require("zerorpc");
-const constLargeEnoughHeartbeat = 60 * 60 * 24 * 30 * 12 // 1 Year
+const constLargeEnoughHeartbeat = 60 * 60 * 2 // 2 hour
 const clientOptions = {
   "heartbeatInterval": constLargeEnoughHeartbeat,
 }
