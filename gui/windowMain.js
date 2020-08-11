@@ -145,7 +145,7 @@ function encrypt() {
       parent: window, 
       modal: true, 
       show: false, 
-      width: 200, 
+      width: 300, 
       height: 100, 
       webPreferences: {
         nodeIntegration: true
@@ -207,7 +207,7 @@ function decrypt() {
       parent: window, 
       modal: true, 
       show: false, 
-      width: 200, 
+      width: 300, 
       height: 100,
       webPreferences: {
         nodeIntegration: true
