@@ -57,7 +57,7 @@ class Cryptor(object):
         self._dataset_name = dataset_name
         if self._arguments["--encrypt"]:
             if self._arguments["--vault"]:
-                self._secret_path = os.path.join(self._key_manager.get_vault_entity_id(), dataset_name)
+                self._secret_path = "/".join([self._key_manager.get_vault_entity_id(), dataset_name])
             else:
                 self._secret_path = "{}_key.pem".format(dataset_name)
             self._key_manager.generate_key()
