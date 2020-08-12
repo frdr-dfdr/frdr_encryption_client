@@ -37,29 +37,29 @@ class CryptoGui(object):
         else:
             return "Unable to obtain token. Verify your credentials and Vault URL."
 
-    def encrypt(self, username, password, hostname, output_path):
+    def encrypt(self, username, password, vault_token, hostname, output_path):
         try:
             self._logger.info("Encrypt files in the path {}".format(self._input_path))
-            vault_client = VaultClient(hostname, username, password, tokenfile)
+            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
             dataset_name = str(uuid.uuid4()) 
             key_manager = KeyManagementVault(vault_client, dataset_name)
             arguments = {"--input": self._input_path, 
                         "--output": output_path,
                         "--username": username,
-                        "--password": password, 
+                        "--password": password,
                         "--vault": hostname,
                         "--encrypt": True}
-            self._logger.info(arguments)
             encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
             bag_path = encryptor.encrypt()
             return (True, bag_path)
         except Exception as e:
+            self._logger.info(str(e))
             return (False, str(e))
 
-    def decrypt(self, username, password, hostname, url, output_path):
+    def decrypt(self, username, password, vault_token, hostname, url, output_path):
         try:
             self._logger.info("Decrypt files in the path {}".format(self._input_path))
-            vault_client = VaultClient(hostname, username, password, tokenfile)
+            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
             dataset_name = url.split("/")[-1]
             key_manager = KeyManagementVault(vault_client, dataset_name)
             arguments = {"--input": self._input_path, 
@@ -70,25 +70,24 @@ class CryptoGui(object):
                         "--url": url,
                         "--decrypt": True,
                         "--encrypt": False}
-            self._logger.info(arguments)
             encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
             encryptor.decrypt()
             return (True, None)
         except Exception as e:
             return (False, str(e))
 
-    def grant_access(self, username, password, hostname, dataset_name, requester_id, expiry_date):
+    def grant_access(self, username, password, vault_token, hostname, dataset_name, requester_id, expiry_date):
         try:
-            vault_client = VaultClient(hostname, username, password, tokenfile)
+            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
             access_granter = AccessManager(vault_client)
             access_granter.grant_access(requester_id, dataset_name, expiry_date)
             return (True, None)
         except Exception as e:
             return (False, str(e))
 
-    def create_access_granter(self, username, password, hostname):
+    def create_access_granter(self, username, password, vault_token, hostname):
         try:
-            vault_client = VaultClient(hostname, username, password, tokenfile)
+            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
             # TODO: add another method to set self._access_granter to null when the review window is closed
             access_granter = AccessManager(vault_client)
             self._access_granter = access_granter
@@ -111,9 +110,9 @@ class CryptoGui(object):
         self._logger.info("Clearing input path.")
         self._input_path = None
     
-    def get_entity_name(self, username, password, hostname, entity_id):
+    def get_entity_name(self, username, password, vault_token, hostname, entity_id):
         try:
-            vault_client = VaultClient(hostname, username, password, tokenfile)
+            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
             return (True, vault_client.read_entity_by_id(entity_id))
         except Exception as e:
             return (False, str(e))

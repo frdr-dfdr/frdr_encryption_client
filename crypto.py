@@ -2,19 +2,21 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    crypto.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--loglevel=<loglevel>] 
-    crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> --username <vault_username> --password <vault_password> --url <API_path>) [--loglevel=<loglevel>] 
+    crypto.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--oauth] [--loglevel=<loglevel>] 
+    crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> (--username <vault_username> --password <vault_password> | --oauth) --url <API_path>) [--loglevel=<loglevel>] 
     crypto.py --logout_vault
 
 Options:
     -e --encrypt           encrypt
     -d --decrypt           decrypt
+    --oauth 
     -i <input_path>, --input <input_path>
     -o <output_path>, --output <output_path> 
     -k <key_path>, --key <key_path>
     --vault <vault_addr> using hashicorp vault for key generation and storage
     -u <vault_username>, --username <vault_username>
     -p <vault_password>, --password <vault_password>
+    --token <vault_token> 
     --logout_vault  Remove old vault tokens
     --url <API_path>  API Path to fetch secret on vault
     -l --loglevel The logging level(debug, error, warning or info) [default: info]
@@ -37,6 +39,8 @@ import tempfile
 from zipfile import ZipFile
 import bagit
 import click
+import webbrowser
+from urllib.parse import urljoin
 
 __version__ = constants.VERSION
 dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
@@ -53,7 +57,7 @@ class Cryptor(object):
         self._dataset_name = dataset_name
         if self._arguments["--encrypt"]:
             if self._arguments["--vault"]:
-                self._secret_path = os.path.join(self._key_manager.get_vault_entity_id(), dataset_name)
+                self._secret_path = "/".join([self._key_manager.get_vault_entity_id(), dataset_name])
             else:
                 self._secret_path = "{}_key.pem".format(dataset_name)
             self._key_manager.generate_key()
@@ -236,7 +240,13 @@ if __name__ == "__main__":
             logger.info("Removed old auth tokens. Exiting.")
             sys.exit()
         if arguments["--vault"]:
-            vault_client = VaultClient(arguments["--vault"], arguments["--username"], arguments["--password"], tokenfile)
+            if arguments["--username"]:
+                vault_client = VaultClient(arguments["--vault"], arguments["--username"], arguments["--password"], tokenfile)
+            elif arguments["--oauth"]:
+                vault_ui_url = urljoin(arguments["--vault"], "/ui/vault/auth?with=oidc")
+                webbrowser.open_new_tab(vault_ui_url)
+                token = input('Please input your vault client token: ')
+                vault_client = VaultClient(arguments["--vault"], arguments["--username"], arguments["--password"], tokenfile, token)
             if arguments["--encrypt"]:
                 dataset_name = str(uuid.uuid4()) 
             elif arguments["--decrypt"]:

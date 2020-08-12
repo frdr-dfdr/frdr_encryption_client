@@ -37,9 +37,9 @@ class VaultClient(object):
         if auth_method == "userpass":
             try:
                 response = self.hvac_client.auth.userpass.login(username, password)
-                self._vault_auth = response["auth"]
+                self._vault_token = response["auth"]["client_token"]
                 if self._tokenfile:
-                    self.write_auth_to_file()
+                    self.write_token_to_file()
                 return True
             except Exception:
                 self._logger.error("Failed to auth with userpass method.")
@@ -48,19 +48,19 @@ class VaultClient(object):
         elif auth_method == "ldap":
             pass
         
-    def load_auth_from_file(self):
+    def load_token_from_file(self):
         if os.path.exists(self._tokenfile):
             with open(self._tokenfile) as f:
-                self._vault_auth = json.load(f)
-            if self._vault_auth.get("client_token"):
+                self._vault_token = f.read()
+            if self._vault_token is not None:
                 return True
         return None
     
-    def write_auth_to_file(self):
+    def write_token_to_file(self):
         #TODO: decide whether to save auth to file or not
         pass
         # with open(self._tokenfile, "w") as f:
-        #     json.dump(self._vault_auth, f)   
+        #     f.write(self._vault_token)  
    
     def enable_transit_engine(self):
         try:
@@ -110,7 +110,10 @@ class VaultClient(object):
     def read_entity_by_id(self, entity_id):
         try:
             response = self.hvac_client.secrets.identity.read_entity(entity_id=entity_id)
-            return response["data"]["name"]
+            if (len(response["data"]["aliases"]) > 0):
+                return response["data"]["aliases"][0]["name"]
+            else:
+                return response["data"]["name"]
         except Exception as e:
             self._logger.error("error {}".format(e))
     
@@ -134,19 +137,27 @@ class VaultClient(object):
             else:
                 self._logger.error("error {}".format(e))
 
+    def lookup_token(self):
+        try: 
+            response = self.hvac_client.lookup_token()
+            return response["data"]
+        except Exception as e:
+            self._logger.error("error {}".format(e))
+
     @property
     def vault_auth(self):
         if self._vault_auth is None:
-            if self.load_auth_from_file():
-                self._logger.info("Token loaded from file")
-            else:
-                self.login(self._username, self._password)
+            self._vault_auth = self.lookup_token()
         return self._vault_auth
 
     @property
     def vault_token(self):
-        if self._vault_token is None:
-            self._vault_token = self.vault_auth["client_token"]
+        # self._vault_token is an empty string, not None
+        if not self._vault_token:
+            if self.load_token_from_file():
+                self._logger.info("Token loaded from file")
+            else:
+                self.login(self._username, self._password)
         return self._vault_token
 
     @property

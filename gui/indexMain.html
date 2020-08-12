@@ -46,6 +46,17 @@
       padding-bottom: 5%;
     }
 
+    #open-browser {
+      background-image: url("btn_google_signin_dark_normal_web.png");
+      background-repeat: no-repeat;
+      background-position: center;
+      height: 40px;
+      width: 170px;
+      background-size: cover; 
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+
   </style>
 </head>
 
@@ -66,20 +77,38 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-        <h3>Username</h3>
-        <input name="username" id="username" type="text" size="40"/>
-      </div>
+    <div class="custom-control custom-switch">
+      <input type="checkbox" class="custom-control-input" id="loginSwitch">
+      <label class="custom-control-label" for="loginSwitch">Login with Google Account</label>
     </div>
 
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-        <h3>Password</h3>
-        <input name="password" id="password" type="password" size="40"/>
+    <div id="userpass_login">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+          <h3>Username</h3>
+          <input name="username" id="username" type="text" size="40"/>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+          <h3>Password</h3>
+          <input name="password" id="password" type="password" size="40"/>
+        </div>
       </div>
     </div>
-
+    
+    <div id="oauth2_login">
+      <div class="button">
+        <button class="btn btn-primary" type="submit" id="open-browser" onclick="openVaultUI()"></button>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+          <h3>Client Token</h3>
+          <input name="token" id="token" type="token" size="40"/>
+        </div>
+      </div>
+    </div>
     
     <div id="div-encrypt-extra" style="display: block;">
       <div class="row">
