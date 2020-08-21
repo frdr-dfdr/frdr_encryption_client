@@ -36,29 +36,42 @@ function selectMode(e) {
   var decryptExtraBlock = document.getElementById("div-decrypt-extra");
   var grantAccessExtraBlock = document.getElementById("div-grant-access-extra");
   var reviewSharesExtraBlock = document.getElementById("div-review-shares-extra");
+  var generateAccessRequestExtraBlock = document.getElementById("div-generate-access-request-extra");
+
   if (e.target.id == "button-encrypt") {
     encryptExtraBlock.style.display = "block";
     decryptExtraBlock.style.display = "none";
     grantAccessExtraBlock.style.display = "none";
     reviewSharesExtraBlock.style.display = "none";
+    generateAccessRequestExtraBlock.style.display = "none";
   }
   else if (e.target.id == "button-decrypt") {
     decryptExtraBlock.style.display = "block";
     encryptExtraBlock.style.display = "none";
     grantAccessExtraBlock.style.display = "none";
     reviewSharesExtraBlock.style.display = "none";
+    generateAccessRequestExtraBlock.style.display = "none";
   }
   else if (e.target.id == "button-grant-access") {
     decryptExtraBlock.style.display = "none";
     encryptExtraBlock.style.display = "none";
     grantAccessExtraBlock.style.display = "block";
     reviewSharesExtraBlock.style.display = "none";
+    generateAccessRequestExtraBlock.style.display = "none";
   }
   else if (e.target.id == "button-review-shares") {
     decryptExtraBlock.style.display = "none";
     encryptExtraBlock.style.display = "none";
     grantAccessExtraBlock.style.display = "none";
     reviewSharesExtraBlock.style.display = "block";
+    generateAccessRequestExtraBlock.style.display = "none";
+  }
+  else if (e.target.id == "button-generate-access-request") {
+    decryptExtraBlock.style.display = "none";
+    encryptExtraBlock.style.display = "none";
+    grantAccessExtraBlock.style.display = "none";
+    reviewSharesExtraBlock.style.display = "none";
+    generateAccessRequestExtraBlock.style.display = "block";
   }
 }
 
@@ -305,9 +318,33 @@ function reviewShares() {
   });
 }
 
+function generateAccessRequest() {
+  var hostname = document.getElementById("hostname").value;
+  var username = document.getElementById("username").value;
+  var password = document.getElementById("password").value;
+  var token = document.getElementById("token").value;
+  client.invoke("get_entity_id", username, password, token, hostname, function(error, res, more) {
+    var success = res[0];
+    var result = res[1];
+    if (success) {
+      var options = {
+        type: "info",
+        title: "Important Information",
+        message: `Please copy the following id to the Requester ID Field on the Access Request Page on FRDR. \n \n${result}`
+      }
+      const response = dialog.showMessageBoxSync(options);
+    }
+    else {
+      notifier.notify({"title" : "FRDR-Crypto", "message" : `Error generating access request. \n${result}`});
+    }
+  });  
+}
+
 document.getElementById("ReviewShares").addEventListener("click", reviewShares);
 
 document.getElementById("GrantAccess").addEventListener("click", grantAccess);
+
+document.getElementById("GenerateAccessRequest").addEventListener("click", generateAccessRequest);
 
 // Send a open directory selector dialog message from a renderer process to main process 
 const ipc = require('electron').ipcRenderer

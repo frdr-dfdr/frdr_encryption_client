@@ -117,6 +117,13 @@ class CryptoGui(object):
         except Exception as e:
             return (False, str(e))
 
+    def get_entity_id(self, username, password, vault_token, hostname):
+        try:
+            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
+            return (True, vault_client.entity_id)
+        except Exception as e:
+            return (False, str(e))
+
 if __name__ == "__main__":
     s = zerorpc.Server(CryptoGui(tokenfile=tokenfile))
     s.bind("tcp://127.0.0.1:" + str(sys.argv[1]))
