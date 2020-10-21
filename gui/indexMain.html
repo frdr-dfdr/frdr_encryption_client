@@ -36,6 +36,11 @@
       border: none;
     }
 
+    #button-generate-access-request {
+      color: white;
+      border: none;
+    }
+
     .tooltip-inner {
       max-width: none;
       white-space: nowrap;
@@ -66,6 +71,7 @@
     <button class="w3-bar-item btn btn-outline-success" id="button-decrypt" onclick="highlightButton(this); clearFields();">Decrypt</button>
     <button class="w3-bar-item btn btn-outline-warning" id="button-grant-access" onclick="highlightButton(this); clearFields();">Grant Access</button>          
     <button class="w3-bar-item btn btn-outline-secondary" id="button-review-shares" onclick="highlightButton(this); clearFields();">Review Shares</button>          
+    <button class="w3-bar-item btn btn-outline-info" id="button-generate-access-request" onclick="highlightButton(this); clearFields();">Generate Access Request</button>          
   </div>
   <br/>
   <div id="container" class="container-fluid">
@@ -187,6 +193,14 @@
 
       <div class="button">
         <button class="btn btn-primary" type="submit" id="ReviewShares">Review Shares</button>
+      </div>
+    </div>
+
+    <div id="div-generate-access-request-extra" style="display: none;">
+      <br/><br/>
+
+      <div class="button">
+        <button class="btn btn-primary" type="submit" id="GenerateAccessRequest">Generate Access Request</button>
       </div>
     </div>
 

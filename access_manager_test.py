@@ -5,7 +5,7 @@ Usage:
     access_manager_test.py --mode <mode> --vault <vault_addr> (--username <vault_username> --password <vault_password> | --oauth) [--requester <requester_vault_entity_id>] [--name <dataset_name>] [--expire <expiry_date>]
 
 Options:
-    -m <mode>, --mode <mode> grant-access, revoke-access or review-shares
+    -m <mode>, --mode <mode> grant-access, revoke-access, review-shares or generate-access-request
     --vault <vault_addr> using hashicorp vault for key generation and storage
     -u <vault_username>, --username <vault_username>
     -p <vault_password>, --password <vault_password>
@@ -50,6 +50,10 @@ if __name__ == "__main__":
     access_manager = AccessManager(vault_client)
     if arguments["--mode"] == "review-shares":
         print (access_manager.list_members())
+    elif arguments["--mode"] == "generate-access-request":
+        entity_id = vault_client.entity_id
+        print ("Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.")
+        print (Util.wrap_text(entity_id))
     else:
         requester_name = vault_client.read_entity_by_id(arguments["--requester"])
         if arguments["--mode"] == "grant-access":
