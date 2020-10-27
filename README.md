@@ -127,7 +127,7 @@ access_manager_test.py --mode <mode> --vault <vault_addr> (--username <vault_use
 ```
 Options:
 ```sh
--m <mode>, --mode <mode> grant-access, revoke-access or review-shares
+-m <mode>, --mode <mode> grant-access, revoke-access, review-shares or generate-access-request
 --vault <vault_addr> using hashicorp vault for key generation and storage
 -u <vault_username>, --username <vault_username>
 -p <vault_password>, --password <vault_password>
@@ -136,6 +136,18 @@ Options:
 -n <dataset_name>, --name <dataset_name>
 --expire <expiry date> the permission expiry date in format YYYY-mm-dd
 ```
+
+### Generate Access Request
+Researchers need to log into Vault to generate a unique entity ID on vault before they request access on FRDR, which is performed on this client applcaiton. 
+
+```sh
+$ python access_manager_test.py --mode generate-access-request --vault <vault server address> (--username <vault_username> --password <vault_password> | --oauth) 
+```
+For example, 
+```sh
+python access_manager_test.py --mode generate-access-request --vault http://127.0.0.1:8200/ --username "bob" --password "training"
+```
+
 ## GUI Usage
 
 The GUI is divided into four features -- encrypting a package, decrypting a package, granting access to another user, and reviewing/revoking existing shares. In order to do any of these, you'll need to provide the URL of the Vault instance, as well as a username and password.
