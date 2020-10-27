@@ -97,7 +97,7 @@ class Cryptor(object):
         try:
             bag = bagit.make_bag(bag_dir, None, 1, ['sha256'])
             bag.info['Depositor-Entity-ID'] = self._key_manager.get_vault_entity_id()
-            bag.info['Datast-UUID'] = self._dataset_name
+            bag.info['Dataset-UUID'] = self._dataset_name
             bag.save()
         except (bagit.BagError, Exception) as e:
             # TODO: log error
