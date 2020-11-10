@@ -6,6 +6,7 @@ const remote = require('electron').remote;
 const {dialog} = require('electron').remote;
 const {shell} = require('electron').remote;
 const flatpickr = require('flatpickr');
+const {clipboard} = require('electron').remote; 
 let client = remote.getGlobal('client');
 
 var expiryDate = null;
@@ -328,11 +329,23 @@ function generateAccessRequest() {
     var result = res[1];
     if (success) {
       var options = {
-        type: "info",
-        title: "Important Information",
-        message: `Please copy the following id to the Requester ID Field on the Access Request Page on FRDR. \n \n${result}`
-      }
+        type: 'question',
+        buttons: ['Copy to Clipboard'],
+        defaultId: 0,
+        title: 'Question',
+        message: 'Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.',
+        detail: `${result}`,
+      };
       const response = dialog.showMessageBoxSync(options);
+      if (response == 0) {
+        clipboard.writeText(result);
+        var options2 = {
+          type: "info",
+          title: "Important Information",
+          message: `Requester ID copied to clipboard`
+        }
+        dialog.showMessageBoxSync(options2);
+      }
     }
     else {
       notifier.notify({"title" : "FRDR-Crypto", "message" : `Error generating access request. \n${result}`});
