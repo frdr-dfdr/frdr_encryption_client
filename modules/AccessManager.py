@@ -52,6 +52,8 @@ class AccessManager(object):
             each_dataset_members["members"] = []
             read_group_response = self._vault_client.read_group_by_name(group_name)
             metadata = read_group_response["data"]["metadata"]
+            if metadata is None:
+                continue
             metadata_defaultdict = defaultdict(lambda: 'None', metadata)
             for each_member_id in self._list_members_per_group(group_name):
                 each_member_name = self._vault_client.read_entity_by_id(each_member_id)
