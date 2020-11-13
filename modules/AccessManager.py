@@ -79,6 +79,6 @@ class AccessManager(object):
             if metadata is None:
                 continue
             for key, value in metadata.items():
-                expiry_date = datetime.datetime.strptime(value, "%Y-%m-%d").date()
+                expiry_date = datetime.datetime.strptime(value.split(",")[0], "%Y-%m-%d").date()
                 if expiry_date <= datetime.date.today():
                     self._remove_member_from_group(each_group, key)
