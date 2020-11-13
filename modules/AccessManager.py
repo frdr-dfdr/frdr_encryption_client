@@ -2,6 +2,7 @@ from modules.VaultClient import VaultClient
 import json
 import datetime
 from collections import defaultdict
+import datetime
 
 class AccessManager(object):
     # TODO: add logger in this class
@@ -22,7 +23,7 @@ class AccessManager(object):
         metadata = read_group_response["data"]["metadata"]
         if metadata is None:
             metadata = {}
-        metadata[requester_entity_id] = expiry_date
+        metadata[requester_entity_id] = expiry_date + "," + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
 
     def revoke_access(self, requester_entity_id, dataset_id):
@@ -57,7 +58,7 @@ class AccessManager(object):
             metadata_defaultdict = defaultdict(lambda: 'None', metadata)
             for each_member_id in self._list_members_per_group(group_name):
                 each_member_name = self._vault_client.read_entity_by_id(each_member_id)
-                each_member = {"entity_id": each_member_id, "entity_name": each_member_name, "expiry_date": metadata_defaultdict[each_member_id]}
+                each_member = {"entity_id": each_member_id, "entity_name": each_member_name, "expiry_date": metadata_defaultdict[each_member_id].split(",")[0]}
                 each_dataset_members["members"].append(each_member)
             members["data"].append(each_dataset_members)
         return json.dumps(members)
