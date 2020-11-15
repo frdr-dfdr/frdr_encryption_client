@@ -102,8 +102,8 @@ class AccessManager(object):
             for key, value in metadata.items():
                 if len(value.split(",")) > 1:
                     access_updated_time = datetime.datetime.strptime(value.split(",")[1], "%Y-%m-%d %H:%M:%S")
-                    # TODO: if shares have been handled already in last cron task
-                    if access_updated_time <= datetime.datetime.utcnow():
+                    nowutc= datetime.datetime.utcnow() 
+                    if access_updated_time <= nowutc and access_updated_time >= (nowutc - datetime.timedelta(minutes=15)):
                         vault_api_url = "http://206-12-90-40.cloud.computecanada.ca/secret/data/{depositor_user_id}/{dataset_id}"\
                                         .format(depositor_user_id=depositor_user_id, dataset_id=dataset_id)
                         requester_email = self._vault_client.read_entity_by_id(key)
