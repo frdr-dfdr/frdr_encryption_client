@@ -84,7 +84,7 @@ class Util(object):
         return wrapped_text
 
     @classmethod
-    def send_email(to_addrs, msg_subject, msg_body, from_addr=None):
+    def send_email(cls, to_addrs, msg_subject, msg_body, from_addr=None):
         msg = EmailMessage()
         msg.set_content(msg_body)
         if from_addr is not None:
