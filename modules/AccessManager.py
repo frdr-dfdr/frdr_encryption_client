@@ -3,6 +3,8 @@ import json
 import datetime
 from collections import defaultdict
 import datetime
+from util.util import Util
+from dateutil import parser
 
 class AccessManager(object):
     # TODO: add logger in this class
@@ -23,7 +25,7 @@ class AccessManager(object):
         metadata = read_group_response["data"]["metadata"]
         if metadata is None:
             metadata = {}
-        metadata[requester_entity_id] = expiry_date + "," + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        metadata[requester_entity_id] = expiry_date + "," + datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
         self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
 
     def revoke_access(self, requester_entity_id, dataset_id):
@@ -82,3 +84,43 @@ class AccessManager(object):
                 expiry_date = datetime.datetime.strptime(value.split(",")[0], "%Y-%m-%d").date()
                 if expiry_date <= datetime.date.today():
                     self._remove_member_from_group(each_group, key)
+
+    def find_new_shares(self):
+        groups = self._vault_client.list_groups()
+        for each_group in groups:
+            read_group_response = self._vault_client.read_group_by_name(each_group)
+            metadata = read_group_response["data"]["metadata"]
+            group_last_update_time = parser.isoparse(read_group_response["data"]["last_update_time"])
+            # if (group_last_update_time.replace(tzinfo=None) <= (datetime.datetime.utcnow() - datetime.timedelta(minutes=15))):
+            #     continue  
+
+            # no requesters to this dataset
+            if metadata is None:
+                continue
+            depositor_user_id = read_group_response["data"]["name"].split("_")[0]
+            dataset_id = read_group_response["data"]["name"].split("_")[1]
+            for key, value in metadata.items():
+                if len(value.split(",")) > 1:
+                    access_updated_time = datetime.datetime.strptime(value.split(",")[1], "%Y-%m-%d %H:%M:%S")
+                    # TODO: if shares have been handled already in last cron task
+                    if access_updated_time <= datetime.datetime.utcnow():
+                        vault_api_url = "http://206-12-90-40.cloud.computecanada.ca/secret/data/{depositor_user_id}/{dataset_id}"\
+                                        .format(depositor_user_id=depositor_user_id, dataset_id=dataset_id)
+                        requester_email = self._vault_client.read_entity_by_id(key)
+                        subject = "Vault - Access granted to the request copy of item"
+                        body = (
+                            "Please refer to the other message first in order to download the dataset itself. "
+                            "In order to decrypt the data after downloading it, you will need to run our FRDR Vault App"
+                            "which can be downloaded from [here], and navigate to the Decrypt menu. You will need"
+                            " to input your FRDR credentials (note: this may be updated to reflect multiple auth sources"
+                            " later on), and provide the path to the encrypted dataset that you already downloaded,"
+                            " and a Vault API URL that has been generated for you to access the decryption key"
+                            "for this dataset, as in this screenshot: [screenshot] \nYour Vault API URL is: {}\n"
+                            "We strongly recommend only decrypting this data on a trusted computer which is itself "
+                            "encrypted (e.g. using Windows' BitLocker or Apple's FileVault functionality) and accessed only "
+                            "by you. You assume full liability for this data upon decryption and the risk of disclosure may be"
+                            "very significant. If you encounter any problems with this workflow, or you have other feedback "
+                            "for us, feel free to get in touch at support@frdr-dfdr.ca. Best of luck with the data!"
+                        ).format(vault_api_url)
+                        print (requester_email)
+                        Util.send_email(requester_email, subject, body)

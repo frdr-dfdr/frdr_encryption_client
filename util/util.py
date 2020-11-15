@@ -3,6 +3,8 @@ import sys
 import logging
 from base64 import b64encode, b64decode
 import textwrap
+import subprocess
+from email.message import EmailMessage
 
 logger = logging.getLogger("frdr-crypto.util")
 
@@ -80,3 +82,15 @@ class Util(object):
             wrapped_text += '*{pad}{text:{width}}{pad}*\n'.format(text=line, pad=' '*padding, width=max_line_length)
         wrapped_text += 60 * '*'
         return wrapped_text
+
+    @classmethod
+    def send_email(to_addrs, msg_subject, msg_body, from_addr=None):
+        msg = EmailMessage()
+        msg.set_content(msg_body)
+        if from_addr is not None:
+            msg['From'] = from_addr
+        msg['To'] = to_addrs
+        msg['Subject'] = msg_subject
+
+        sendmail_location = "/usr/sbin/sendmail"
+        subprocess.run([sendmail_location, "-t", "-oi"], input=msg.as_bytes())
