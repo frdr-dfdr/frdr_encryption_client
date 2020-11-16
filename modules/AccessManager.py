@@ -26,6 +26,7 @@ class AccessManager(object):
         if metadata is None:
             metadata = {}
         metadata[requester_entity_id] = expiry_date + "," + datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        print (metadata[requester_entity_id])
         self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
 
     def revoke_access(self, requester_entity_id, dataset_id):
@@ -102,8 +103,10 @@ class AccessManager(object):
             for key, value in metadata.items():
                 if len(value.split(",")) > 1:
                     access_updated_time = datetime.datetime.strptime(value.split(",")[1], "%Y-%m-%d %H:%M:%S")
+                    print (access_updated_time)
                     nowutc= datetime.datetime.utcnow() 
-                    if access_updated_time <= nowutc and access_updated_time >= (nowutc - datetime.timedelta(minutes=15)):
+                    print (nowutc)
+                    if access_updated_time <= nowutc and access_updated_time >= (nowutc - datetime.timedelta(minutes=1)):
                         vault_api_url = "http://206-12-90-40.cloud.computecanada.ca/secret/data/{depositor_user_id}/{dataset_id}"\
                                         .format(depositor_user_id=depositor_user_id, dataset_id=dataset_id)
                         requester_email = self._vault_client.read_entity_by_id(key)
