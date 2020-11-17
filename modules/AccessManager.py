@@ -109,6 +109,7 @@ class AccessManager(object):
                     if access_updated_time <= nowutc and access_updated_time >= (nowutc - datetime.timedelta(minutes=1)):
                         vault_api_url = "http://206-12-90-40.cloud.computecanada.ca/secret/data/{depositor_user_id}/{dataset_id}"\
                                         .format(depositor_user_id=depositor_user_id, dataset_id=dataset_id)
+                        app_download_url = "https://github.com/jza201/frdr-secure-data/releases/tag/0.1.0"
                         requester_email = self._vault_client.read_entity_by_id(key)
                         subject = "Vault - Access granted to the request copy of item"
                         # body = (
@@ -128,12 +129,30 @@ class AccessManager(object):
                         body_html = """\
                             <html>
                                 <body>
-                                    <p>Please refer to the other message first in order to download the dataset itself. \
-                                       In order to decrypt the data after downloading it, you will need to run our FRDR Vault App </p>
-                                    <br>
+                                    <p>
+                                        Please refer to the other message first in order to download the dataset itself. \
+                                        In order to decrypt the data after downloading it, you will need to run our FRDR Vault App \
+                                        which can be downloaded from {}, and navigate to the Decrypt menu. You will need \
+                                        to input your FRDR credentials (note: this may be updated to reflect multiple auth sources \
+                                        later on), and provide the path to the encrypted dataset that you already downloaded, \
+                                        and a Vault API URL that has been generated for you to access the decryption key \
+                                        for this dataset, as in this screenshot: 
+                                    </p>
+                                    <img src="../img/decrypt.png">
                                     <p> Your Vault API URL is: {} </p>
+                                    <p>
+                                        We strongly recommend only decrypting this data on a trusted computer which is itself \
+                                        encrypted (e.g. using Windows' BitLocker or Apple's FileVault functionality) and \
+                                        accessed only by you. You assume full liability for this data upon decryption and \
+                                        the risk of disclosure may be very significant. If you encounter any problems with \
+                                        this workflow, or you have other feedback for us, feel free to get in touch at \
+                                        support@frdr-dfdr.ca. Best of luck with the data!
+                                    </p>
+                                    <br/><br/>
+                                    FRDR Support
+                                    support@frdr-dfdr.ca
                                 </body>
                             </html>
-                            """.format(vault_api_url)
+                            """.format(app_download_url, vault_api_url)
                         print (requester_email)
                         Util.send_email(requester_email, subject, body_html)
