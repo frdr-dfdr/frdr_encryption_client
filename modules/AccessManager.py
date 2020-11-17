@@ -111,19 +111,29 @@ class AccessManager(object):
                                         .format(depositor_user_id=depositor_user_id, dataset_id=dataset_id)
                         requester_email = self._vault_client.read_entity_by_id(key)
                         subject = "Vault - Access granted to the request copy of item"
-                        body = (
-                            "Please refer to the other message first in order to download the dataset itself. "
-                            "In order to decrypt the data after downloading it, you will need to run our FRDR Vault App"
-                            "which can be downloaded from [here], and navigate to the Decrypt menu. You will need"
-                            " to input your FRDR credentials (note: this may be updated to reflect multiple auth sources"
-                            " later on), and provide the path to the encrypted dataset that you already downloaded,"
-                            " and a Vault API URL that has been generated for you to access the decryption key"
-                            "for this dataset, as in this screenshot: [screenshot] \nYour Vault API URL is: {}\n"
-                            "We strongly recommend only decrypting this data on a trusted computer which is itself "
-                            "encrypted (e.g. using Windows' BitLocker or Apple's FileVault functionality) and accessed only "
-                            "by you. You assume full liability for this data upon decryption and the risk of disclosure may be"
-                            "very significant. If you encounter any problems with this workflow, or you have other feedback "
-                            "for us, feel free to get in touch at support@frdr-dfdr.ca. Best of luck with the data!"
-                        ).format(vault_api_url)
+                        # body = (
+                        #     "Please refer to the other message first in order to download the dataset itself. "
+                        #     "In order to decrypt the data after downloading it, you will need to run our FRDR Vault App"
+                        #     "which can be downloaded from [here], and navigate to the Decrypt menu. You will need"
+                        #     " to input your FRDR credentials (note: this may be updated to reflect multiple auth sources"
+                        #     " later on), and provide the path to the encrypted dataset that you already downloaded,"
+                        #     " and a Vault API URL that has been generated for you to access the decryption key"
+                        #     "for this dataset, as in this screenshot: [screenshot] \nYour Vault API URL is: {}\n"
+                        #     "We strongly recommend only decrypting this data on a trusted computer which is itself "
+                        #     "encrypted (e.g. using Windows' BitLocker or Apple's FileVault functionality) and accessed only "
+                        #     "by you. You assume full liability for this data upon decryption and the risk of disclosure may be"
+                        #     "very significant. If you encounter any problems with this workflow, or you have other feedback "
+                        #     "for us, feel free to get in touch at support@frdr-dfdr.ca. Best of luck with the data!"
+                        # ).format(vault_api_url)
+                        body_html = """\
+                            <html>
+                                <body>
+                                    <p>Please refer to the other message first in order to download the dataset itself. \
+                                       In order to decrypt the data after downloading it, you will need to run our FRDR Vault App </p>
+                                    <br>
+                                    <p> Your Vault API URL is: {} </p>
+                                </body>
+                            </html>
+                            """.format(vault_api_url)
                         print (requester_email)
-                        Util.send_email(requester_email, subject, body)
+                        Util.send_email(requester_email, subject, body_html)
