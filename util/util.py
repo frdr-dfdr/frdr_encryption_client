@@ -5,6 +5,8 @@ from base64 import b64encode, b64decode
 import textwrap
 import subprocess
 import smtplib
+from email import encoders
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from configparser import ConfigParser
@@ -87,7 +89,7 @@ class Util(object):
         return wrapped_text
 
     @classmethod
-    def send_email(cls, to_addr, msg_subject, msg_body_html):    
+    def send_email(cls, to_addr, msg_subject, msg_body_html, file_to_attach):    
         parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         config_path = os.path.join(parent_path, "email.ini")
 
@@ -106,5 +108,20 @@ class Util(object):
         message["From"] = from_addr
         message["To"] = to_addr
         message.attach(MIMEText(msg_body_html, "html"))
+
+        with open(file_to_attach, 'rb') as f:
+            # set attachment mime and file name, the image type is png
+            mime = MIMEBase('image', 'png', filename='decrypt.png')
+            # add required header data:
+            mime.add_header('Content-Disposition', 'attachment', filename='decrypt.png')
+            mime.add_header('X-Attachment-Id', '0')
+            mime.add_header('Content-ID', '<0>')
+            # read attachment file content into the MIMEBase object
+            mime.set_payload(f.read())
+            # encode with base64
+            encoders.encode_base64(mime)
+            # add MIMEBase object to MIMEMultipart object
+            message.attach(mime)
+    
         with smtplib.SMTP(host) as server:
             server.sendmail(from_addr, to_addr, message.as_string())

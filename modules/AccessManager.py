@@ -138,7 +138,7 @@ class AccessManager(object):
                                         and a Vault API URL that has been generated for you to access the decryption key \
                                         for this dataset, as in this screenshot: 
                                     </p>
-                                    <img src="../img/decrypt.png">
+                                    <img src="cid:0">
                                     <p> Your Vault API URL is: {} </p>
                                     <p>
                                         We strongly recommend only decrypting this data on a trusted computer which is itself \
@@ -155,4 +155,4 @@ class AccessManager(object):
                             </html>
                             """.format(app_download_url, vault_api_url)
                         print (requester_email)
-                        Util.send_email(requester_email, subject, body_html)
+                        Util.send_email(requester_email, subject, body_html, '../img/decrypt.png')
