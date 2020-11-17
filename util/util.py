@@ -87,10 +87,7 @@ class Util(object):
         return wrapped_text
 
     @classmethod
-    def send_email(cls, to_addr, msg_subject, msg_body_html):
-        if not isinstance(to_addr, list):
-            to_addr = [to_addr]
-        
+    def send_email(cls, to_addr, msg_subject, msg_body_html):    
         parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         config_path = os.path.join(parent_path, "email.ini")
 
