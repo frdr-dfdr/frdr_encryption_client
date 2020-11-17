@@ -132,8 +132,8 @@ class AccessManager(object):
                                 <body>
                                     <p>
                                         Please refer to the other message first in order to download the dataset itself. \
-                                        In order to decrypt the data after downloading it, you will need to run our FRDR Vault App \
-                                        which can be downloaded from {}, and navigate to the Decrypt menu. You will need \
+                                        In order to decrypt the data after downloading it, you will need to run our <b>FRDR Vault App</b> \
+                                        which can be downloaded from {}, and navigate to the <b>Decrypt menu</b>. You will need \
                                         to input your FRDR credentials (note: this may be updated to reflect multiple auth sources \
                                         later on), and provide the path to the encrypted dataset that you already downloaded, \
                                         and a Vault API URL that has been generated for you to access the decryption key \
