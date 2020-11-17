@@ -5,6 +5,7 @@ from collections import defaultdict
 import datetime
 from util.util import Util
 from dateutil import parser
+import os
 
 class AccessManager(object):
     # TODO: add logger in this class
@@ -155,4 +156,6 @@ class AccessManager(object):
                             </html>
                             """.format(app_download_url, vault_api_url)
                         print (requester_email)
-                        Util.send_email(requester_email, subject, body_html, '../img/decrypt.png')
+                        parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                        screenshot_path = os.path.join(parent_path, "/img/decrypt.png")
+                        Util.send_email(requester_email, subject, body_html, screenshot_path)
