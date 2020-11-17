@@ -4,7 +4,10 @@ import logging
 from base64 import b64encode, b64decode
 import textwrap
 import subprocess
-from email.message import EmailMessage
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from configparser import ConfigParser
 
 logger = logging.getLogger("frdr-crypto.util")
 
@@ -84,13 +87,27 @@ class Util(object):
         return wrapped_text
 
     @classmethod
-    def send_email(cls, to_addrs, msg_subject, msg_body, from_addr=None):
-        msg = EmailMessage()
-        msg.set_content(msg_body)
-        if from_addr is not None:
-            msg['From'] = from_addr
-        msg['To'] = to_addrs
-        msg['Subject'] = msg_subject
+    def send_email(cls, to_addr, msg_subject, msg_body_html):
+        if not isinstance(to_addr, list):
+            to_addr = [to_addr]
+        
+        parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        config_path = os.path.join(parent_path, "email.ini")
 
-        sendmail_location = "/usr/sbin/sendmail"
-        subprocess.run([sendmail_location, "-t", "-oi"], input=msg.as_bytes())
+        if os.path.exists(config_path):
+            cfg = ConfigParser()
+            cfg.read(config_path)
+        else:
+            logger.error("Email Server Config not found! Exiting!")
+            sys.exit(1)
+        
+        host = cfg.get("smtp", "server")
+        from_addr = cfg.get("smtp", "from_addr")
+        
+        message = MIMEMultipart("alternative")
+        message["Subject"] = msg_subject
+        message["From"] = from_addr
+        message["To"] = to_addr
+        message.attach(MIMEText(msg_body_html, "html"))
+        with smtplib.SMTP(host) as server:
+            server.sendmail(from_addr, to_addr, message.as_string())
