@@ -159,4 +159,4 @@ class AccessManager(object):
                         parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                         screenshot_path = os.path.join(parent_path, "img", "decrypt.png")
                         Util.send_email(requester_email, subject, body_html, screenshot_path)
-                        print ("New access granted to {} at {}".(requester_email, access_updated_time))
+                        print ("New access granted to {} at {}".format(requester_email, access_updated_time))
