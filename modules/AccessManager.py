@@ -9,6 +9,7 @@ from dateutil import parser
 import os
 from pytz import timezone
 import logging
+import hvac
 
 class AccessManager(object):
     def __init__(self, vault_client):
@@ -59,7 +60,10 @@ class AccessManager(object):
             each_dataset_members = {}
             each_dataset_members["dataset_id"] = each_dataset_id
             each_dataset_members["members"] = []
-            read_group_response = self._vault_client.read_group_by_name(group_name)
+            try:
+                read_group_response = self._vault_client.read_group_by_name(group_name)
+            except hvac.exceptions.InvalidPath:
+                continue
             metadata = read_group_response["data"]["metadata"]
             if metadata is None:
                 continue
