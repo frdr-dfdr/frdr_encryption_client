@@ -8,12 +8,14 @@ from util import constants
 from dateutil import parser
 import os
 from pytz import timezone
+import logging
 
 class AccessManager(object):
-    # TODO: add logger in this class
     def __init__(self, vault_client):
         self._vault_client = vault_client
         self._depositor_entity_id = self._vault_client.entity_id
+        self._logger = logging.getLogger("frdr-crypto.access-manager")
+
     def grant_access(self, requester_entity_id, dataset_id, expiry_date=None):
         if expiry_date is None:
             expiry_date = (datetime.date.today() + datetime.timedelta(days=14)).strftime("%Y-%m-%d")
@@ -78,6 +80,7 @@ class AccessManager(object):
         return self._vault_client.list_secrets(self._depositor_entity_id)
 
     def expire_shares(self):
+        self._logger = logging.getLogger("cron-monitor-expired-shares.access-manager")
         groups = self._vault_client.list_groups()
         for each_group in groups:
             read_group_response = self._vault_client.read_group_by_name(each_group)
@@ -88,9 +91,11 @@ class AccessManager(object):
                 expiry_date = datetime.datetime.strptime(value.split(",")[0], "%Y-%m-%d").date()
                 if expiry_date < datetime.date.today():
                     self._remove_member_from_group(each_group, key)
-                    print ("User {}'s access to dataset {} has expired.".format(key, each_group.split("_")[1]))
+                    self._logger.info("User {}'s access to dataset {} has expired.".format(key, each_group.split("_")[1]))
 
     def find_new_shares(self):
+        self._logger = logging.getLogger("cron-monitor-new-shares.access-manager")
+        self._logger.info("Start running finding new shares method ...")
         groups = self._vault_client.list_groups()
         for each_group in groups:
             read_group_response = self._vault_client.read_group_by_name(each_group)
@@ -159,4 +164,4 @@ class AccessManager(object):
                         parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                         screenshot_path = os.path.join(parent_path, "img", "decrypt.png")
                         Util.send_email(requester_email, subject, body_html, screenshot_path)
-                        print ("New access granted to {} at {}".format(requester_email, access_updated_time))
+                        self._logger.info("New access granted to {} at {}".format(requester_email, access_updated_time))

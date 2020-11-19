@@ -15,11 +15,16 @@ from docopt import docopt
 from modules.VaultClient import VaultClient
 from util import constants
 from modules.AccessManager import AccessManager
+from util.util import Util
+import os
 
 __version__ = constants.VERSION
 
 if __name__ == "__main__":
     arguments = docopt(__doc__, version=__version__)
+    Util.get_logger("cron-monitor-new-shares", 
+                log_level="info",
+                filepath=os.path.join(os.path.expanduser('~'), "logs", "new_shares_monitor.log"))
     with open(arguments["--tokenfile"]) as f:
         vault_root_token = f.read()
     vault_client = VaultClient(vault_addr=arguments["--vault"], 

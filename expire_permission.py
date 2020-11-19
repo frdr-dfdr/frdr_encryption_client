@@ -13,12 +13,17 @@ import datetime
 from docopt import docopt
 from modules.VaultClient import VaultClient
 from util import constants
+from util.util import Util
 from modules.AccessManager import AccessManager
+import os
 
 __version__ = constants.VERSION
 
 if __name__ == "__main__":
     arguments = docopt(__doc__, version=__version__)
+    Util.get_logger("cron-monitor-expired-shares", 
+            log_level="info",
+            filepath=os.path.join(os.path.expanduser('~'), "logs", "permission_monitor.log"))
     with open(arguments["--tokenfile"]) as f:
         vault_root_token = f.read()
     vault_client = VaultClient(vault_addr=arguments["--vault"], 
