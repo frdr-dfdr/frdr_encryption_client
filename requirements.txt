@@ -14,3 +14,4 @@ typed-ast==1.4.1
 wrapt==1.11.2
 click==7.1.2
 python-dateutil==2.8.1
+pytz==2020.4

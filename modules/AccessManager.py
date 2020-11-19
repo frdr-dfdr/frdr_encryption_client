@@ -4,8 +4,10 @@ import datetime
 from collections import defaultdict
 import datetime
 from util.util import Util
+from util import constants
 from dateutil import parser
 import os
+from pytz import timezone
 
 class AccessManager(object):
     # TODO: add logger in this class
@@ -26,8 +28,8 @@ class AccessManager(object):
         metadata = read_group_response["data"]["metadata"]
         if metadata is None:
             metadata = {}
-        metadata[requester_entity_id] = expiry_date + "," + datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-        print (metadata[requester_entity_id])
+        access_updated_time = datetime.datetime.now(timezone(constants.TIMEZONE)).isoformat()
+        metadata[requester_entity_id] = expiry_date + "," + access_updated_time
         self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
 
     def revoke_access(self, requester_entity_id, dataset_id):
@@ -84,8 +86,9 @@ class AccessManager(object):
                 continue
             for key, value in metadata.items():
                 expiry_date = datetime.datetime.strptime(value.split(",")[0], "%Y-%m-%d").date()
-                if expiry_date <= datetime.date.today():
+                if expiry_date < datetime.date.today():
                     self._remove_member_from_group(each_group, key)
+                    print ("User {}'s access to dataset {} has expired.".format(key, each_group.split("_")[1]))
 
     def find_new_shares(self):
         groups = self._vault_client.list_groups()
@@ -93,8 +96,9 @@ class AccessManager(object):
             read_group_response = self._vault_client.read_group_by_name(each_group)
             metadata = read_group_response["data"]["metadata"]
             group_last_update_time = parser.isoparse(read_group_response["data"]["last_update_time"])
-            # if (group_last_update_time.replace(tzinfo=None) <= (datetime.datetime.utcnow() - datetime.timedelta(minutes=15))):
-            #     continue  
+            now = datetime.datetime.now(timezone(constants.TIMEZONE)) 
+            if (group_last_update_time <= (now - datetime.timedelta(hours=6))):
+                continue  
 
             # no requesters to this dataset
             if metadata is None:
@@ -103,11 +107,8 @@ class AccessManager(object):
             dataset_id = read_group_response["data"]["name"].split("_")[1]
             for key, value in metadata.items():
                 if len(value.split(",")) > 1:
-                    access_updated_time = datetime.datetime.strptime(value.split(",")[1], "%Y-%m-%d %H:%M:%S")
-                    print (access_updated_time)
-                    nowutc= datetime.datetime.utcnow() 
-                    print (nowutc)
-                    if access_updated_time <= nowutc and access_updated_time >= (nowutc - datetime.timedelta(minutes=1)):
+                    access_updated_time = parser.parse(value.split(",")[1])
+                    if access_updated_time <= now and access_updated_time >= (now - datetime.timedelta(minutes=1)):
                         vault_api_url = "http://206-12-90-40.cloud.computecanada.ca/secret/data/{depositor_user_id}/{dataset_id}"\
                                         .format(depositor_user_id=depositor_user_id, dataset_id=dataset_id)
                         app_download_url = "https://github.com/jza201/frdr-secure-data/releases/tag/0.1.0"
@@ -155,7 +156,7 @@ class AccessManager(object):
                                 </body>
                             </html>
                             """.format(app_download_url, vault_api_url)
-                        print (requester_email)
                         parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                         screenshot_path = os.path.join(parent_path, "img", "decrypt.png")
                         Util.send_email(requester_email, subject, body_html, screenshot_path)
+                        print ("New access granted to {} at {}".(requester_email, access_updated_time))
