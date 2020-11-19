@@ -99,7 +99,6 @@ class AccessManager(object):
 
     def find_new_shares(self):
         self._logger = logging.getLogger("cron-monitor-new-shares.access-manager")
-        self._logger.info("Start running finding new shares method ...")
         groups = self._vault_client.list_groups()
         for each_group in groups:
             read_group_response = self._vault_client.read_group_by_name(each_group)
