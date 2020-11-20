@@ -93,8 +93,8 @@ class AccessManager(object):
                 continue
             for key, value in metadata.items():
                 expiry_date = datetime.datetime.strptime(value.split(",")[0], "%Y-%m-%d").date()
-                print (expiry_date)
-                print (datetime.date.today())
+                self._logger.info("Expire date for user {} of dataset {} is {}".format(key, each_group.split("_")[1], expiry_date))
+                self._logger.info("Today is {}".format(datetime.date.today()))
                 if expiry_date < datetime.date.today():
                     self._remove_member_from_group(each_group, key)
                     self._logger.info("User {}'s access to dataset {} has expired.".format(key, each_group.split("_")[1]))
