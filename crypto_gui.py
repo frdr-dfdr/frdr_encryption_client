@@ -96,7 +96,10 @@ class CryptoGui(object):
             return (False, str(e))
 
     def review_shares(self):
-        return self._access_granter.list_members()
+        try:
+            return self._access_granter.list_members()
+        except Exception as e:
+            self._logger.error(e, exc_info=True)
 
     def revoke_access(self, dataset_name, requester_id):
         self._access_granter.revoke_access(requester_id, dataset_name)

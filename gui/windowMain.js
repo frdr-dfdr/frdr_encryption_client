@@ -6,6 +6,7 @@ const remote = require('electron').remote;
 const {dialog} = require('electron').remote;
 const {shell} = require('electron').remote;
 const flatpickr = require('flatpickr');
+const {clipboard} = require('electron').remote; 
 let client = remote.getGlobal('client');
 
 var expiryDate = null;
@@ -269,10 +270,12 @@ function grantAccess() {
       const response = dialog.showMessageBoxSync(options);
       if (response == 0){
         client.invoke("grant_access", username, password, token, hostname, dataset, requester, expiryDate, function(error, res, more) {
-          if (success){
+          var grant_access_success = res[0];
+          var grant_access_result = res[1];
+          if (grant_access_success){
             notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
           } else {
-            notifier.notify({"title" : "FRDR-Crypto", "message" : `Error granting access. ${result}`});
+            notifier.notify({"title" : "FRDR-Crypto", "message" : `Error granting access. ${grant_access_result}`});
           }
         });
       }
@@ -328,11 +331,23 @@ function generateAccessRequest() {
     var result = res[1];
     if (success) {
       var options = {
-        type: "info",
-        title: "Important Information",
-        message: `Please copy the following id to the Requester ID Field on the Access Request Page on FRDR. \n \n${result}`
-      }
+        type: 'question',
+        buttons: ['Copy to Clipboard'],
+        defaultId: 0,
+        title: 'Question',
+        message: 'Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.',
+        detail: `${result}`,
+      };
       const response = dialog.showMessageBoxSync(options);
+      if (response == 0) {
+        clipboard.writeText(result);
+        var options2 = {
+          type: "info",
+          title: "Important Information",
+          message: `Requester ID copied to clipboard`
+        }
+        dialog.showMessageBoxSync(options2);
+      }
     }
     else {
       notifier.notify({"title" : "FRDR-Crypto", "message" : `Error generating access request. \n${result}`});

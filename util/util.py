@@ -3,6 +3,13 @@ import sys
 import logging
 from base64 import b64encode, b64decode
 import textwrap
+import subprocess
+import smtplib
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from configparser import ConfigParser
 
 logger = logging.getLogger("frdr-crypto.util")
 
@@ -80,3 +87,41 @@ class Util(object):
             wrapped_text += '*{pad}{text:{width}}{pad}*\n'.format(text=line, pad=' '*padding, width=max_line_length)
         wrapped_text += 60 * '*'
         return wrapped_text
+
+    @classmethod
+    def send_email(cls, to_addr, msg_subject, msg_body_html, file_to_attach):    
+        parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        config_path = os.path.join(parent_path, "email.ini")
+
+        if os.path.exists(config_path):
+            cfg = ConfigParser()
+            cfg.read(config_path)
+        else:
+            logger.error("Email Server Config not found! Exiting!")
+            sys.exit(1)
+        
+        host = cfg.get("smtp", "server")
+        from_addr = cfg.get("smtp", "from_addr")
+        
+        message = MIMEMultipart("alternative")
+        message["Subject"] = msg_subject
+        message["From"] = from_addr
+        message["To"] = to_addr
+        message.attach(MIMEText(msg_body_html, "html"))
+
+        with open(file_to_attach, 'rb') as f:
+            # set attachment mime and file name, the image type is png
+            mime = MIMEBase('image', 'png', filename='decrypt.png')
+            # add required header data:
+            mime.add_header('Content-Disposition', 'attachment', filename='decrypt.png')
+            mime.add_header('X-Attachment-Id', '0')
+            mime.add_header('Content-ID', '<0>')
+            # read attachment file content into the MIMEBase object
+            mime.set_payload(f.read())
+            # encode with base64
+            encoders.encode_base64(mime)
+            # add MIMEBase object to MIMEMultipart object
+            message.attach(mime)
+    
+        with smtplib.SMTP(host) as server:
+            server.sendmail(from_addr, to_addr, message.as_string())

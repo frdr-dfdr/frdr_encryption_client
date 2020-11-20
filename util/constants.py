@@ -13,4 +13,5 @@ EXCLUDED_FILES = [".*",
                   "NULLEXT"]
 APP_NAME = "frdr-crypto"
 APP_AUTHOR = "Simon Fraser University"
+TIMEZONE = "America/Regina"
                   
