@@ -29,6 +29,31 @@ deactivate
 
 The Electron GUI in /gui should work for development after runing  `cd gui` and `npm install` and `npm start`.
 
+
+## Building
+The Python code needs to be built on its target platform using `pyinstaller`:
+
+`pyinstaller -w crypto_gui.py --distpath gui`
+
+After building the crawler, the GUI can be built from the `gui` subdirectory with:
+
+`electron-packager . --icon=resources/icon.ico` (Windows)
+
+`electron-packager . --icon=resources/icon.icns` (Mac)
+
+On Mac, you can sign for distribution with `electron-osx-sign` and `electron-notarize-cli`, and you need to include the embedded Python binaries:
+
+`electron-osx-sign frdr-crypto-darwin-x64/frdr-crypto.app/ frdr-crypto-darwin-x64/frdr-crypto.app/Contents/Resources/app/crypto_gui/crypto_gui --identity [hash] --entitlements=entitlements.plist --hardenedRuntime`
+
+`electron-notarize --bundle-id com.webambler.FRDRSecure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-crypto-darwin-x64/frdr-crypto.app/`
+
+Finally, to package for install:
+
+`electron-installer-windows --src proveit-win32-x64/ --dest install/ --config config.json` (Windows)
+
+`hdiutil create tmp.dmg -ov -volname "FRDRSecure" -fs HFS+ -srcfolder frdr-crypto-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDRSecure.dmg && rm tmp.dmg` (Mac)
+
+
 ## CLI Usage
 ### Key Stored Locally
 To encrypt a file or a directory,
