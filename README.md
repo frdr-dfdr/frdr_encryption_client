@@ -49,7 +49,7 @@ On Mac, you can sign for distribution with `electron-osx-sign` and `electron-not
 
 Finally, to package for install:
 
-`electron-installer-windows --src proveit-win32-x64/ --dest install/ --config config.json` (Windows)
+`electron-installer-windows --src frdr-crypto-win32-x64/ --dest install/ --config config.json` (Windows)
 
 `hdiutil create tmp.dmg -ov -volname "FRDRSecure" -fs HFS+ -srcfolder frdr-crypto-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDRSecure.dmg && rm tmp.dmg` (Mac)
 
