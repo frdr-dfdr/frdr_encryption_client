@@ -43,9 +43,9 @@ After building the crawler, the GUI can be built from the `gui` subdirectory wit
 
 On Mac, you can sign for distribution with `electron-osx-sign` and `electron-notarize-cli`, and you need to include the embedded Python binaries:
 
-`electron-osx-sign frdr-crypto-darwin-x64/frdr-crypto.app/ frdr-crypto-darwin-x64/frdr-crypto.app/Contents/Resources/app/crypto_gui/crypto_gui --identity [hash] --entitlements=entitlements.plist --hardenedRuntime`
+`IFS=$'\n' && electron-osx-sign frdr-crypto-darwin-x64/frdr-crypto.app/ $(find frdr-crypto-darwin-x64/frdr-crypto.app/Contents/ -type f -perm -u+x) --identity [hash] --entitlements=entitlements.plist --hardenedRuntime`
 
-`electron-notarize --bundle-id com.webambler.FRDRSecure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-crypto-darwin-x64/frdr-crypto.app/`
+`electron-notarize --bundle-id ca.frdr-dfdr.secure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-crypto-darwin-x64/frdr-crypto.app/`
 
 Finally, to package for install:
 
