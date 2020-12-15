@@ -35,6 +35,8 @@ The Python code needs to be built on its target platform using `pyinstaller`:
 
 `pyinstaller -w crypto_gui.py --distpath gui`
 
+(On Mac, this also builds a .app version of the Python code, which you'll actually want to delete -- just keep the folder of CLI tools.)
+
 After building the crawler, the GUI can be built from the `gui` subdirectory with:
 
 `electron-packager . --icon=resources/icon.ico` (Windows)
@@ -43,7 +45,7 @@ After building the crawler, the GUI can be built from the `gui` subdirectory wit
 
 On Mac, you can sign for distribution with `electron-osx-sign` and `electron-notarize-cli`, and you need to include the embedded Python binaries:
 
-`IFS=$'\n' && electron-osx-sign frdr-crypto-darwin-x64/frdr-crypto.app/ $(find frdr-crypto-darwin-x64/frdr-crypto.app/Contents/ -type f -perm -u+x) --identity [hash] --entitlements=entitlements.plist --hardenedRuntime`
+`IFS=$'\n' && electron-osx-sign frdr-crypto-darwin-x64/frdr-crypto.app/ $(find frdr-crypto-darwin-x64/frdr-crypto.app/Contents/ -type f -perm -u+x) --identity [hash] --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
 
 `electron-notarize --bundle-id ca.frdr-dfdr.secure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-crypto-darwin-x64/frdr-crypto.app/`
 
