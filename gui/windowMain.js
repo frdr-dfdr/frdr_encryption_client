@@ -76,6 +76,15 @@ function selectMode(e) {
   }
 }
 
+function showToken() {
+  var x = document.getElementById("token");
+  if (x.type === "password") {
+    x.type = "text";
+  } else {
+    x.type = "password";
+  }
+}
+
 var buttonClicked = document.getElementById("button-encrypt");
 function highlightButton(element) {
   if (buttonClicked != null) {
