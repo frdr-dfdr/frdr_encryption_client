@@ -311,7 +311,8 @@ function reviewShares() {
         width: 800, 
         height: 500,       
         webPreferences: {
-          nodeIntegration: true
+          nodeIntegration: true,
+          enableRemoteModule: true
         }
       });
       reviewWindow.setMenuBarVisibility(false);
