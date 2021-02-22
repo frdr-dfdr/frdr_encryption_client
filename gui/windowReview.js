@@ -24,10 +24,10 @@ function revoke() {
   if (response == 0){
     client.invoke("revoke_access", datasetId, entityId, function(error, res, more) {
       if (res === true){
-        notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Revoked"});
+        notifier.notify({"title" : "FRDR Encryption Application", "message" : "Access Revoked"});
         window.location.reload();
       } else {
-        notifier.notify({"title" : "FRDR-Crypto", "message" : "Error revoking access."});
+        notifier.notify({"title" : "FRDR Encryption Application", "message" : "Error revoking access."});
       }
     });
   }

@@ -187,10 +187,10 @@ function encrypt() {
     var result = res[1];
     childWindow.close();
     if (success){
-      notifier.notify({"title" : "FRDR-Crypto", "message" : `Dataset has been encrypted and transfer package has been created on ${result}.`});
+      notifier.notify({"title" : "FRDR Encryption Application", "message" : `Dataset has been encrypted and transfer package has been created on ${result}.`});
       shell.showItemInFolder(result)
     } else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : `Error encrypting. ${result}`});
+      notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error encrypting. ${result}`});
     }
   });
 }
@@ -249,9 +249,9 @@ function decrypt() {
       var success = res[0];
       var errMessage = res[1];
       if (success){
-        notifier.notify({"title" : "FRDR-Crypto", "message" : "Dataset has been decrypted for access."});
+        notifier.notify({"title" : "FRDR Encryption Application", "message" : "Dataset has been decrypted for access."});
       } else {
-        notifier.notify({"title" : "FRDR-Crypto", "message" : `Error decrypting. ${errMessage}`});
+        notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error decrypting. ${errMessage}`});
       }
     });
   }
@@ -282,15 +282,15 @@ function grantAccess() {
           var grant_access_success = res[0];
           var grant_access_result = res[1];
           if (grant_access_success){
-            notifier.notify({"title" : "FRDR-Crypto", "message" : "Access Granted"});
+            notifier.notify({"title" : "FRDR Encryption Application", "message" : "Access Granted"});
           } else {
-            notifier.notify({"title" : "FRDR-Crypto", "message" : `Error granting access. ${grant_access_result}`});
+            notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error granting access. ${grant_access_result}`});
           }
         });
       }
     }
     else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : `Error finding the User in Vault. \n${result}`});
+      notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error finding the User in Vault. \n${result}`});
     }
   });
 }
@@ -326,7 +326,7 @@ function reviewShares() {
       });
     }
     else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : `Error reviewing shares. \n${errMessage}`});
+      notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error reviewing shares. \n${errMessage}`});
     }
   });
 }
@@ -360,7 +360,7 @@ function generateAccessRequest() {
       }
     }
     else {
-      notifier.notify({"title" : "FRDR-Crypto", "message" : `Error generating access request. \n${result}`});
+      notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error generating access request. \n${result}`});
     }
   });  
 }

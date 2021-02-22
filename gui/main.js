@@ -8,7 +8,7 @@ if (!gotTheLock) {
   app.quit();
 } else {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
-    notifier.notify({"title" : "FRDR-Crypto", "message" : "FRDR-Crypto is already running."});
+    notifier.notify({"title" : "FRDR Encryption Application", "message" : "FRDR Encryption Application is already running."});
   });
 }
 
