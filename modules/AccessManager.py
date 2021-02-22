@@ -21,6 +21,7 @@ class AccessManager(object):
         if expiry_date is None:
             expiry_date = (datetime.date.today() + datetime.timedelta(days=14)).strftime("%Y-%m-%d")
         group_name = "_".join((self._depositor_entity_id, dataset_id, "share_group"))
+        
         self._add_member_to_group(group_name, requester_entity_id, expiry_date)
     
     def _add_member_to_group(self, group_name, requester_entity_id, expiry_date):
@@ -86,6 +87,8 @@ class AccessManager(object):
     def expire_shares(self):
         self._logger = logging.getLogger("cron-monitor-expired-shares.access-manager")
         groups = self._vault_client.list_groups()
+        if groups is None:
+            return None
         for each_group in groups:
             read_group_response = self._vault_client.read_group_by_name(each_group)
             metadata = read_group_response["data"]["metadata"]
@@ -102,6 +105,8 @@ class AccessManager(object):
     def find_new_shares(self):
         self._logger = logging.getLogger("cron-monitor-new-shares.access-manager")
         groups = self._vault_client.list_groups()
+        if groups is None:
+            return None
         for each_group in groups:
             read_group_response = self._vault_client.read_group_by_name(each_group)
             metadata = read_group_response["data"]["metadata"]
