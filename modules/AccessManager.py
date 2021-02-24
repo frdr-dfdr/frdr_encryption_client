@@ -133,22 +133,35 @@ class AccessManager(object):
                             <html>
                                 <body>
                                     <p>
+                                        Attention: 
+                                    </p>
+                                    <p>
+                                        Congratulations! You have been granted access to an encrypted dataset with \
+                                        the metatdata frdr.vault.dataset_uuid {dataset_id} on FRDR . You will be \
+                                        receiving a second email that contains similar text to this one which has \
+                                        been generated from a separate platform. This is not a duplicate of that \
+                                        message; they are sent separately in order to maintain zero-knowledge \
+                                        encryption between the dataset and the encryption key. You will use \
+                                        information from both email messages in order to access the dataset.
+                                    </p>
+                                    <p>
                                         Please refer to the other message first in order to download the dataset itself. \
                                         In order to decrypt the data after downloading it, you will need to run our <b>FRDR Vault App</b> \
-                                        which can be downloaded from {}, and navigate to the <b>Decrypt menu</b>. You will need \
+                                        which can be downloaded from {app_download_url}, and navigate to the <b>Decrypt menu</b>. You will need \
                                         to input your FRDR credentials (note: this may be updated to reflect multiple auth sources \
                                         later on), and provide the path to the encrypted dataset that you already downloaded, \
                                         and a Vault API URL that has been generated for you to access the decryption key \
-                                        for this dataset, as in this screenshot: 
+                                        for this dataset. Please refer to this guide for assistance:[LINK]. 
                                     </p>
-                                    <img src="cid:0">
-                                    <p> Your Vault API URL is: {} </p>
+                                    <p> Your Vault API URL is: {vault_api_url} </p>
                                     <p>
                                         We strongly recommend only decrypting this data on a trusted computer which is itself \
                                         encrypted (e.g. using Windows' BitLocker or Apple's FileVault functionality) and \
-                                        accessed only by you. You assume full liability for this data upon decryption and \
-                                        the risk of disclosure may be very significant. If you encounter any problems with \
-                                        this workflow, or you have other feedback for us, feel free to get in touch at \
+                                        accessed only by you. Please refer to your institutional requirements for accessing \
+                                        sensitive datasets here: [LINK].Please ensure all protocols are followed to prevent data breach.
+                                    </p>
+                                    <p>
+                                        If you encounter any problems or have other questions, please contact us at \
                                         support@frdr-dfdr.ca. Best of luck with the data!
                                     </p>
                                     <br/><br/>
@@ -156,8 +169,6 @@ class AccessManager(object):
                                     support@frdr-dfdr.ca
                                 </body>
                             </html>
-                            """.format(app_download_url, vault_api_url)
-                        parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                        screenshot_path = os.path.join(parent_path, "img", "decrypt.png")
-                        Util.send_email(requester_email, subject, body_html, screenshot_path)
+                            """.format(dataset_id=dataset_id, app_download_url=app_download_url, vault_api_url=vault_api_url)
+                        Util.send_email(requester_email, subject, body_html)
                         self._logger.info("New access granted to {} at {}".format(requester_email, access_updated_time))
