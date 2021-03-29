@@ -22,10 +22,6 @@ And if it's indeed version 3, then install the requirements inside the virtual e
 ```sh
 pip install -r requirements.txt
 ```
-To activate the virtual environment: 
-```sh
-source env/bin/activate
-```
 To exit the virtual environment:
 ```sh
 deactivate
