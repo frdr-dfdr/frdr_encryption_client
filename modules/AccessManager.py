@@ -122,6 +122,7 @@ class AccessManager(object):
             dataset_id = read_group_response["data"]["name"].split("_")[1]
             for key, value in metadata.items():
                 if len(value.split(",")) > 1:
+                    expiry_date = datetime.datetime.strptime(value.split(",")[0], "%Y-%m-%d").date()
                     access_updated_time = parser.parse(value.split(",")[1])
                     if access_updated_time <= now and access_updated_time >= (now - datetime.timedelta(minutes=1)):
                         vault_api_url = "http://206-12-90-40.cloud.computecanada.ca/secret/data/{depositor_user_id}/{dataset_id}"\
@@ -137,7 +138,7 @@ class AccessManager(object):
                                     </p>
                                     <p>
                                         Congratulations! You have been granted access to an encrypted dataset with \
-                                        the metatdata frdr.vault.dataset_uuid {dataset_id} on FRDR . You will be \
+                                        the metatdata frdr.vault.dataset_uuid {dataset_id} on FRDR. You will be \
                                         receiving a second email that contains similar text to this one which has \
                                         been generated from a separate platform. This is not a duplicate of that \
                                         message; they are sent separately in order to maintain zero-knowledge \
@@ -152,6 +153,12 @@ class AccessManager(object):
                                         later on), and provide the path to the encrypted dataset that you already downloaded, \
                                         and a Vault API URL that has been generated for you to access the decryption key \
                                         for this dataset. Please refer to this guide for assistance:[LINK]. 
+                                    </p>
+                                    <p>
+                                        Please note that your access to this dataset will expire on {expiry_date}. \
+                                        Please ensure you have downloaded the dataset from FRDR and decrypted it prior \
+                                        to {expiry_date}. After {expiry_date} you will no longer be able to \
+                                        access the dataset.
                                     </p>
                                     <p> Your Vault API URL is: {vault_api_url} </p>
                                     <p>
@@ -169,6 +176,6 @@ class AccessManager(object):
                                     support@frdr-dfdr.ca
                                 </body>
                             </html>
-                            """.format(dataset_id=dataset_id, app_download_url=app_download_url, vault_api_url=vault_api_url)
+                            """.format(dataset_id=dataset_id, expiry_date=expiry_date, app_download_url=app_download_url, vault_api_url=vault_api_url)
                         Util.send_email(requester_email, subject, body_html)
                         self._logger.info("New access granted to {} at {}".format(requester_email, access_updated_time))
