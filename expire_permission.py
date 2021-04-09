@@ -29,4 +29,4 @@ if __name__ == "__main__":
     vault_client = VaultClient(vault_addr=arguments["--vault"], 
                                vault_token=vault_root_token)
     access_manager = AccessManager(vault_client)     
-    access_manager.expire_shares()
+    access_manager.check_access()

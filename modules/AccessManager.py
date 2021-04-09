@@ -84,13 +84,14 @@ class AccessManager(object):
     def _list_datasets(self):        
         return self._vault_client.list_secrets(self._depositor_entity_id)
 
-    def expire_shares(self):
+    def check_access(self):
         self._logger = logging.getLogger("cron-monitor-expired-shares.access-manager")
         groups = self._vault_client.list_groups()
         if groups is None:
             return None
         for each_group in groups:
             read_group_response = self._vault_client.read_group_by_name(each_group)
+            dataset_id = read_group_response["data"]["name"].split("_")[1]
             metadata = read_group_response["data"]["metadata"]
             if metadata is None:
                 continue
@@ -98,10 +99,44 @@ class AccessManager(object):
                 expiry_date = datetime.datetime.strptime(value.split(",")[0], "%Y-%m-%d").date()
                 self._logger.info("Expire date for user {} of dataset {} is {}".format(key, each_group.split("_")[1], expiry_date))
                 self._logger.info("Today is {}".format(datetime.date.today()))
+                # Expire shares
                 if expiry_date < datetime.date.today():
                     self._remove_member_from_group(each_group, key)
                     self._logger.info("User {}'s access to dataset {} has expired.".format(key, each_group.split("_")[1]))
+                # Send notice three days before access expires
+                if expiry_date == (datetime.date.today() + datetime.timedelta(days=3)):
+                    self._send_notice(key, dataset_id, expiry_date)
+                    self._logger.info("User {}'s access to dataset {} will expire in three days. Notice email sent to user."\
+                        .format(key, each_group.split("_")[1]))
 
+    def _send_notice(self, requester_entity_id, dataset_id, expiry_date):
+        requester_email = self._vault_client.read_entity_by_id(requester_entity_id)
+        subject = "Vault - Access to sensitive data's key expires Soon"
+        body_html = """\
+            <html>
+                <body>
+                    <p>
+                        Attention: 
+                    </p>
+                    <p>
+                        Please note that your access to the key of an encrypted dataset with \
+                        the metatdata frdr.vault.dataset_uuid {dataset_id} will expire on {expiry_date}. \
+                        Please ensure you have downloaded the dataset from FRDR and decrypted it prior \
+                        to {expiry_date}. After {expiry_date} you will no longer be able to \
+                        access the key.
+                    </p>
+                    <p>
+                        If you encounter any problems or have other questions, please contact us at \
+                        support@frdr-dfdr.ca. Best of luck with the data!
+                    </p>
+                    <br/><br/>
+                    FRDR Support
+                    support@frdr-dfdr.ca
+                </body>
+            </html>
+            """.format(dataset_id=dataset_id, expiry_date=expiry_date)
+        Util.send_email(requester_email, subject, body_html)
+    
     def find_new_shares(self):
         self._logger = logging.getLogger("cron-monitor-new-shares.access-manager")
         groups = self._vault_client.list_groups()
