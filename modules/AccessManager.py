@@ -111,7 +111,7 @@ class AccessManager(object):
 
     def _send_notice(self, requester_entity_id, dataset_id, expiry_date):
         requester_email = self._vault_client.read_entity_by_id(requester_entity_id)
-        subject = "Vault - Access to sensitive data's key expires Soon"
+        subject = "Vault - Access to sensitive data's key expires soon"
         body_html = """\
             <html>
                 <body>
