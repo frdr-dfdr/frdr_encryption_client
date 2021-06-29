@@ -10,12 +10,6 @@ const flatpickr = require('flatpickr');
 const {clipboard} = require('electron').remote; 
 let client = remote.getGlobal('client');
 
-window.onload = myMain;
-
-function myMain() {
-  document.getElementById("menu").onclick = selectMode;
-}
-
 $(function () {
   $('[data-toggle="tooltip"]').tooltip();
 })
