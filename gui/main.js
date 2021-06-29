@@ -1,7 +1,7 @@
 "use strict";
 
 if(require('electron-squirrel-startup')) return;
-const {app, dialog, Menu, BrowserWindow} = require("electron");
+const {app, dialog, Menu, BrowserWindow, ipcMain} = require("electron");
 // Does not allow a second instance
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -55,8 +55,8 @@ const getScriptPath = () => {
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 530,
-    height: 750,
+    width: 800,
+    height: 600,
     backgroundColor: "#D6D8DC",
     webPreferences: {
       nodeIntegration: true,
@@ -66,11 +66,30 @@ const createWindow = () => {
 
   mainWindow.setMenuBarVisibility(false);
 
+  // Load the login page by default.
   mainWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexMain.html'),
+    pathname: path.join(__dirname, 'indexLogin.html'),
     protocol: 'file:',
     slashes: true
   }))
+
+  // Load the login page when user is unauthenticated.
+  ipcMain.on("unauthenticated", (event) => {
+    mainWindow.loadURL(require('url').format({
+      pathname: path.join(__dirname, 'indexLogin.html'),
+      protocol: 'file:',
+      slashes: true
+    }))
+  })
+
+  // Load our app when user is authenticated.
+  ipcMain.on("authenticated", async event => {
+    mainWindow.loadURL(require('url').format({
+      pathname: path.join(__dirname, 'indexMain.html'),
+      protocol: 'file:',
+      slashes: true
+    }))
+  })
 
   mainWindow.on('close', (event) => {
     if (mainWindow != null){

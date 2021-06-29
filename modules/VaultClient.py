@@ -1,40 +1,24 @@
 import hvac
-import json
 import os
 import logging 
+import webbrowser
+from urllib import parse
 
 class VaultClient(object):
-    def __init__(self, vault_addr, vault_username=None, vault_passowrd=None, tokenfile=None, vault_token=None):
+    def __init__(self):
         self._logger = logging.getLogger("frdr-crypto.vault-client")
-        self._vault_addr = vault_addr
-        self._tokenfile = tokenfile
-        self._username = vault_username
-        self._password = vault_passowrd
         self._vault_auth = None
-        self._vault_token = vault_token
         self._entity_id = None
-        try:
-            self.hvac_client = hvac.Client(
-                url=self._vault_addr, 
-                token=self.vault_token
-                )
-            assert self.hvac_client.is_authenticated(), \
-                   "Failed to authenticate with Vault."
-        except AssertionError as error:
-            self._logger.error(error)
-            raise Exception(error)
-        except Exception as e:
-            self._logger.error("Failed to authenticate with Vault.")
-            raise Exception("Failed to authenticate with Vault.")
+        self.hvac_client = hvac.Client()
+        # TODO: decide whether need this
+        self._vault_token = None
 
-        self._logger.info("Authenticated with Vault successfully.")
-
-    def login(self, username, password, auth_method="userpass"):
-        if username is None or password is None:
-            self._logger.error("Unable to load auth tokens from file, while username and password also not supplied. You need to obtain a login token with your username and password the first time you use the app.")
-            return False
-        self.hvac_client = hvac.Client(url=self._vault_addr)
+    def login(self, vault_addr, auth_method, username=None, password=None, oauth_type=None):
+        self.hvac_client = hvac.Client(url=vault_addr)
         if auth_method == "userpass":
+            if username is None or password is None:
+                self._logger.error("Unable to load auth tokens from file, while username and password also not supplied. You need to obtain a login token with your username and password the first time you use the app.")
+                return False
             try:
                 response = self.hvac_client.auth.userpass.login(username, password)
                 self._vault_token = response["auth"]["client_token"]
@@ -47,6 +31,48 @@ class VaultClient(object):
         # TODO: add other auth methods
         elif auth_method == "ldap":
             pass
+        elif auth_method == "oidc":
+            if oauth_type is None:
+                self._logger.error("Account type must be provided for oidc login mehtod")
+                return False
+            path = "oidc/" + oauth_type
+            try:
+                response = self.hvac_client.auth.jwt.oidc_authorization_url_request(
+                    role='',
+                    redirect_uri='http://localhost:8250/{}/callback'.format(path),
+                    path=path
+                )
+                auth_url = response['data']['auth_url']
+                params = parse.parse_qs(auth_url.split('?')[1])
+                auth_url_nonce = params['nonce'][0]
+                auth_url_state = params['state'][0]
+
+                webbrowser.open(auth_url)
+                token = self._login_odic_get_token()
+
+                auth_result = self.hvac_client.auth.oidc.oidc_callback(
+                    code=token, path=path, nonce=auth_url_nonce, state=auth_url_state
+                )
+                self._vault_token = auth_result['auth']['client_token']
+                self._logger.info("Authenticated with Vault successfully.")
+                return True
+            except Exception:
+                self._logger.error("Failed to auth with google account using oidc method.")
+                raise Exception
+
+        try:
+            assert self.hvac_client.is_authenticated(), "Failed to authenticate with Vault."
+        except AssertionError as error:
+            self._logger.error(error)
+            raise Exception(error)
+        
+    def logout(self):
+        try:
+            self.hvac_client.logout()
+            self._logger.info("Logged out of Vault successfully.")
+        except Exception:
+            self._logger.error("Failed to log out of Vault.")
+            raise Exception
         
     def load_token_from_file(self):
         if os.path.exists(self._tokenfile):
@@ -144,21 +170,47 @@ class VaultClient(object):
         except Exception as e:
             self._logger.error("error {}".format(e))
 
+
+
+    # handles the callback
+    def _login_odic_get_token(self):
+        from http.server import BaseHTTPRequestHandler, HTTPServer
+
+        class HttpServ(HTTPServer):
+            def __init__(self, *args, **kwargs):
+                HTTPServer.__init__(self, *args, **kwargs)
+                self.token = None
+
+        class AuthHandler(BaseHTTPRequestHandler):
+            token = ''
+
+            def do_GET(self):
+                params = parse.parse_qs(self.path.split('?')[1])
+                self.server.token = params['code'][0]
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(str.encode('<div>Authentication successful, you can close the browser now.</div>'))
+
+        server_address = ('', 8250)
+        httpd = HttpServ(server_address, AuthHandler)
+        httpd.handle_request()
+        return httpd.token 
+
     @property
     def vault_auth(self):
         if self._vault_auth is None:
             self._vault_auth = self.lookup_token()
         return self._vault_auth
 
-    @property
-    def vault_token(self):
-        # self._vault_token is an empty string, not None
-        if not self._vault_token:
-            if self.load_token_from_file():
-                self._logger.info("Token loaded from file")
-            else:
-                self.login(self._username, self._password)
-        return self._vault_token
+    # @property
+    # def vault_token(self):
+    #     # self._vault_token is an empty string, not None
+    #     if not self._vault_token:
+    #         if self.load_token_from_file():
+    #             self._logger.info("Token loaded from file")
+    #         else:
+    #             self.login(self._auth_method, self._username, self._password, self._oauth_type)
+    #     return self._vault_token
 
     @property
     def entity_id(self):

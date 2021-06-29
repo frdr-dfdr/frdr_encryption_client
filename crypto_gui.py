@@ -27,15 +27,38 @@ class CryptoGui(object):
                         log_level="info",
                         filepath=os.path.join(dirs.user_data_dir, "frdr-crypto_log.txt"))
         self._logger = logging.getLogger("frdr-crypto.gui")
+        self._vault_client = VaultClient()
 
-    def get_token(self, username, password, hostname):
-        self._logger.info("Get token from GUI.")
-        vault_client = VaultClient(hostname, username, password, tokenfile)
-        login_status = vault_client.login(username, password)
-        if login_status:
-            return "Token obtained."
-        else:
-            return "Unable to obtain token. Verify your credentials and Vault URL."
+    def login_oidc_google(self, hostname):
+        try:
+            self._logger.info("Log into Vault using oidc method with google acccount")
+            self._vault_client.login(vault_addr=hostname,
+                                     auth_method="oidc",
+                                     oauth_type="google")          
+            return (True, None)
+        except Exception as e:
+            self._logger.info(str(e))
+            return (False, str(e))
+    
+    def login_oidc_globus(self, hostname):
+        try:
+            self._logger.info("Log into Vault using oidc method with globus acccount")
+            self._vault_client.login(vault_addr=hostname,
+                                     auth_method="oidc",
+                                     oauth_type="globus")          
+            return (True, None)
+        except Exception as e:
+            self._logger.info(str(e))
+            return (False, str(e))
+
+    def logout(self):
+        try:
+            self._vault_client.logout()
+            self._logger.info("Log out successfully")
+            return (True, None)
+        except Exception as e:
+            self._logger.error(str(e))
+            return (False, str(e))
 
     def encrypt(self, username, password, vault_token, hostname, output_path):
         try:

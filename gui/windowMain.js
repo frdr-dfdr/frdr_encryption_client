@@ -399,3 +399,22 @@ document.getElementById('selected-file').innerHTML = `You selected: ${path}`
 
 document.getElementById("decrypt").addEventListener("click", decrypt);
 
+// Allow the user to logout
+document.getElementById("logout").addEventListener("click", function() {
+  logout();
+});
+
+function logout() {
+  client.invoke("logout", function(error, res, more) {
+    var success = res[0];
+    var result = res[1];
+    childWindow.close();
+    if (success){
+      notifier.notify({"title" : "FRDR Encryption Application", "message" : `Log out successfully`});
+      shell.showItemInFolder(result)
+    } else {
+      notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error logging out. ${result}`});
+    }
+  });
+  ipc.send("unauthenticated")
+}
