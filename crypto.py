@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    crypto.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--oauth] [--loglevel=<loglevel>] 
-    crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> (--username <vault_username> --password <vault_password> | --oauth) --url <API_path>) [--loglevel=<loglevel>] 
+    crypto.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>] [<oauth_type>] [--loglevel=<loglevel>] 
+    crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> (--username <vault_username> --password <vault_password> | <oauth_type>) --url <API_path>) [--loglevel=<loglevel>] 
     crypto.py --logout_vault
+    crypto.py --vault <vault_addr> --oauth <oauth_type>
 
 Options:
     -e --encrypt           encrypt
     -d --decrypt           decrypt
-    --oauth 
+    --oauth <oauth_type>
     -i <input_path>, --input <input_path>
     -o <output_path>, --output <output_path> 
     -k <key_path>, --key <key_path>
@@ -239,14 +240,23 @@ if __name__ == "__main__":
                 pass
             logger.info("Removed old auth tokens. Exiting.")
             sys.exit()
+        vault_client = VaultClient()
+
         if arguments["--vault"]:
             if arguments["--username"]:
-                vault_client = VaultClient(arguments["--vault"], arguments["--username"], arguments["--password"], tokenfile)
+                login_result = vault_client.login(vault_addr=arguments["--vault"],
+                                   auth_method="userpass",
+                                   username=arguments["--username"], 
+                                   password=arguments["--password"])
             elif arguments["--oauth"]:
-                vault_ui_url = urljoin(arguments["--vault"], "/ui/vault/auth?with=oidc")
-                webbrowser.open_new_tab(vault_ui_url)
-                token = input('Please input your vault client token: ')
-                vault_client = VaultClient(arguments["--vault"], arguments["--username"], arguments["--password"], tokenfile, token)
+                login_result = vault_client.login(vault_addr=arguments["--vault"],
+                                   auth_method="oidc",
+                                   oauth_type=arguments["--oauth"])
+
+            operation = input("Please type in the operation you would like to do, encrypt, decrypt, or grant access: ")    
+            if operation == "encrypt":
+               dataset_name = str(uuid.uuid4())     
+            
             if arguments["--encrypt"]:
                 dataset_name = str(uuid.uuid4()) 
             elif arguments["--decrypt"]:
