@@ -32,11 +32,13 @@ class VaultClient(object):
         elif auth_method == "ldap":
             pass
         elif auth_method == "oidc":
-            if oauth_type is None:
-                self._logger.error("Account type must be provided for oidc login mehtod")
-                return False
-            path = "oidc/" + oauth_type
             try:
+                if oauth_type is None:
+                    path = "oidc"
+                    # self._logger.error("Account type must be provided for oidc login mehtod")
+                    # return False
+                else:
+                    path = "oidc/" + oauth_type
                 response = self.hvac_client.auth.jwt.oidc_authorization_url_request(
                     role='',
                     redirect_uri='http://localhost:8250/{}/callback'.format(path),
@@ -55,9 +57,9 @@ class VaultClient(object):
                 )
                 self._vault_token = auth_result['auth']['client_token']
                 self._logger.info("Authenticated with Vault successfully.")
-                return True
-            except Exception:
-                self._logger.error("Failed to auth with google account using oidc method.")
+                return True                                    
+            except Exception as e:
+                self._logger.error("Failed to auth with {} account using oidc method. {}".format(oauth_type, e))
                 raise Exception
 
         try:

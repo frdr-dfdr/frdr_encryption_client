@@ -28,6 +28,7 @@ class CryptoGui(object):
                         filepath=os.path.join(dirs.user_data_dir, "frdr-crypto_log.txt"))
         self._logger = logging.getLogger("frdr-crypto.gui")
         self._vault_client = VaultClient()
+        self._vault_client_pki = VaultClient()
 
     def login_oidc_google(self, hostname):
         try:
@@ -40,12 +41,14 @@ class CryptoGui(object):
             self._logger.info(str(e))
             return (False, str(e))
     
-    def login_oidc_globus(self, hostname):
+    def login_oidc_globus(self, hostname, hostname_pki):
         try:
-            self._logger.info("Log into Vault using oidc method with globus acccount")
+            self._logger.info("Log into Vault using oidc method with globus acccount") 
             self._vault_client.login(vault_addr=hostname,
                                      auth_method="oidc",
-                                     oauth_type="globus")          
+                                     oauth_type="globus")  
+            self._vault_client_pki.login(vault_addr=hostname_pki, 
+                                     auth_method="oidc")           
             return (True, None)
         except Exception as e:
             self._logger.info(str(e))
@@ -54,6 +57,7 @@ class CryptoGui(object):
     def logout(self):
         try:
             self._vault_client.logout()
+            self._vault_client_pki.logout()
             self._logger.info("Log out successfully")
             return (True, None)
         except Exception as e:

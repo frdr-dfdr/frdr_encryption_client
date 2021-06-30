@@ -33,8 +33,8 @@
     } 
 
     .login-container{
-      margin-top: 10%;
-      margin-bottom: 10%;
+      margin-top: 5%;
+      margin-bottom: 5%;
     }
 
     /* Two-column layout */
@@ -49,7 +49,7 @@
     /* vertical line */
     .vl {
       position: absolute;
-      top: 150%;
+      top: 125%;
       left: 50%;
       transform: translate(-50%);
       border: 1px solid #ddd;
@@ -110,15 +110,15 @@
     <div class="row">
       <div class="col-md-12" style="text-align:center">
         <h3>Vault URL</h3>
-        <input name="vault address" id="hostname" type="text" style='width:80%'/>
+        <input name="vault-address" id="hostname" type="text" style='width:80%' value="https://206-12-90-40.cloud.computecanada.ca"/>
         <a data-placement="right" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
           <span class="glyphicon glyphicon-question-sign" ></span>
         </a>  
-        <!-- <h3>Public Key Infrastructure URL</h3>
-        <input name="pki address" id="pki-hostname" type="text" style='width:80%'/>
+        <h3>Public Key Infrastructure URL</h3>
+        <input name="pki address" id="pki-hostname" type="text" style='width:80%' value="https://frdrvault.mit.c3.ca/"/>
         <a data-placement="right" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
           <span class="glyphicon glyphicon-question-sign" ></span>
-        </a>  -->
+        </a> 
         <div class="vl">
           <span class="vl-innertext">or</span>
         </div>      
@@ -145,6 +145,40 @@
       </div>
     </div>
   </div>
+
+  <!-- <div class="container login-container">
+    <div class="row">
+      <div class="col-md-12" style="text-align:center"> 
+        <h3>Public Key Infrastructure URL</h3>
+        <input name="pki-address" id="pki-hostname" type="text" style='width:80%' value="https://frdrvault.mit.c3.ca/"/>
+        <a data-placement="right" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
+          <span class="glyphicon glyphicon-question-sign" ></span>
+        </a> 
+        <div class="vl">
+          <span class="vl-innertext">or</span>
+        </div>      
+      </div>
+    </div>
+    <br>
+
+    <div class="row">
+      <div id="userpass_login_pki" class="col">
+        <h3 style="text-align:center">Login with Compute Canada Account</h3>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Compute Canada Username" value="" />
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" placeholder="Compute Canada Password" value="" />
+        </div>
+        <div class="form-group">
+            <input type="submit" class="btn btn-primary" id="userpass_submit" value="Login" />
+        </div>
+      </div>
+      <div id="oauth2_login_pki" class="col my-auto">     
+        <a id="globus_submit_pki" href="#" class="globus btn""> Login with Globus </a>
+      </div>
+    </div>
+  </div> -->
 
   <script src="windowLogin.js" charset="utf-8"></script> 
 

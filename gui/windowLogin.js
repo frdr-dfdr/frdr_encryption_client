@@ -82,7 +82,8 @@ function oidcGoogleLogin() {
 
 function oidcGlobusLogin() {
   var hostname = document.getElementById("hostname").value;
-  client.invoke("login_oidc_globus", hostname, function(error, res, more) {
+  var hostnamePKI = document.getElementById("pki-hostname").value;
+  client.invoke("login_oidc_globus", hostname, hostnamePKI, function(error, res, more) {
     var success = res[0];
     var errMessage = res[1];
     if (success) {
@@ -101,6 +102,7 @@ document.getElementById("userpass_submit").addEventListener("click", userpassLog
 document.getElementById("google_submit").addEventListener("click", oidcGoogleLogin);
 
 document.getElementById("globus_submit").addEventListener("click", oidcGlobusLogin);
+
 
 
 
