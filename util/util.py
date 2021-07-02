@@ -29,6 +29,10 @@ class Util(object):
         return b64decode(plaintext.encode())
 
     @classmethod
+    def byte_to_base64(cls, byte):
+        return b64encode(byte).decode()
+
+    @classmethod
     def clean_dir_path(cls, path):
         if path.endswith(os.sep):
             return path[:-1]
@@ -50,7 +54,7 @@ class Util(object):
 
         logger.info("Log level: {}".format(log_level))
 
-        clean_logformatter = '%(asctime)s %(name)s [%(levelname)s] %(message)s'
+        clean_logformatter = '%(asctime)s %(name)s [%(levelname)s] %(message)s [%(filename)s:%(lineno)d]'
         clean_formatter = logging.Formatter(clean_logformatter)
         console = logging.StreamHandler(sys.stdout)
         try:

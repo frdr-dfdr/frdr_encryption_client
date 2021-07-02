@@ -5,7 +5,7 @@ Usage:
     crypto.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>] [<oauth_type>] [--loglevel=<loglevel>] 
     crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> (--username <vault_username> --password <vault_password> | <oauth_type>) --url <API_path>) [--loglevel=<loglevel>] 
     crypto.py --logout_vault
-    crypto.py --vault <vault_addr> --oauth <oauth_type>
+    crypto.py --vault <vault_addr> --vault_pki <pki_vault_addr> --oauth <oauth_type>
 
 Options:
     -e --encrypt           encrypt
@@ -15,6 +15,7 @@ Options:
     -o <output_path>, --output <output_path> 
     -k <key_path>, --key <key_path>
     --vault <vault_addr> using hashicorp vault for key generation and storage
+    --vault_pki <pki_vault_addr> using hashicorp vault for key generation and storage
     -u <vault_username>, --username <vault_username>
     -p <vault_password>, --password <vault_password>
     --token <vault_token> 
@@ -22,6 +23,7 @@ Options:
     --url <API_path>  API Path to fetch secret on vault
     -l --loglevel The logging level(debug, error, warning or info) [default: info]
 """
+from modules.PublicKeyManager import PublicKeyManager
 from docopt import docopt
 import sys
 import nacl.utils
@@ -49,32 +51,38 @@ os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
 class Cryptor(object):
-    def __init__(self, arguments, key_manager, logger, dataset_name):
+    def __init__(self, arguments, dataset_key_manager, person_key_manager, logger, dataset_uuid, input_dir, output_dir):
         self._arguments = arguments
-        self._key_manager = key_manager
-        self._input = Util.clean_dir_path(self._arguments["--input"])
-        self._output = self._arguments["--output"]
+        self._dataset_key_manager = dataset_key_manager
+        self._person_key_manager = person_key_manager
+        self._input = Util.clean_dir_path(input_dir)
+        self._output = output_dir
         self._logger = logger
-        self._dataset_name = dataset_name
-        if self._arguments["--encrypt"]:
-            if self._arguments["--vault"]:
-                self._secret_path = "/".join([self._key_manager.get_vault_entity_id(), dataset_name])
-            else:
-                self._secret_path = "{}_key.pem".format(dataset_name)
-            self._key_manager.generate_key()
-        elif self._arguments["--decrypt"]:
-            if self._arguments["--vault"]:
-                self._secret_path = "/".join(arguments["--url"].split("/")[-2:])
-            else: 
-                self._secret_path = self._arguments["--key"]
-            self._key_manager.read_key(self._secret_path)
-        else:
-            self._logger.error("Argument (encrypt or decrypt) is not provided.")
-            raise Exception
-        self.box = nacl.secret.SecretBox(self._key_manager.key)
+        self._dataset_uuid = dataset_uuid
+        # if self._arguments["--encrypt"]:
+        #     if self._arguments["--vault"]:
+        #         self._secret_path = "/".join([self._dataset_key_manager.get_vault_entity_id(), dataset_uuid])
+        #     else:
+        #         self._secret_path = "{}_key.pem".format(dataset_uuid)
+        #     self._dataset_key_manager.generate_key()
+        # elif self._arguments["--decrypt"]:
+        #     if self._arguments["--vault"]:
+        #         self._secret_path = "/".join(arguments["--url"].split("/")[-2:])
+        #     else: 
+        #         self._secret_path = self._arguments["--key"]
+        #     self._dataset_key_manager.read_key(self._secret_path)
+        # else:
+        #     self._logger.error("Argument (encrypt or decrypt) is not provided.")
+        #     raise Exception
+        # self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
 
     def encrypt(self):
         logger = logging.getLogger('frdr-crypto.encrypt')
+
+        # generate key 
+        self._dataset_key_manager.generate_key()
+        self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
+
         bag_dir_parent = tempfile.mkdtemp()
         if os.path.isdir(bag_dir_parent):
             shutil.rmtree(bag_dir_parent)
@@ -97,8 +105,8 @@ class Cryptor(object):
         
         try:
             bag = bagit.make_bag(bag_dir, None, 1, ['sha256'])
-            bag.info['Depositor-Entity-ID'] = self._key_manager.get_vault_entity_id()
-            bag.info['Dataset-UUID'] = self._dataset_name
+            bag.info['Depositor-Entity-ID'] = self._dataset_key_manager.get_vault_entity_id()
+            bag.info['Dataset-UUID'] = self._dataset_uuid
             bag.save()
         except (bagit.BagError, Exception) as e:
             # TODO: log error
@@ -112,11 +120,9 @@ class Cryptor(object):
         shutil.move(zipname, bag_output_path)
 
         # save key
-        self._key_manager.save_key(self._secret_path)
-
-        # create dataset access policy and group if they don't exist
-        if self._arguments["--vault"]:
-            self._key_manager.create_access_policy_and_group()
+        self._person_key_manager.create_key_pair()
+        self._dataset_key_manager.encrypt_key(self._person_key_manager.get_public_key(self._person_key_manager.get_vault_entity_id()))
+        self._dataset_key_manager.save_key("/".join([self._dataset_key_manager.get_vault_entity_id(), dataset_uuid]))
         
         return bag_output_path
 
@@ -241,6 +247,7 @@ if __name__ == "__main__":
             logger.info("Removed old auth tokens. Exiting.")
             sys.exit()
         vault_client = VaultClient()
+        vault_client_pki = VaultClient()
 
         if arguments["--vault"]:
             if arguments["--username"]:
@@ -252,32 +259,44 @@ if __name__ == "__main__":
                 login_result = vault_client.login(vault_addr=arguments["--vault"],
                                    auth_method="oidc",
                                    oauth_type=arguments["--oauth"])
-
+                login_result_pki = vault_client_pki.login(vault_addr=arguments["--vault_pki"],
+                                   auth_method="oidc",
+                                   oauth_type=arguments["--oauth"])
+            
             operation = input("Please type in the operation you would like to do, encrypt, decrypt, or grant access: ")    
             if operation == "encrypt":
-               dataset_name = str(uuid.uuid4())     
+               dataset_uuid = str(uuid.uuid4())  
+               dataset_key_manager = KeyManagementVault(vault_client, dataset_uuid)   
+               person_key_manager = PublicKeyManager(vault_client_pki)
+               encryptor = Cryptor(arguments, dataset_key_manager, person_key_manager, logger, dataset_uuid, 
+                                   "/Users/jza201/Documents/SFU_FRDR/research",
+                                   "/Users/jza201/Desktop")
+               encryptor.encrypt()
             
-            if arguments["--encrypt"]:
-                dataset_name = str(uuid.uuid4()) 
-            elif arguments["--decrypt"]:
-                dataset_name = arguments["--url"].split("/")[-1]
-            else:
-                raise Exception
-            key_manager = KeyManagementVault(vault_client, dataset_name)
-        else:
-            key_manager = KeyManagementLocal()
-            dataset_name = str(uuid.uuid4()) 
-        encryptor = Cryptor(arguments, key_manager, logger, dataset_name)
-        if arguments["--encrypt"]:
-            encryptor.encrypt()
-        elif arguments["--decrypt"]:
-            warning_string = "You are trying to decrypt the dataset {dataset_id}"\
-                             .format(dataset_id=dataset_name)
-            print (Util.wrap_text(warning_string))
-            if click.confirm("Do you want to continue?", default=False):  
-                encryptor.decrypt()
-        else:
-            pass
+            # if arguments["--encrypt"]:
+            #     dataset_uuid = str(uuid.uuid4()) 
+            # elif arguments["--decrypt"]:
+            #     dataset_uuid = arguments["--url"].split("/")[-1]
+            # else:
+            #     raise Exception
+
+            # key_manager = KeyManagementVault(vault_client, dataset_uuid)
+        # else:
+        #     key_manager = KeyManagementLocal()
+        #     dataset_uuid = str(uuid.uuid4()) 
+
+        # personal_key_manager = PublicKeyManager()
+        # encryptor = Cryptor(arguments, key_manager, logger, dataset_uuid)
+        # if arguments["--encrypt"]:
+        #     encryptor.encrypt()
+        # elif arguments["--decrypt"]:
+        #     warning_string = "You are trying to decrypt the dataset {dataset_id}"\
+        #                      .format(dataset_id=dataset_uuid)
+        #     print (Util.wrap_text(warning_string))
+        #     if click.confirm("Do you want to continue?", default=False):  
+        #         encryptor.decrypt()
+        # else:
+        #     pass
     except Exception as e:
         logger.error("Exception caught, exiting. {}".format(e))
         exit

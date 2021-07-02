@@ -56,17 +56,20 @@ class VaultClient(object):
                     code=token, path=path, nonce=auth_url_nonce, state=auth_url_state
                 )
                 self._vault_token = auth_result['auth']['client_token']
-                self._logger.info("Authenticated with Vault successfully.")
-                return True                                    
+                self._entity_id = auth_result['auth']['entity_id']                
+                print (self._vault_token)
+                                                 
             except Exception as e:
                 self._logger.error("Failed to auth with {} account using oidc method. {}".format(oauth_type, e))
                 raise Exception
 
+        self.hvac_client.token = self._vault_token
         try:
             assert self.hvac_client.is_authenticated(), "Failed to authenticate with Vault."
         except AssertionError as error:
             self._logger.error(error)
             raise Exception(error)
+        self._logger.info("Authenticated with Vault successfully.") 
         
     def logout(self):
         try:
@@ -96,14 +99,26 @@ class VaultClient(object):
         except hvac.exceptions.InvalidRequest:
             self._logger.warning("Transit engine has been enabled.")
 
-    def create_transit_engine_key_ring(self, name):
-        self.hvac_client.secrets.transit.create_key(name=name)
+    def create_transit_engine_key_ring(self, name, mount_point=None, exportable=None, key_type=None):
+        self.hvac_client.secrets.transit.create_key(name=name, 
+                                                    mount_point=mount_point, 
+                                                    exportable=exportable, 
+                                                    key_type=key_type)
 
-    def generate_data_key(self, name, key_type="plaintext"):
-        gen_key_response = self.hvac_client.secrets.transit.generate_data_key(name=name, key_type=key_type,)
+    def read_transit_key_rsa(self, name, mount_point=None):
+        response = self.hvac_client.secrets.transit.read_key(name=name, mount_point=mount_point)
+        public_key = response["data"]["keys"]["1"]["public_key"]
+        return public_key
+    
+    def export_transit_key_rsa(self, name, mount_point=None):
+        response = self.hvac_client.secrets.transit.export_key(name=name, key_type="encryption-key", mount_point=mount_point)
+        private_key = response['data']['keys']['1']
+        return private_key
+
+    def generate_data_key(self, name, key_type="plaintext", mount_point=None):
+        gen_key_response = self.hvac_client.secrets.transit.generate_data_key(name=name, key_type=key_type, mount_point=mount_point)
         key_plaintext = gen_key_response["data"]["plaintext"]
-        key_ciphertext = gen_key_response["data"]["ciphertext"]
-        return (key_plaintext, key_ciphertext)
+        return key_plaintext
 
     def decrypt_data_key(self, name, ciphertext):
         decrypt_data_response = self.hvac_client.secrets.transit.decrypt_data(name=name, ciphertext=ciphertext,)
@@ -145,9 +160,9 @@ class VaultClient(object):
         except Exception as e:
             self._logger.error("error {}".format(e))
     
-    def list_secrets(self, entity_id):
+    def list_secrets(self, path):
         try:
-            response = self.hvac_client.secrets.kv.v2.list_secrets(entity_id)
+            response = self.hvac_client.secrets.kv.v2.list_secrets(path)
             return response["data"]["keys"]
         except Exception as e:
             if str(e).startswith("None"):
@@ -165,15 +180,16 @@ class VaultClient(object):
             else:
                 self._logger.error("error {}".format(e))
 
-    def lookup_token(self):
-        try: 
-            response = self.hvac_client.lookup_token()
-            return response["data"]
+    def read_secret_metadata(self, path):
+        try:
+            response = self.hvac_client.secrets.kv.v2.read_secret_metadata(path)
+            return response["data"]["versions"]
         except Exception as e:
-            self._logger.error("error {}".format(e))
-
-
-
+            if str(e).startswith("None"):
+                self._logger.info(str(e))
+            else:
+                self._logger.error("error {}".format(e))
+                
     # handles the callback
     def _login_odic_get_token(self):
         from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -216,9 +232,4 @@ class VaultClient(object):
 
     @property
     def entity_id(self):
-        if self._entity_id is None:
-            try:
-                self._entity_id = self.vault_auth["entity_id"]
-            except:
-                self._entity_id = None
         return self._entity_id
