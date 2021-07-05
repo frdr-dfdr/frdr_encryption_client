@@ -44,6 +44,7 @@ import bagit
 import click
 import webbrowser
 from urllib.parse import urljoin
+import re
 
 __version__ = constants.VERSION
 dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
@@ -51,14 +52,13 @@ os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
 class Cryptor(object):
-    def __init__(self, arguments, dataset_key_manager, person_key_manager, logger, dataset_uuid, input_dir, output_dir):
+    def __init__(self, arguments, dataset_key_manager, person_key_manager, logger, input_dir, output_dir):
         self._arguments = arguments
         self._dataset_key_manager = dataset_key_manager
         self._person_key_manager = person_key_manager
         self._input = Util.clean_dir_path(input_dir)
         self._output = output_dir
         self._logger = logger
-        self._dataset_uuid = dataset_uuid
         # if self._arguments["--encrypt"]:
         #     if self._arguments["--vault"]:
         #         self._secret_path = "/".join([self._dataset_key_manager.get_vault_entity_id(), dataset_uuid])
@@ -76,7 +76,7 @@ class Cryptor(object):
         #     raise Exception
         # self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
 
-    def encrypt(self):
+    def encrypt(self, dataset_uuid):
         logger = logging.getLogger('frdr-crypto.encrypt')
 
         # generate key 
@@ -106,7 +106,7 @@ class Cryptor(object):
         try:
             bag = bagit.make_bag(bag_dir, None, 1, ['sha256'])
             bag.info['Depositor-Entity-ID'] = self._dataset_key_manager.get_vault_entity_id()
-            bag.info['Dataset-UUID'] = self._dataset_uuid
+            bag.info['Dataset-UUID'] = dataset_uuid
             bag.save()
         except (bagit.BagError, Exception) as e:
             # TODO: log error
@@ -126,8 +126,20 @@ class Cryptor(object):
         
         return bag_output_path
 
-    def decrypt(self):
+    def decrypt(self, url):
         logger = logging.getLogger('frdr-crypto.decrypt')
+
+        depositor_uuid, dataset_uuid, requester_uuid = self._parse_url(url)
+        if requester_uuid == "" :
+            assert self._dataset_key_manager.get_vault_entity_id() == depositor_uuid, "The url you provide is not correct"
+            encrypted_data_key_path =  "/".join([depositor_uuid, dataset_uuid])
+        else:
+            encrypted_data_key_path = "/".join([depositor_uuid, dataset_uuid, requester_uuid])
+        self._dataset_key_manager.read_key(encrypted_data_key_path)
+        user_private_key = self._person_key_manager.get_private_key()
+        self._dataset_key_manager.decrypt_key(user_private_key)
+        self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
+
         if self._output is None:
             # default output path is the desktop
             self._output = os.path.expanduser("~/Desktop/")
@@ -231,6 +243,14 @@ class Cryptor(object):
             zipfile_name = shutil.make_archive(zipfile_path, 'zip', input_path)
         return zipfile_name
 
+    def _parse_url(self, url):
+        match = re.match(r"^.*secret/data/([0-9a-f\-]*)/([0-9a-f\-]*)/?(.*)?", url)
+        depositor_uuid = match.group(1)
+        dataset_uuid = match.group(2)
+        requester_uuid = match.group(3)
+        return (depositor_uuid, dataset_uuid, requester_uuid)
+
+
 if __name__ == "__main__":
     try:
         arguments = docopt(__doc__, version=__version__)
@@ -265,14 +285,25 @@ if __name__ == "__main__":
             
             operation = input("Please type in the operation you would like to do, encrypt, decrypt, or grant access: ")    
             if operation == "encrypt":
-               dataset_uuid = str(uuid.uuid4())  
-               dataset_key_manager = KeyManagementVault(vault_client, dataset_uuid)   
-               person_key_manager = PublicKeyManager(vault_client_pki)
-               encryptor = Cryptor(arguments, dataset_key_manager, person_key_manager, logger, dataset_uuid, 
-                                   "/Users/jza201/Documents/SFU_FRDR/research",
-                                   "/Users/jza201/Desktop")
-               encryptor.encrypt()
-            
+                dataset_uuid = str(uuid.uuid4())  
+                dataset_key_manager = KeyManagementVault(vault_client)   
+                person_key_manager = PublicKeyManager(vault_client_pki)
+                # TODO: add argument for input dir and output dir
+                encryptor = Cryptor(arguments, dataset_key_manager, person_key_manager, logger, 
+                                    "/Users/jza201/Documents/SFU_FRDR/research",
+                                    "/Users/jza201/Desktop")
+                encryptor.encrypt(dataset_uuid)
+            elif operation == "decrypt":
+                #TODO: rewording
+                url = input("Please type in the url: ")
+                dataset_key_manager = KeyManagementVault(vault_client)   
+                person_key_manager = PublicKeyManager(vault_client_pki)
+                # TODO: add argument for input dir and output dir
+                encryptor = Cryptor(arguments, dataset_key_manager, person_key_manager, logger, 
+                                    "/Users/jza201/Desktop/research_bag.zip",
+                                    "/Users/jza201/Documents")
+                encryptor.decrypt(url)
+                           
             # if arguments["--encrypt"]:
             #     dataset_uuid = str(uuid.uuid4()) 
             # elif arguments["--decrypt"]:

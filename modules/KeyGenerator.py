@@ -80,7 +80,12 @@ class KeyManagementVault(object):
         self._logger.info("key is read from vault")
 
     def decrypt_key(self, user_private_key):
-        self._key = user_private_key.decrypt(
+        private_key = serialization.load_pem_private_key(
+                        user_private_key.encode(),
+                        password=None,
+                        backend=default_backend()
+                    )
+        self._key = private_key.decrypt(
                                 Util.base64_to_byte(self._key_encrypted),
                                 padding.OAEP(
                                     mgf=padding.MGF1(algorithm=hashes.SHA256()),
@@ -94,6 +99,4 @@ class KeyManagementVault(object):
 
     @property
     def key(self):
-        if self._key is None:
-            self.generate_key()
         return self._key
