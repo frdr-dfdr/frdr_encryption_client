@@ -23,6 +23,8 @@ Options:
     --url <API_path>  API Path to fetch secret on vault
     -l --loglevel The logging level(debug, error, warning or info) [default: info]
 """
+import datetime
+from modules.AccessManager import AccessManager
 from modules.PublicKeyManager import PublicKeyManager
 from docopt import docopt
 import sys
@@ -45,6 +47,7 @@ import click
 import webbrowser
 from urllib.parse import urljoin
 import re
+import traceback
 
 __version__ = constants.VERSION
 dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
@@ -52,11 +55,12 @@ os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
 class Cryptor(object):
-    def __init__(self, arguments, dataset_key_manager, person_key_manager, logger, input_dir, output_dir):
+    def __init__(self, arguments, dataset_key_manager, person_key_manager, logger, input_dir=None, output_dir=None):
         self._arguments = arguments
         self._dataset_key_manager = dataset_key_manager
         self._person_key_manager = person_key_manager
-        self._input = Util.clean_dir_path(input_dir)
+        if input_dir is not None:
+            self._input = Util.clean_dir_path(input_dir)
         self._output = output_dir
         self._logger = logger
         # if self._arguments["--encrypt"]:
@@ -120,9 +124,8 @@ class Cryptor(object):
         shutil.move(zipname, bag_output_path)
 
         # save key
-        self._person_key_manager.create_key_pair()
-        self._dataset_key_manager.encrypt_key(self._person_key_manager.get_public_key(self._person_key_manager.get_vault_entity_id()))
-        self._dataset_key_manager.save_key("/".join([self._dataset_key_manager.get_vault_entity_id(), dataset_uuid]))
+        self._dataset_key_manager.encrypt_key(self._person_key_manager.my_public_key)
+        self._dataset_key_manager.save_key("/".join([constants.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid]))
         
         return bag_output_path
 
@@ -132,11 +135,12 @@ class Cryptor(object):
         depositor_uuid, dataset_uuid, requester_uuid = self._parse_url(url)
         if requester_uuid == "" :
             assert self._dataset_key_manager.get_vault_entity_id() == depositor_uuid, "The url you provide is not correct"
-            encrypted_data_key_path =  "/".join([depositor_uuid, dataset_uuid])
+            encrypted_data_key_path =  "/".join([constants.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid])
         else:
-            encrypted_data_key_path = "/".join([depositor_uuid, dataset_uuid, requester_uuid])
+            encrypted_data_key_path = "/".join([constants.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid, requester_uuid])
         self._dataset_key_manager.read_key(encrypted_data_key_path)
-        user_private_key = self._person_key_manager.get_private_key()
+        private_key_path = os.path.join(Util.get_key_dir(self._dataset_key_manager.get_vault_entity_id()), constants.LOCAL_PRIVATE_KEY_FILENAME)
+        user_private_key = self._person_key_manager.read_private_key(private_key_path)
         self._dataset_key_manager.decrypt_key(user_private_key)
         self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
 
@@ -161,6 +165,26 @@ class Cryptor(object):
             shutil.move(decrypted_filename, os.path.join(self._output, os.path.basename(decrypted_filename)))
             shutil.rmtree(bag_dir_parent)
         return True
+
+    def grant_access(self, requester_entity_id, dataset_id, expiry_date=None):
+        if expiry_date is None:
+            expiry_date = (datetime.date.today() + datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+
+        # read encrypted data key from Vault
+        encrypted_data_key_path = "/".join([constants.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_id])
+        self._dataset_key_manager.read_key(encrypted_data_key_path)
+        
+        # decrypt the encrypted data key with the depostior private key
+        private_key_path = os.path.join(Util.get_key_dir(self._dataset_key_manager.get_vault_entity_id()), constants.LOCAL_PRIVATE_KEY_FILENAME)
+        depositor_private_key = self._person_key_manager.read_private_key(private_key_path)
+        self._dataset_key_manager.decrypt_key(depositor_private_key)
+
+        # encrypt the encrypted data key with the requester public key
+        requester_public_key = self._person_key_manager.read_public_key_from_vault(requester_entity_id)
+        self._dataset_key_manager.encrypt_key(requester_public_key)
+        path_on_vault = "/".join([constants.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid, requester_entity_id])
+        self._dataset_key_manager.set_key_expiry_date(path_on_vault, expiry_date)
+        self._dataset_key_manager.save_key(path_on_vault)
         
     def _encrypt_file(self, filename, logger):
         if self._file_excluded(filename, constants.EXCLUDED_FILES):
@@ -267,7 +291,6 @@ if __name__ == "__main__":
             logger.info("Removed old auth tokens. Exiting.")
             sys.exit()
         vault_client = VaultClient()
-        vault_client_pki = VaultClient()
 
         if arguments["--vault"]:
             if arguments["--username"]:
@@ -279,15 +302,12 @@ if __name__ == "__main__":
                 login_result = vault_client.login(vault_addr=arguments["--vault"],
                                    auth_method="oidc",
                                    oauth_type=arguments["--oauth"])
-                login_result_pki = vault_client_pki.login(vault_addr=arguments["--vault_pki"],
-                                   auth_method="oidc",
-                                   oauth_type=arguments["--oauth"])
             
             operation = input("Please type in the operation you would like to do, encrypt, decrypt, or grant access: ")    
             if operation == "encrypt":
                 dataset_uuid = str(uuid.uuid4())  
-                dataset_key_manager = KeyManagementVault(vault_client)   
-                person_key_manager = PublicKeyManager(vault_client_pki)
+                dataset_key_manager = KeyManagementVault(vault_client)
+                person_key_manager = PublicKeyManager(vault_client)
                 # TODO: add argument for input dir and output dir
                 encryptor = Cryptor(arguments, dataset_key_manager, person_key_manager, logger, 
                                     "/Users/jza201/Documents/SFU_FRDR/research",
@@ -296,13 +316,30 @@ if __name__ == "__main__":
             elif operation == "decrypt":
                 #TODO: rewording
                 url = input("Please type in the url: ")
-                dataset_key_manager = KeyManagementVault(vault_client)   
-                person_key_manager = PublicKeyManager(vault_client_pki)
+                dataset_key_manager = KeyManagementVault(vault_client)
+                person_key_manager = PublicKeyManager(vault_client)
                 # TODO: add argument for input dir and output dir
                 encryptor = Cryptor(arguments, dataset_key_manager, person_key_manager, logger, 
                                     "/Users/jza201/Desktop/research_bag.zip",
                                     "/Users/jza201/Documents")
                 encryptor.decrypt(url)
+            elif operation == "grant-access":
+                #TODO: rewording
+                requester_uuid = input("Please type in the requester vault entity id: ")
+                dataset_uuid = input("Please type in the dataset uuid on Vault that you want to grant access: ")
+                expire_date = input("Please type in the expire date in format YYYY-mm-dd")
+                if click.confirm("Do you want to continue?", default=False):
+                    dataset_key_manager = KeyManagementVault(vault_client)
+                    person_key_manager = PublicKeyManager(vault_client)
+                    encryptor = Cryptor(arguments, dataset_key_manager, person_key_manager, logger)
+                    encryptor.grant_access(requester_uuid, dataset_uuid, expire_date)  
+            elif operation == "generate-access-request":
+                entity_id = vault_client.entity_id
+                person_key_manager = PublicKeyManager(vault_client)
+                # make sure there is a public key saved on Vault for the requester
+                person_key_manager.create_or_retrieve_public_key()
+                print ("Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.")
+                print (Util.wrap_text(entity_id))
                            
             # if arguments["--encrypt"]:
             #     dataset_uuid = str(uuid.uuid4()) 
@@ -329,5 +366,5 @@ if __name__ == "__main__":
         # else:
         #     pass
     except Exception as e:
-        logger.error("Exception caught, exiting. {}".format(e))
+        logger.error("Exception caught, exiting. {}".format(e), exc_info=True)
         exit

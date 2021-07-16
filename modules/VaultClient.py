@@ -57,7 +57,6 @@ class VaultClient(object):
                 )
                 self._vault_token = auth_result['auth']['client_token']
                 self._entity_id = auth_result['auth']['entity_id']                
-                print (self._vault_token)
                                                  
             except Exception as e:
                 self._logger.error("Failed to auth with {} account using oidc method. {}".format(oauth_type, e))
@@ -133,23 +132,6 @@ class VaultClient(object):
         key_ciphertext = read_secret_response["data"]["data"]["ciphertext"]
         return key_ciphertext
 
-    def create_policy(self, policy_name, policy_string):
-        return self.hvac_client.sys.create_or_update_policy(name=policy_name, policy=policy_string,)
-
-    def read_policy(self, policy_name):
-        return self.hvac_client.sys.read_policy(policy_name)
-
-    def create_or_update_group_by_name(self, group_name, policy_name=None, member_entity_ids=None, metadata=None):
-        return self.hvac_client.secrets.identity.create_or_update_group_by_name(
-            name=group_name,
-            group_type="internal",
-            policies=policy_name,
-            member_entity_ids=member_entity_ids,
-            metadata=metadata,
-        )
-    def read_group_by_name(self, group_name):
-        return self.hvac_client.secrets.identity.read_group_by_name(group_name)
-
     def read_entity_by_id(self, entity_id):
         try:
             response = self.hvac_client.secrets.identity.read_entity(entity_id=entity_id)
@@ -189,7 +171,26 @@ class VaultClient(object):
                 self._logger.info(str(e))
             else:
                 self._logger.error("error {}".format(e))
-                
+    
+    def update_secret_metadata_delete_after(self, path, delete_after):
+        self.hvac_client.secrets.kv.v2.update_metadata(path, delete_version_after=delete_after)
+
+    def generate_certificate(self, name, common_name, mount_point=None):
+        try:
+            response = self.hvac_client.secrets.pki.generate_certificate(
+                name=name,
+                common_name=common_name,
+                mount_point=mount_point
+            )
+            certificate = response['data']['certificate']
+            private_key = response['data']['private_key']
+            return (certificate, private_key)
+        except Exception as e:
+            if str(e).startswith("None"):
+                self._logger.info(str(e))
+            else:
+                self._logger.error("error {}".format(e))
+                 
     # handles the callback
     def _login_odic_get_token(self):
         from http.server import BaseHTTPRequestHandler, HTTPServer

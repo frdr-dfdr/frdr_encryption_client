@@ -10,6 +10,8 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from configparser import ConfigParser
+from pathlib import Path
+from util import constants
 
 logger = logging.getLogger("frdr-crypto.util")
 
@@ -38,6 +40,14 @@ class Util(object):
             return path[:-1]
         else:
             return path
+
+    @classmethod
+    def get_key_dir(cls, subdir):
+        home = str(Path.home())
+        key_dir = os.path.join(home, constants.LOCAL_KEY_DIR_NAME, subdir)
+        if not os.path.exists(key_dir):
+            Util.make_dir(key_dir)
+        return key_dir
 
     @classmethod
     def get_logger(cls, name, log_level="INFO", filepath=None):
