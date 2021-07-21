@@ -19,14 +19,14 @@ from docopt import docopt
 from appdirs import AppDirs
 from modules.AccessManager import AccessManager
 from modules.VaultClient import VaultClient
-from util import constants
+from config import app_config
 from util.util import Util
 import click
 import webbrowser
 from urllib.parse import urljoin
 
-__version__ = constants.VERSION
-dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
+__version__ = app_config.VERSION
+dirs = AppDirs(app_config.APP_NAME, app_config.APP_AUTHOR)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 

@@ -1,8 +1,5 @@
 import datetime
-from shutil import ExecError
-from util import constants
-import nacl
-import hvac
+from config import app_config
 import logging
 
 from pytz import timezone
@@ -13,35 +10,9 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
-Util.get_logger("frdr-crypto.key-manager")
-class KeyManagementLocal(object):
-    def __init__(self):
-        self._key = None
-        self._logger = logging.getLogger("frdr-crypto.key-mamanger.local")
-    
-    def generate_key(self):
-        self._key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
-        self._logger.info("Key is generated using python nacl package.")
-    
-    def save_key(self, filename):
-        with open(filename, 'wb') as f:
-            f.write(self._key)
-        self._logger.info("Key is saved to local path {}".format(filename))
-    
-    def read_key(self, filename):
-        with open(filename, "rb") as f:
-            self._key = f.read()
-        self._logger.info("key is read from local path {}".format(filename))
-
-    @property
-    def key(self):
-        if self._key is None:
-            self.generate_key()
-        return self._key
-
-class KeyManagementVault(object):
-    def __init__(self, vault_client, key_ring_name=None):
-        self._logger = logging.getLogger("frdr-crypto.key-mamanger.vault")
+class DatasetKeyManager(object):
+    def __init__(self, vault_client):
+        self._logger = logging.getLogger("fdrd-encryption-client.dataset-key-manager")
         self._vault_client = vault_client
         self._key_ring_name = self._vault_client.entity_id #key_ring_name is the user_entity_id
         self._key = None
@@ -97,7 +68,7 @@ class KeyManagementVault(object):
                                 )
                             )
     def set_key_expiry_date(self, path, expiry_date):
-        tz = timezone(constants.TIMEZONE)
+        tz = timezone(app_config.TIMEZONE)
         now = datetime.datetime.now(tz)
         # date + 1 00:00:00
         expiry_time = tz.localize(datetime.datetime.strptime(expiry_date, '%Y-%m-%d') + datetime.timedelta(days=1))

@@ -6,7 +6,7 @@ from urllib import parse
 
 class VaultClient(object):
     def __init__(self):
-        self._logger = logging.getLogger("frdr-crypto.vault-client")
+        self._logger = logging.getLogger("fdrd-encryption-client.vault-client")
         self._vault_auth = None
         self._entity_id = None
         self.hvac_client = hvac.Client()

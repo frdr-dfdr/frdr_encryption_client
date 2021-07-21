@@ -11,7 +11,7 @@ EXCLUDED_FILES = [".*",
                   "*~", 
                   "~$*", 
                   "NULLEXT"]
-APP_NAME = "frdr-crypto"
+APP_NAME = "fdrd-encryption-client"
 APP_AUTHOR = "Simon Fraser University"
 TIMEZONE = "America/Regina"
 VAULT_DATASET_KEY_PATH = "dataset"

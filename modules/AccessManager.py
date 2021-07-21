@@ -4,7 +4,7 @@ import datetime
 from collections import defaultdict
 import datetime
 from util.util import Util
-from util import constants
+from config import app_config
 from dateutil import parser
 import os
 from pytz import timezone
@@ -15,7 +15,7 @@ class AccessManager(object):
     def __init__(self, vault_client):
         self._vault_client = vault_client
         self._depositor_entity_id = self._vault_client.entity_id
-        self._logger = logging.getLogger("frdr-crypto.access-manager")
+        self._logger = logging.getLogger("fdrd-encryption-client.access-manager")
 
     def grant_access(self, requester_entity_id, dataset_id, expiry_date=None):
         if expiry_date is None:
@@ -32,7 +32,7 @@ class AccessManager(object):
         metadata = read_group_response["data"]["metadata"]
         if metadata is None:
             metadata = {}
-        access_updated_time = datetime.datetime.now(timezone(constants.TIMEZONE)).isoformat()
+        access_updated_time = datetime.datetime.now(timezone(app_config.TIMEZONE)).isoformat()
         metadata[requester_entity_id] = expiry_date + "," + access_updated_time
         self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
 
@@ -146,7 +146,7 @@ class AccessManager(object):
             read_group_response = self._vault_client.read_group_by_name(each_group)
             metadata = read_group_response["data"]["metadata"]
             group_last_update_time = parser.isoparse(read_group_response["data"]["last_update_time"])
-            now = datetime.datetime.now(timezone(constants.TIMEZONE)) 
+            now = datetime.datetime.now(timezone(app_config.TIMEZONE)) 
             if (group_last_update_time <= (now - datetime.timedelta(hours=6))):
                 continue  
 

@@ -9,15 +9,14 @@ Options:
     --tokenfile <root_tokenfile>
 """
 
-import datetime
 from docopt import docopt
 from modules.VaultClient import VaultClient
-from util import constants
+from config import app_config
 from util.util import Util
 from modules.AccessManager import AccessManager
 import os
 
-__version__ = constants.VERSION
+__version__ = app_config.VERSION
 
 if __name__ == "__main__":
     arguments = docopt(__doc__, version=__version__)

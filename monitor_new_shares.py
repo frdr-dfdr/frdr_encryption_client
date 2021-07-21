@@ -13,12 +13,12 @@ import subprocess
 from email.message import EmailMessage
 from docopt import docopt
 from modules.VaultClient import VaultClient
-from util import constants
+from config import app_config
 from modules.AccessManager import AccessManager
 from util.util import Util
 import os
 
-__version__ = constants.VERSION
+__version__ = app_config.VERSION
 
 if __name__ == "__main__":
     arguments = docopt(__doc__, version=__version__)

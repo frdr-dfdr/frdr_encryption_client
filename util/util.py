@@ -3,7 +3,6 @@ import sys
 import logging
 from base64 import b64encode, b64decode
 import textwrap
-import subprocess
 import smtplib
 from email import encoders
 from email.mime.base import MIMEBase
@@ -11,9 +10,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from configparser import ConfigParser
 from pathlib import Path
-from util import constants
+from config import app_config
 
-logger = logging.getLogger("frdr-crypto.util")
+logger = logging.getLogger("fdrd-encryption-client.util")
 
 class Util(object):
     
@@ -44,10 +43,14 @@ class Util(object):
     @classmethod
     def get_key_dir(cls, subdir):
         home = str(Path.home())
-        key_dir = os.path.join(home, constants.LOCAL_KEY_DIR_NAME, subdir)
+        key_dir = os.path.join(home, app_config.LOCAL_KEY_DIR_NAME, subdir)
         if not os.path.exists(key_dir):
             Util.make_dir(key_dir)
         return key_dir
+
+    @classmethod
+    def check_dir_exists(cls, path):
+        return os.path.isdir(path)
 
     @classmethod
     def get_logger(cls, name, log_level="INFO", filepath=None):

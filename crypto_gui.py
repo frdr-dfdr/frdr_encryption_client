@@ -7,26 +7,25 @@ from shutil import move
 import json
 from modules.VaultClient import VaultClient
 from modules.AccessManager import AccessManager
-from util import constants
+from config import app_config
 import logging
 from util.util import Util
 import uuid
-from crypto import Cryptor
-from modules.KeyGenerator import KeyManagementVault
+from modules.DatasetKeyManager import DatasetKeyManager
 
 
-__version__ = constants.VERSION
-dirs = AppDirs(constants.APP_NAME, constants.APP_AUTHOR)
+__version__ = app_config.VERSION
+dirs = AppDirs(app_config.APP_NAME, app_config.APP_AUTHOR)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
 class CryptoGui(object):
     def __init__(self, tokenfile):
         self._tokenfile = tokenfile
-        Util.get_logger("frdr-crypto", 
+        Util.get_logger("fdrd-encryption-client", 
                         log_level="info",
-                        filepath=os.path.join(dirs.user_data_dir, "frdr-crypto_log.txt"))
-        self._logger = logging.getLogger("frdr-crypto.gui")
+                        filepath=os.path.join(dirs.user_data_dir, "fdrd-encryption-client_log.txt"))
+        self._logger = logging.getLogger("fdrd-encryption-client.gui")
         self._vault_client = VaultClient()
         self._vault_client_pki = VaultClient()
 
@@ -69,14 +68,14 @@ class CryptoGui(object):
             self._logger.info("Encrypt files in the path {}".format(self._input_path))
             vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
             dataset_name = str(uuid.uuid4()) 
-            key_manager = KeyManagementVault(vault_client, dataset_name)
+            key_manager = DatasetKeyManager(vault_client, dataset_name)
             arguments = {"--input": self._input_path, 
                         "--output": output_path,
                         "--username": username,
                         "--password": password,
                         "--vault": hostname,
                         "--encrypt": True}
-            encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
+            encryptor = EncryptionClient(key_manager, self._logger, dataset_name)
             bag_path = encryptor.encrypt()
             return (True, bag_path)
         except Exception as e:
@@ -88,7 +87,7 @@ class CryptoGui(object):
             self._logger.info("Decrypt files in the path {}".format(self._input_path))
             vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
             dataset_name = url.split("/")[-1]
-            key_manager = KeyManagementVault(vault_client, dataset_name)
+            key_manager = DatasetKeyManager(vault_client, dataset_name)
             arguments = {"--input": self._input_path, 
                         "--output": output_path,
                         "--username": username,
@@ -97,7 +96,7 @@ class CryptoGui(object):
                         "--url": url,
                         "--decrypt": True,
                         "--encrypt": False}
-            encryptor = Cryptor(arguments, key_manager, self._logger, dataset_name)
+            encryptor = EncryptionClient(key_manager, self._logger, dataset_name)
             encryptor.decrypt()
             return (True, None)
         except Exception as e:
