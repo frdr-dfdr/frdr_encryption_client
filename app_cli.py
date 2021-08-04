@@ -2,25 +2,24 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-    app_cli.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>] [<oauth_type>] [--loglevel=<loglevel>] 
-    app_cli.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> (--username <vault_username> --password <vault_password> | <oauth_type>) --url <API_path>) [--loglevel=<loglevel>] 
-    app_cli.py --vault <vault_addr> --vault_pki <pki_vault_addr> --oauth <oauth_type> -i <input_path> [-o <output_path>]
+  app_cli.py encrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> [--output=<op>] [--loglevel=<l>]
+  app_cli.py decrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> --url=<key_addr> [--output=<op>] [--loglevel=<l>]
+  app_cli.py grant_access --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --dataset=<id> --requester=<id> --expire=<date> [--loglevel=<l>]
+  app_cli.py generate_access_request --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>)
+  app_cli.py -h | --help
 
 Options:
-    -e --encrypt           encrypt
-    -d --decrypt           decrypt
-    --oauth <oauth_type>
-    -i <input_path>, --input <input_path>
-    -o <output_path>, --output <output_path> 
-    -k <key_path>, --key <key_path>
-    --vault <vault_addr> using hashicorp vault for key generation and storage
-    --vault_pki <pki_vault_addr> using hashicorp vault for key generation and storage
-    -u <vault_username>, --username <vault_username>
-    -p <vault_password>, --password <vault_password>
-    --token <vault_token> 
-    --logout_vault  Remove old vault tokens
-    --url <API_path>  API Path to fetch secret on vault
-    -l --loglevel The logging level(debug, error, warning or info) [default: info]
+  -h --help     Show this screen.
+  --username=<un>  username.
+  --password=<pd>  password.
+  --vault=<vault_addr>
+  --input=<ip>
+  --output=<op>
+  --url=<key_addr>
+  --dataset=<id>
+  --requester=<id>
+  --expire=<date>  the permission expiry date in format YYYY-mm-dd
+  --loglevel=<l>  loglevel [default: info].
 """
 from modules.PersonKeyManager import PersonKeyManager
 from modules.EncryptionClient import EncryptionClient
@@ -49,9 +48,16 @@ def main():
             raise Exception("Python 3 is required to run the local client.")
 
         vault_client = VaultClient()
+        print (arguments)
 
-        if (arguments["--input"] is not None) and (not Util.check_dir_exists(arguments["--input"])):
+        if (arguments["encrypt"]) and (not Util.check_dir_exists(arguments["--input"])):
             logger.error("The input directory does not exist.")
+            # TODO: raise Exception or return to exit
+            # raise Exception
+            return 
+
+        if (arguments["decrypt"]) and (not Util.check_dir_exists(arguments["--input"])):
+            logger.error("The input zip file does not exist.")
             # TODO: raise Exception or return to exit
             return 
         
@@ -68,36 +74,37 @@ def main():
                                    password=arguments["--password"])
             elif arguments["--oauth"]:
                 vault_client.login(vault_addr=arguments["--vault"],
-                                   auth_method="oidc",
-                                   oauth_type=arguments["--oauth"])
+                                   auth_method="oidc")
             
-            operation = input("Please type in the operation you would like to do, encrypt, decrypt, or grant access: ")    
-            if operation == "encrypt":
+            if arguments["encrypt"]:
+                print (arguments["--input"])
+                if not Util.check_dir_exists(arguments["--input"]):
+                    logger.error("The input directory does not exist.")
+                    # TODO: raise Exception or return to exit
+                    return 
                 dataset_uuid = str(uuid.uuid4())  
                 dataset_key_manager = DatasetKeyManager(vault_client)
                 person_key_manager = PersonKeyManager(vault_client)
                 # TODO: add argument for input dir and output dir
                 encryptor = EncryptionClient(dataset_key_manager, person_key_manager, arguments["--input"], arguments["--output"])
                 encryptor.encrypt(dataset_uuid)
-            elif operation == "decrypt":
-                #TODO: rewording
-                url = input("Please type in the url: ")
+            elif arguments["decrypt"]:
+                url = arguments["--url"]
                 dataset_key_manager = DatasetKeyManager(vault_client)
                 person_key_manager = PersonKeyManager(vault_client)
                 # TODO: add argument for input dir and output dir
                 encryptor = EncryptionClient(dataset_key_manager, person_key_manager, arguments["--input"], arguments["--output"])
                 encryptor.decrypt(url)
-            elif operation == "grant-access":
-                #TODO: rewording
-                requester_uuid = input("Please type in the requester vault entity id: ")
-                dataset_uuid = input("Please type in the dataset uuid on Vault that you want to grant access: ")
-                expire_date = input("Please type in the expire date in format YYYY-mm-dd")
+            elif arguments["grant_access"]:
+                requester_uuid = arguments["--requester"]
+                dataset_uuid = arguments["--dataset"]
+                expire_date = arguments["--expire"]
                 if click.confirm("Do you want to continue?", default=False):
                     dataset_key_manager = DatasetKeyManager(vault_client)
                     person_key_manager = PersonKeyManager(vault_client)
                     encryptor = EncryptionClient(dataset_key_manager, person_key_manager)
                     encryptor.grant_access(requester_uuid, dataset_uuid, expire_date)  
-            elif operation == "generate-access-request":
+            elif arguments["generate_access_request"]:
                 entity_id = vault_client.entity_id
                 person_key_manager = PersonKeyManager(vault_client)
                 # make sure there is a public key saved on Vault for the requester

@@ -123,7 +123,7 @@ class EncryptionClient(object):
         # encrypt the encrypted data key with the requester public key
         requester_public_key = self._person_key_manager.read_public_key_from_vault(requester_entity_id)
         self._dataset_key_manager.encrypt_key(requester_public_key)
-        path_on_vault = "/".join([app_config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid, requester_entity_id])
+        path_on_vault = "/".join([app_config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_id, requester_entity_id])
         self._dataset_key_manager.set_key_expiry_date(path_on_vault, expiry_date)
         self._dataset_key_manager.save_key(path_on_vault)
         
@@ -209,7 +209,8 @@ class EncryptionClient(object):
         return zipfile_name
 
     def _parse_url(self, url):
-        match = re.match(r"^.*secret/data/([0-9a-f\-]*)/([0-9a-f\-]*)/?(.*)?", url)
+        print (url)
+        match = re.match(r"^.*secret/data/dataset/([0-9a-f\-]*)/([0-9a-f\-]*)/?(.*)?", url)
         depositor_uuid = match.group(1)
         dataset_uuid = match.group(2)
         requester_uuid = match.group(3)

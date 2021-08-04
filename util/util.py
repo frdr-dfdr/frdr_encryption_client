@@ -51,6 +51,10 @@ class Util(object):
     @classmethod
     def check_dir_exists(cls, path):
         return os.path.isdir(path)
+    
+    @classmethod
+    def check_file_exists(cls, path):
+        return os.path.isfile(path)
 
     @classmethod
     def get_logger(cls, name, log_level="INFO", filepath=None):

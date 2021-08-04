@@ -9,8 +9,6 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography import x509
 
-Util.get_logger("fdrd-encryption-client.person-key-manager")
-
 class PersonKeyManager(object):
     def __init__(self, vault_client):
         self._logger = logging.getLogger("fdrd-encryption-client.person-key-manager.vault")
@@ -35,7 +33,7 @@ class PersonKeyManager(object):
     def save_key_locally(self, key, filename):
         with open(filename, 'wb') as f:
             f.write(key)
-        self._logger.info("Private key is saved to local path {}".format(filename))
+        self._logger.info("Key is saved to local path {}".format(filename))
     
     def read_private_key(self, filename):
         with open(filename, "rb") as f:
