@@ -31,9 +31,8 @@ const PY_MODULE = 'crypto_gui'
 
 let pythonChild = null
 let mainWindow = null
-//TODO: Add about window?
-let aboutWindow = null
 let input_path = null;
+let selected_path = null;
 
 //TODO: this is for?
 const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
@@ -56,7 +55,7 @@ const getScriptPath = () => {
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 628,
     backgroundColor: "#D6D8DC",
     webPreferences: {
       nodeIntegration: true,
@@ -68,7 +67,7 @@ const createWindow = () => {
 
   // Load the login page by default.
   mainWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'indexLogin.html'),
+    pathname: path.join(__dirname, 'pages/login.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -76,7 +75,7 @@ const createWindow = () => {
   // Load the login page when user is unauthenticated.
   ipcMain.on("unauthenticated", (event) => {
     mainWindow.loadURL(require('url').format({
-      pathname: path.join(__dirname, 'indexLogin.html'),
+      pathname: path.join(__dirname, 'pages/login.html'),
       protocol: 'file:',
       slashes: true
     }))
@@ -85,7 +84,7 @@ const createWindow = () => {
   // Load our app when user is authenticated.
   ipcMain.on("authenticated", async event => {
     mainWindow.loadURL(require('url').format({
-      pathname: path.join(__dirname, 'indexMain.html'),
+      pathname: path.join(__dirname, 'pages/home.html'),
       protocol: 'file:',
       slashes: true
     }))
@@ -187,10 +186,16 @@ ipc.on('open-file-dialog', function (event) {
   }
 })
 
-ipc.on('open-dir-dialog', function (event) {
-  input_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
-  if (input_path) {
-    client.invoke("set_input_path", input_path[0], function(error, res, more) {} );
-    event.reply('selected-dir', input_path)
+ipc.on('open-input-dir-dialog', function (event) {
+  selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
+  if (selected_path) {
+    event.reply('selected-input-dir', selected_path)
+  }
+})
+
+ipc.on('open-output-dir-dialog', function (event) {
+  selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
+  if (selected_path) {
+    event.reply('selected-output-dir', selected_path)
   }
 })

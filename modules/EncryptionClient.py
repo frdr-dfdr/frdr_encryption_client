@@ -115,7 +115,7 @@ class EncryptionClient(object):
         encrypted_data_key_path = "/".join([app_config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_id])
         self._dataset_key_manager.read_key(encrypted_data_key_path)
         
-        # decrypt the encrypted data key with the depostior private key
+        # decrypt the encrypted data key with the depositor private key
         private_key_path = os.path.join(Util.get_key_dir(self._dataset_key_manager.get_vault_entity_id()), app_config.LOCAL_PRIVATE_KEY_FILENAME)
         depositor_private_key = self._person_key_manager.read_private_key(private_key_path)
         self._dataset_key_manager.decrypt_key(depositor_private_key)

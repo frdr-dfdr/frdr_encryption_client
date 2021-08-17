@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" dir="ltr">
 
 <head>
   <meta charset="utf-8">
@@ -13,24 +13,6 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <style>
-
-    /* #google_login {
-      background-image: url("btn_google_signin_dark_normal_web.png");
-      background-repeat: no-repeat;
-      background-position: center;
-      height: 40px;
-      width: 170px;
-      background-size: cover; 
-      margin-top: 15px;
-      margin-bottom: 15px;
-    } */
-
-    /* style the container */
-    .container {
-      position: relative;
-      border-radius: 5px;
-      padding: 20px 0 30px 0;
-    } 
 
     .login-container{
       margin-top: 5%;
@@ -46,40 +28,9 @@
       margin-top: 6px;
     }
 
-    /* vertical line */
-    .vl {
-      position: absolute;
-      top: 125%;
-      left: 50%;
-      transform: translate(-50%);
-      border: 1px solid #ddd;
-      height: 200px;
-    }
-
-    /* text inside the vertical line */
-    .vl-innertext {
-      position: absolute;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #f1f1f1;
-      border: 1px solid #ccc;
-      border-radius: 50%;
-      padding: 8px 10px;
-    }
-
     /* add appropriate colors to globus, twitter and google buttons */
     .globus {
       background-color: #3B5998;
-      color: white;
-    }
-
-    .twitter {
-      background-color: #55ACEE;
-      color: white;
-    }
-
-    .google {
-      background-color: #dd4b39;
       color: white;
     }
 
@@ -89,12 +40,14 @@
       padding: 12px;
       border: none;
       border-radius: 4px;
-      margin: 5px 0;
+      margin: 30px 0;
       opacity: 0.85;
       display: inline-block;
       font-size: 17px;
       line-height: 20px;
       text-decoration: none; /* remove underline from anchors */
+      background:#3B5998;
+      text-align: center;
     }
 
     .my-auto {
@@ -102,14 +55,46 @@
       margin-bottom: auto;
     }
 
+    label {
+  display: block;
+}
+
+input{
+  display:inline;
+  }
+
+.login-block{
+  background: #3B5998;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to bottom, #a2bdf8, #3B5998);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to bottom, #a2bdf8, #3B5998); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  float:left;
+  width:100%;
+  padding : 50px 0;
+}
+.banner-sec{background:rgb(160, 187, 212); background-size:cover; min-height:500px; border-radius: 10px 0 0 10px; padding:50px;}
+.container{background:#fff; border-radius: 10px;}
+.carousel-inner{border-radius:0 10px 10px 0;}
+.carousel-caption{text-align:left; left:5%;}
+.login-sec{padding: 50px; position:relative;}
+.login-sec .copy-text{position:absolute; width:80%; bottom:20px; font-size:13px; text-align:center;}
+.login-sec .copy-text i{color:#a2bdf8;}
+.login-sec .copy-text a{color:#a2bdf8;}
+.login-sec h2{margin-bottom:30px; font-weight:800; font-size:30px; color: #3B5998;}
+.login-sec h2:after{content:" "; width:100px; height:5px; background:#FEB58A; display:block; margin-top:20px; border-radius:3px; margin-left:auto;margin-right:auto}
+.btn-login{background: #3B5998; color:#fff; font-weight:600;}
+.banner-text{width:70%; position:absolute; padding-left:20px;}
+.banner-text h2{color:#fff; font-weight:600;}
+.banner-text h2:after{content:" "; width:100px; height:5px; background:#FFF; display:block; margin-top:20px; border-radius:3px;}
+.banner-text p{color:#fff;}
+
   </style>
 </head>
 
 <body>
-  <div class="container login-container">
+  <!-- <div class="container login-container">
     <div class="row">
       <div class="col-md-12" style="text-align:center">
-        <h3>Vault URL</h3>
+        <h3>Key Server URL</h3>
         <input name="vault-address" id="hostname" type="text" style='width:80%' value="https://206-12-90-40.cloud.computecanada.ca"/>
         <a data-placement="right" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
           <span class="glyphicon glyphicon-question-sign" ></span>
@@ -127,60 +112,44 @@
     <br>
 
     <div class="row">
-      <div id="userpass_login" class="col">
-        <h3 style="text-align:center">Login with Compute Canada Account</h3>
-        <div class="form-group">
-            <input type="text" class="form-control" placeholder="Compute Canada Username" value="" />
-        </div>
-        <div class="form-group">
-            <input type="password" class="form-control" placeholder="Compute Canada Password" value="" />
-        </div>
-        <div class="form-group">
-            <input type="submit" class="btn btn-primary" id="userpass_submit" value="Login" />
-        </div>
-      </div>
       <div id="oauth2_login" class="col my-auto">
-        <a id="google_submit" href="#" class="google btn""> Login with Google </a>          
         <a id="globus_submit" href="#" class="globus btn""> Login with Globus </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- <div class="container login-container">
-    <div class="row">
-      <div class="col-md-12" style="text-align:center"> 
-        <h3>Public Key Infrastructure URL</h3>
-        <input name="pki-address" id="pki-hostname" type="text" style='width:80%' value="https://frdrvault.mit.c3.ca/"/>
-        <a data-placement="right" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
-          <span class="glyphicon glyphicon-question-sign" ></span>
-        </a> 
-        <div class="vl">
-          <span class="vl-innertext">or</span>
-        </div>      
-      </div>
-    </div>
-    <br>
-
-    <div class="row">
-      <div id="userpass_login_pki" class="col">
-        <h3 style="text-align:center">Login with Compute Canada Account</h3>
-        <div class="form-group">
-            <input type="text" class="form-control" placeholder="Compute Canada Username" value="" />
-        </div>
-        <div class="form-group">
-            <input type="password" class="form-control" placeholder="Compute Canada Password" value="" />
-        </div>
-        <div class="form-group">
-            <input type="submit" class="btn btn-primary" id="userpass_submit" value="Login" />
-        </div>
-      </div>
-      <div id="oauth2_login_pki" class="col my-auto">     
-        <a id="globus_submit_pki" href="#" class="globus btn""> Login with Globus </a>
       </div>
     </div>
   </div> -->
 
-  <script src="windowLogin.js" charset="utf-8"></script> 
+  <section class="login-block">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 banner-sec">
+          <div class="banner-text">
+              <h2>FRDR Encryption Client</h2>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation</p>
+          </div>	
+        </div>	 
+
+        <div class="col-md-6 login-sec">
+          <h2 class="text-center">Login Now</h2>  
+
+          <div>
+            <label for="hostname">Key Server URL</label>
+            <input name="vault-address" id="hostname" type="text" style='width:90%;display:inline' value="https://vault-dev.frdr.ca"/>
+            <a data-placement="right" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
+              <span class="glyphicon glyphicon-question-sign" ></span>
+            </a>
+          </div>
+
+          <div id="oauth2_login" class="text-center">
+            <a id="globus_submit" href="#" class="globus btn"> Login with Globus </a>
+          </div>
+        </div>
+  
+    </div>
+  </div>
+  </div>
+  </section>  
+
+  <script src="../renderer_process/login.js" charset="utf-8"></script> 
 
 </body>
 

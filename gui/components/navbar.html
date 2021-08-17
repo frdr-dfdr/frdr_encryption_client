@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" aria-expanded="false" data-target="#navbar-collapse-1" data-toggle="collapse">
+          <span class="sr-only">Toggle Navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../pages/home.html"><span class="navbar-highlight"><img src="../resources/icon.png" style="max-height:44px" alt="FRDR Encryption App"></span></a>
+      </div>
+
+      <div class="navbar-collapse collapse" id="navbar-collapse-1" uib-collapse="isCollapsed" style="height: 0px;" aria-expanded="false" aria-hidden="true">
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" id="locale-dropdown" class="dropdown-toggle" id="locale" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></a>
+            <ul class="dropdown-menu" id="locale-menu" role="menu">
+              <li><a role="menuitem" class="lang-switch" id="nav_switch_en" href="#" data-locale="en" data-i18n="app-navbar-locale-english"></a></li>
+              <li><a role="menuitem" class="lang-switch" id="nav_switch_fr" href="#" data-locale="fr" data-i18n="app-navbar-locale-french"></a></li>
+            </ul>
+          </li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+          <a href="#" id="requester-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="../pages/requester-request-access.html" data-i18n="app-navbar-requester-request-access"></a></li>
+            <li><a href="../pages/requester-decrypt.html" data-i18n="app-navbar-requester-decrypt"></a></li>
+          </ul>
+          </li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+          <a href="#" id="depositor-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="../pages/depositor-encrypt.html" data-i18n="app-navbar-depositor-encrypt"></a></li>
+            <li><a href="../pages/depositor-grant-access.html" data-i18n="app-navbar-depositor-grant-access"></a></li>
+          </ul>
+          </li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" id="account-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="#" data-i18n="app-navbar-account-profile"></a></li>
+              <li role="separator" class="divider"></li>
+              <li><a id="logout" href="#" data-i18n="app-navbar-account-logout"></a></li>
+            </ul>
+          </li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+            <a id="contactus" href="#" data-i18n="app-navbar-contact-us"></a>
+            </li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+
+  <script src="../renderer_process/logout.js" charset="utf-8"></script>
+  <script src="../renderer_process/contactus.js" charset="utf-8"></script>
+  <script src="../assests/js/jquery_i18n/app.js"></script>
+
+</body>
+
+</html>

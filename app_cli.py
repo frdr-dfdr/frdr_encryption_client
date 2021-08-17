@@ -77,7 +77,6 @@ def main():
                                    auth_method="oidc")
             
             if arguments["encrypt"]:
-                print (arguments["--input"])
                 if not Util.check_dir_exists(arguments["--input"]):
                     logger.error("The input directory does not exist.")
                     # TODO: raise Exception or return to exit
@@ -85,14 +84,12 @@ def main():
                 dataset_uuid = str(uuid.uuid4())  
                 dataset_key_manager = DatasetKeyManager(vault_client)
                 person_key_manager = PersonKeyManager(vault_client)
-                # TODO: add argument for input dir and output dir
                 encryptor = EncryptionClient(dataset_key_manager, person_key_manager, arguments["--input"], arguments["--output"])
                 encryptor.encrypt(dataset_uuid)
             elif arguments["decrypt"]:
                 url = arguments["--url"]
                 dataset_key_manager = DatasetKeyManager(vault_client)
                 person_key_manager = PersonKeyManager(vault_client)
-                # TODO: add argument for input dir and output dir
                 encryptor = EncryptionClient(dataset_key_manager, person_key_manager, arguments["--input"], arguments["--output"])
                 encryptor.decrypt(url)
             elif arguments["grant_access"]:

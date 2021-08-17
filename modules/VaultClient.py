@@ -70,6 +70,33 @@ class VaultClient(object):
             raise Exception(error)
         self._logger.info("Authenticated with Vault successfully.") 
         
+    def get_oidc_auth_url(self, vault_addr):
+        self.hvac_client = hvac.Client(url=vault_addr)
+        path = "oidc"
+        response = self.hvac_client.auth.jwt.oidc_authorization_url_request(
+            role='',
+            redirect_uri='http://localhost:8250/{}/callback'.format(path),
+            path=path
+        )
+        auth_url = response['data']['auth_url']
+        return auth_url
+    
+    def login_oidc_temp(self, auth_url):
+        path = "oidc"
+        params = parse.parse_qs(auth_url.split('?')[1])
+        auth_url_nonce = params['nonce'][0]
+        auth_url_state = params['state'][0]
+
+        print ("here")
+        token = self._login_odic_get_token()
+
+        auth_result = self.hvac_client.auth.oidc.oidc_callback(
+            code=token, path=path, nonce=auth_url_nonce, state=auth_url_state
+        )
+        self._vault_token = auth_result['auth']['client_token']
+        self._entity_id = auth_result['auth']['entity_id']     
+        self.hvac_client.token = self._vault_token
+    
     def logout(self):
         try:
             self.hvac_client.logout()

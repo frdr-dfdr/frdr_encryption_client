@@ -140,9 +140,9 @@ cython_debug/
 
 .DS_Store
 gui/FRDR-Crypto.dmg
-gui/frdr-crypto-darwin-x64/
+gui/fdrd-encryption-client-darwin-x64/
 gui/crypto_gui/
-gui/frdr-crypto-win32-x64/
+gui/fdrd-encryption-client-win32-x64/
 gui/install/
 gui/node_modules
 gui/package-lock.json

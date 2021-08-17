@@ -1,7 +1,6 @@
 "use strict";
 
 const notifier = require('node-notifier');
-const remote = require('electron').remote;
 const {dialog} = require('electron').remote;
 let client = remote.getGlobal('client');
 

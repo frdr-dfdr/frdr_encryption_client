@@ -1,10 +1,11 @@
+import webbrowser
+
+from modules.PersonKeyManager import PersonKeyManager
+from modules.EncryptionClient import EncryptionClient
 from appdirs import AppDirs
 import sys
 import zerorpc
 import os
-from tempfile import mkstemp, gettempdir
-from shutil import move
-import json
 from modules.VaultClient import VaultClient
 from modules.AccessManager import AccessManager
 from config import app_config
@@ -27,7 +28,7 @@ class CryptoGui(object):
                         filepath=os.path.join(dirs.user_data_dir, "fdrd-encryption-client_log.txt"))
         self._logger = logging.getLogger("fdrd-encryption-client.gui")
         self._vault_client = VaultClient()
-        self._vault_client_pki = VaultClient()
+        # self._vault_client_pki = VaultClient()
 
     def login_oidc_google(self, hostname):
         try:
@@ -44,10 +45,9 @@ class CryptoGui(object):
         try:
             self._logger.info("Log into Vault using oidc method with globus acccount") 
             self._vault_client.login(vault_addr=hostname,
-                                     auth_method="oidc",
-                                     oauth_type="globus")  
-            self._vault_client_pki.login(vault_addr=hostname_pki, 
-                                     auth_method="oidc")           
+                                     auth_method="oidc")  
+            # self._vault_client_pki.login(vault_addr=hostname_pki, 
+            #                          auth_method="oidc")           
             return (True, None)
         except Exception as e:
             self._logger.info(str(e))
@@ -56,57 +56,43 @@ class CryptoGui(object):
     def logout(self):
         try:
             self._vault_client.logout()
-            self._vault_client_pki.logout()
+            webbrowser.open("https://auth.globus.org/v2/web/logout")
             self._logger.info("Log out successfully")
             return (True, None)
         except Exception as e:
             self._logger.error(str(e))
             return (False, str(e))
 
-    def encrypt(self, username, password, vault_token, hostname, output_path):
+    def encrypt(self, input_path, output_path):
         try:
-            self._logger.info("Encrypt files in the path {}".format(self._input_path))
-            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
-            dataset_name = str(uuid.uuid4()) 
-            key_manager = DatasetKeyManager(vault_client, dataset_name)
-            arguments = {"--input": self._input_path, 
-                        "--output": output_path,
-                        "--username": username,
-                        "--password": password,
-                        "--vault": hostname,
-                        "--encrypt": True}
-            encryptor = EncryptionClient(key_manager, self._logger, dataset_name)
-            bag_path = encryptor.encrypt()
+            self._logger.info("Encrypt files in the path {}".format(input_path))
+            dataset_uuid = str(uuid.uuid4()) 
+            dataset_key_manager = DatasetKeyManager(self._vault_client)
+            person_key_manager = PersonKeyManager(self._vault_client)
+            encryptor = EncryptionClient(dataset_key_manager, person_key_manager, input_path, output_path)
+            bag_path = encryptor.encrypt(dataset_uuid)
             return (True, bag_path)
         except Exception as e:
             self._logger.info(str(e))
             return (False, str(e))
 
-    def decrypt(self, username, password, vault_token, hostname, url, output_path):
+    def decrypt(self, input_path, output_path, url):
         try:
-            self._logger.info("Decrypt files in the path {}".format(self._input_path))
-            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
-            dataset_name = url.split("/")[-1]
-            key_manager = DatasetKeyManager(vault_client, dataset_name)
-            arguments = {"--input": self._input_path, 
-                        "--output": output_path,
-                        "--username": username,
-                        "--password": password, 
-                        "--vault": hostname,
-                        "--url": url,
-                        "--decrypt": True,
-                        "--encrypt": False}
-            encryptor = EncryptionClient(key_manager, self._logger, dataset_name)
-            encryptor.decrypt()
+            self._logger.info("Decrypt files in the path {}".format(input_path))
+            dataset_key_manager = DatasetKeyManager(self._vault_client)
+            person_key_manager = PersonKeyManager(self._vault_client)
+            encryptor = EncryptionClient(dataset_key_manager, person_key_manager, input_path, output_path)
+            encryptor.decrypt(url)
             return (True, None)
         except Exception as e:
             return (False, str(e))
 
-    def grant_access(self, username, password, vault_token, hostname, dataset_name, requester_id, expiry_date):
+    def grant_access(self, dataset_uuid, requester_uuid, expire_date):
         try:
-            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
-            access_granter = AccessManager(vault_client)
-            access_granter.grant_access(requester_id, dataset_name, expiry_date)
+            dataset_key_manager = DatasetKeyManager(self._vault_client)
+            person_key_manager = PersonKeyManager(self._vault_client)
+            encryptor = EncryptionClient(dataset_key_manager, person_key_manager)
+            encryptor.grant_access(requester_uuid, dataset_uuid, expire_date) 
             return (True, None)
         except Exception as e:
             return (False, str(e))
@@ -139,19 +125,32 @@ class CryptoGui(object):
         self._logger.info("Clearing input path.")
         self._input_path = None
     
-    def get_entity_name(self, username, password, vault_token, hostname, entity_id):
+    def get_entity_name(self, entity_id):
         try:
-            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
-            return (True, vault_client.read_entity_by_id(entity_id))
+            return (True, self._vault_client.read_entity_by_id(entity_id))
         except Exception as e:
             return (False, str(e))
 
-    def get_entity_id(self, username, password, vault_token, hostname):
+    def get_entity_id(self):
         try:
-            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
-            return (True, vault_client.entity_id)
+            entity_id = self._vault_client.entity_id
+            person_key_manager = PersonKeyManager(self._vault_client)
+            # make sure there is a public key saved on Vault for the requester
+            person_key_manager.create_or_retrieve_public_key()
+            return (True, entity_id)
         except Exception as e:
             return (False, str(e))
+
+    def get_auth_url(self, hostname, hostname_pki):
+        return (self._vault_client.get_oidc_auth_url(hostname), None)
+    
+    def login_oidc_temp(self, auth_url):
+        try:
+            print("herehere")
+            self._vault_client.login_oidc_temp(auth_url)
+            return (True, None)
+        except Exception as e:
+            return (False, str(e)) 
 
 if __name__ == "__main__":
     s = zerorpc.Server(CryptoGui(tokenfile=tokenfile))
