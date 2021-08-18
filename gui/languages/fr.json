@@ -49,6 +49,7 @@
   "app-depositor-grant-access-requester-tooltip": "The user ID of the requester you're granting access to111111",
   "app-depositor-grant-access-expire": "Access Expiry Date111111",
   "app-depositor-grant-access-expire-tooltip": "The date that this access is going to expire111111",
-  "app-depositor-grant-access-button": "Grant Access111111","app-depositor-grant-access-confirm": "!!!!! $1 22222 $2. \n\nDo you want to continue?",
+  "app-depositor-grant-access-button": "Grant Access111111",
+  "app-depositor-grant-access-confirm": "!!!!! $1 22222 $2. \n\nDo you want to continue?",
   "app-footer": "© 2021 DFDR Chiffrement Application 0.0.3"
 }
