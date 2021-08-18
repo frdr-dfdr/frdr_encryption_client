@@ -33,7 +33,7 @@ The Electron GUI in /gui should work for development after runing  `cd gui` and 
 ## Building
 The Python code needs to be built on its target platform using `pyinstaller`:
 
-`pyinstaller -w crypto_gui.py --distpath gui`
+`pyinstaller -w app_gui.py --distpath gui`
 
 (On Mac, this also builds a .app version of the Python code, which you'll actually want to delete -- just keep the folder of CLI tools.)
 
@@ -60,59 +60,59 @@ Finally, to package for install:
 ### Key Stored Locally
 To encrypt a file or a directory,
 ```sh
-$ python crypto.py -e -i <path to the file or dir you want to encrypt> -o <output path to the encrypted file or dir>
+$ python app_cli.py -e -i <path to the file or dir you want to encrypt> -o <output path to the encrypted file or dir>
 ```
 The output path is optional.
 
 For example,
 ```sh
-$ python crypto.py -e -i ./test_dataset  -o ./test_dataset_enc_local
+$ python app_cli.py -e -i ./test_dataset  -o ./test_dataset_enc_local
 ```
 To decrypt a file or a directory,
 ```sh
-$ python crypto.py -d -i <path to the encrypted file or dir> -k <path to the key>
+$ python app_cli.py -d -i <path to the encrypted file or dir> -k <path to the key>
 ```
 The output path is optional.
 
 For example,
 ```sh
-$ python crypto.py -d -i ./test_dataset_enc_local -k e9d63a50-bbdb-42ec-b5dd-3a6ad88b58da_key.pem
+$ python app_cli.py -d -i ./test_dataset_enc_local -k e9d63a50-bbdb-42ec-b5dd-3a6ad88b58da_key.pem
 ```
 ### Use Hashicorp Vault for Key Management
 To encrypt a file or a directory,
 ```sh
 # log into vault with username and password
-$ python crypto.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --username <vault username> --password <vault password>
+$ python app_cli.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --username <vault username> --password <vault password>
 # or log into vault with oauth
-$ python crypto.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --oauth
+$ python app_cli.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --oauth
 ```
 The output path is optional.
 For example,
 ```sh
 # log into vault with username and password
-$ python crypto.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --username bob --password training
+$ python app_cli.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --username bob --password training
 # or log into vault with oauth
-$ python crypto.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --oauth
+$ python app_cli.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --oauth
 
 ```
 To decrypt a file or a directory,
 
 ```sh
-$ python crypto.py -d -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --username <vault username> --password <vault password> --url <api path to fetch the secret>
+$ python app_cli.py -d -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --username <vault username> --password <vault password> --url <api path to fetch the secret>
 ```
 The output path is optional.
 
 For example,
 ```sh
-$ python crypto.py -d -i ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --username bob --password training --url http://127.0.0.1:8200/v1/secret/data/4186db38-9ebe-0512-8c32-4552220324aa/test_dataset
+$ python app_cli.py -d -i ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --username bob --password training --url http://127.0.0.1:8200/v1/secret/data/4186db38-9ebe-0512-8c32-4552220324aa/test_dataset
 ```
 
 #### CLI Usage Patterns
 Usage:
 ```sh
-crypto.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--oauth] [--loglevel=<loglevel>] 
-crypto.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> (--username <vault_username> --password <vault_password> | --oauth) --url <API_path>) [--loglevel=<loglevel>] 
-crypto.py --logout_vault
+app_cli.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--oauth] [--loglevel=<loglevel>] 
+app_cli.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> (--username <vault_username> --password <vault_password> | --oauth) --url <API_path>) [--loglevel=<loglevel>] 
+app_cli.py --logout_vault
 ```
 Options:
 ```sh

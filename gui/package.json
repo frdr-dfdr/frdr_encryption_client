@@ -25,7 +25,7 @@
     "zerorpc": "hokiedsp/zerorpc-node#dev_zmq6"
   },
   "files": [
-    "crypto_gui/*"
+    "app_gui/*"
   ],
   "author": "Compute Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)",
   "devDependencies": {

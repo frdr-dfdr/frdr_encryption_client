@@ -20,7 +20,7 @@ dirs = AppDirs(app_config.APP_NAME, app_config.APP_AUTHOR)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
-class CryptoGui(object):
+class EncryptionClientGui(object):
     def __init__(self, tokenfile):
         self._tokenfile = tokenfile
         Util.get_logger("fdrd-encryption-client", 
@@ -153,6 +153,6 @@ class CryptoGui(object):
             return (False, str(e)) 
 
 if __name__ == "__main__":
-    s = zerorpc.Server(CryptoGui(tokenfile=tokenfile))
+    s = zerorpc.Server(EncryptionClientGui(tokenfile=tokenfile))
     s.bind("tcp://127.0.0.1:" + str(sys.argv[1]))
     s.run()
