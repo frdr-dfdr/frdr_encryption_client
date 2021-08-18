@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from configparser import ConfigParser
 from pathlib import Path
-from config import app_config
+from config import person_key_server_config
 
 logger = logging.getLogger("fdrd-encryption-client.util")
 
@@ -43,7 +43,7 @@ class Util(object):
     @classmethod
     def get_key_dir(cls, subdir):
         home = str(Path.home())
-        key_dir = os.path.join(home, app_config.LOCAL_KEY_DIR_NAME, subdir)
+        key_dir = os.path.join(home, person_key_server_config.LOCAL_KEY_DIR_NAME, subdir)
         if not os.path.exists(key_dir):
             Util.make_dir(key_dir)
         return key_dir

@@ -1,4 +1,4 @@
-VERSION = '0.0.1'
+VERSION = '0.0.3'
 EXCLUDED_FILES = [".*", 
                   "Thumbs.db", 
                   ".DS_Store", 
@@ -14,12 +14,3 @@ EXCLUDED_FILES = [".*",
 APP_NAME = "fdrd-encryption-client"
 APP_AUTHOR = "Simon Fraser University"
 TIMEZONE = "America/Regina"
-VAULT_DATASET_KEY_PATH = "dataset"
-VAULT_PUBLIC_KEY_PATH = "public_key"
-VAULT_GENERATE_CERT_ROLE_NAME = "example-dot-com"
-VAULT_GENERATE_CERT_COMMON_NAME = "test.vault-dev.frdr.ca"
-VAULT_GENERATE_CERT_MOUNT_NAME = "pki_int"
-LOCAL_KEY_DIR_NAME = "frdr_keys"
-LOCAL_PRIVATE_KEY_FILENAME = "private.key"
-LOCAL_PUBLIC_KEY_FILENAME = "public.key"
-                  
