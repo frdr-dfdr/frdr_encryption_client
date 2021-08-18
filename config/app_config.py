@@ -12,5 +12,5 @@ EXCLUDED_FILES = [".*",
                   "~$*", 
                   "NULLEXT"]
 APP_NAME = "fdrd-encryption-client"
-APP_AUTHOR = "Simon Fraser University"
+APP_AUTHOR = "Compute Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)"
 TIMEZONE = "America/Regina"
