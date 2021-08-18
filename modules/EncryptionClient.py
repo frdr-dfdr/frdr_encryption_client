@@ -6,7 +6,7 @@ import nacl.utils
 import nacl.secret
 import os
 from util.util import Util
-from config import app_config, person_key_server_config
+from config import app_config, person_key_server_config, dataset_key_server_config
 import logging
 import shutil
 import tempfile
