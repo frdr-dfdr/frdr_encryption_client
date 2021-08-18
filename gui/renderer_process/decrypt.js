@@ -24,8 +24,8 @@ function decrypt() {
       parent: window, 
       modal: true, 
       show: false, 
-      width: 300, 
-      height: 100,
+      width: 400, 
+      height: 200,
       webPreferences: {
         nodeIntegration: true
       } 

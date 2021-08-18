@@ -86,7 +86,7 @@
   "app-requester-decrypt-confirm": "You are trying to decrypt the dataset $. \n\nYou should only do this if you're on a trusted computer, as the risk of this data being accessed by another party may be very high.\n\nDo you want to continue?",
   "app-requester-decrypt-confirm-btn1": "Yes",
   "app-requester-decrypt-confirm-btn2": "Cancel",
-  "app-requester-decrypt-in-progress": "decrypting dataset...",
+  "app-requester-decrypt-in-progress": "Decrypting dataset...",
   "app-requester-decrypt-done": "Dataset has been decrypted for access.",
   "app-requester-decrypt-error": "Error decrypting. $1",
 
