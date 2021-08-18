@@ -2,5 +2,6 @@
   "icon": "resources/icon.ico",
   "tags": [
     "Utility"
-  ]
+  ],
+  "name": "FRDR Encryption App"
 }
