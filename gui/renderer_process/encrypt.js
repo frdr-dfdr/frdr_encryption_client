@@ -4,6 +4,7 @@ const remote = require('electron').remote;
 const {dialog} = require('electron').remote;
 const {shell} = require('electron').remote;
 let client = remote.getGlobal('client');
+const root = document.documentElement;
 
 let input_path = null;
 let output_path = null;
@@ -70,3 +71,9 @@ ipc.on('selected-output-dir', function (event, path) {
 
 document.getElementById("encrypt").addEventListener("click", encrypt);
 
+ipc.on("loaded", (e, data) => {
+  colors = data.colors;
+  console.log(colors);
+  root.style.setProperty("--heading-text-color", colors.general.header_color);
+  ipc.send("load-end");
+});

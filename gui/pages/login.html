@@ -4,38 +4,12 @@
 <head>
   <meta charset="utf-8">
   <title>FRDR Encryption Application</title>
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script>window.jQuery = window.$ = require('jquery');</script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="../assests/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
   <style>
-
-    .login-container{
-      margin-top: 5%;
-      margin-bottom: 5%;
-    }
-
-    /* Two-column layout */
-    .col {
-      float: left;
-      width: 50%;
-      margin: auto;
-      padding: 0 50px;
-      margin-top: 6px;
-    }
-
-    /* add appropriate colors to globus, twitter and google buttons */
-    .globus {
-      background-color: #3B5998;
-      color: white;
-    }
-
-    /* style inputs and link buttons */
-    .btn {
+    @import url("../theme/colors.css");  
+    .btn-login {
       width: 100%;
       padding: 12px;
       border: none;
@@ -46,101 +20,109 @@
       font-size: 17px;
       line-height: 20px;
       text-decoration: none; /* remove underline from anchors */
-      background:#3B5998;
       text-align: center;
+      
     }
 
-    .my-auto {
-      margin-top: auto;
-      margin-bottom: auto;
+    .login-block{
+      background: var(--login-background-gradient-start);  /* fallback for old browsers */
+      background: -webkit-linear-gradient(to bottom, var(--login-background-gradient-start), var(--login-background-gradient-end));  /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(to bottom, var(--login-background-gradient-start), var(--login-background-gradient-end)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+      float:left;
+      width:100%;
+      padding : 50px 0;
+    }
+    
+    .banner-sec{
+      background: var(--login-banner-background); 
+      background-size: cover; 
+      min-height: 500px; 
+      border-radius:  10px 0 0 10px; 
+      padding: 50px;}
+      
+    .container{
+      background: var(--login-login-sec-background); 
+      border-radius:  10px;
+    
+    }
+    
+    .login-sec{
+      padding: 50px; 
+      position: relative;
     }
 
-    label {
-  display: block;
-}
+    .login-sec h2{
+      margin-bottom: 30px; 
+      font-weight: 800; 
+      font-size: 30px; 
+      color:  var(--login-heading);
+    }
 
-input{
-  display:inline;
-  }
+    .login-sec h2:after{
+      content: " "; 
+      width: 100px; 
+      height: 5px; 
+      background: var(--login-dividing-line); 
+      display: block; 
+      margin-top: 20px; 
+      border-radius: 3px; 
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-.login-block{
-  background: #3B5998;  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to bottom, #a2bdf8, #3B5998);  /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to bottom, #a2bdf8, #3B5998); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-  float:left;
-  width:100%;
-  padding : 50px 0;
-}
-.banner-sec{background:rgb(160, 187, 212); background-size:cover; min-height:500px; border-radius: 10px 0 0 10px; padding:50px;}
-.container{background:#fff; border-radius: 10px;}
-.carousel-inner{border-radius:0 10px 10px 0;}
-.carousel-caption{text-align:left; left:5%;}
-.login-sec{padding: 50px; position:relative;}
-.login-sec .copy-text{position:absolute; width:80%; bottom:20px; font-size:13px; text-align:center;}
-.login-sec .copy-text i{color:#a2bdf8;}
-.login-sec .copy-text a{color:#a2bdf8;}
-.login-sec h2{margin-bottom:30px; font-weight:800; font-size:30px; color: #3B5998;}
-.login-sec h2:after{content:" "; width:100px; height:5px; background:#FEB58A; display:block; margin-top:20px; border-radius:3px; margin-left:auto;margin-right:auto}
-.btn-login{background: #3B5998; color:#fff; font-weight:600;}
-.banner-text{width:70%; position:absolute; padding-left:20px;}
-.banner-text h2{color:#fff; font-weight:600;}
-.banner-text h2:after{content:" "; width:100px; height:5px; background:#FFF; display:block; margin-top:20px; border-radius:3px;}
-.banner-text p{color:#fff;}
+    .banner-text{
+      width: 70%; 
+      position: absolute; 
+      padding-left: 20px;
+    }
+
+    .banner-text h2{
+      color: var(--login-banner-text); 
+      font-weight: 600;
+    }
+
+    .banner-text h2:after{
+      content: " "; 
+      width: 100px; 
+      height: 5px; 
+      background: var(--login-banner-text); 
+      display: block; 
+      margin-top: 20px; 
+      border-radius: 3px;
+    }
+
+    .banner-text p{
+      color: var(--login-banner-text);
+    }
 
   </style>
 </head>
 
 <body>
-  <!-- <div class="container login-container">
-    <div class="row">
-      <div class="col-md-12" style="text-align:center">
-        <h3>Key Server URL</h3>
-        <input name="vault-address" id="hostname" type="text" style='width:80%' value="https://206-12-90-40.cloud.computecanada.ca"/>
-        <a data-placement="right" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
-          <span class="glyphicon glyphicon-question-sign" ></span>
-        </a>  
-        <h3>Public Key Infrastructure URL</h3>
-        <input name="pki address" id="pki-hostname" type="text" style='width:80%' value="https://frdrvault.mit.c3.ca/"/>
-        <a data-placement="right" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
-          <span class="glyphicon glyphicon-question-sign" ></span>
-        </a> 
-        <div class="vl">
-          <span class="vl-innertext">or</span>
-        </div>      
-      </div>
-    </div>
-    <br>
-
-    <div class="row">
-      <div id="oauth2_login" class="col my-auto">
-        <a id="globus_submit" href="#" class="globus btn""> Login with Globus </a>
-      </div>
-    </div>
-  </div> -->
 
   <section class="login-block">
     <div class="container">
       <div class="row">
-        <div class="col-md-6 banner-sec">
+        <div class="col-md-6 col-xs-6 banner-sec">
           <div class="banner-text">
               <h2>FRDR Encryption Client</h2>
               <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation</p>
           </div>	
         </div>	 
 
-        <div class="col-md-6 login-sec">
+        <div class="col-md-6 col-xs-6 login-sec">
           <h2 class="text-center">Login Now</h2>  
 
           <div>
             <label for="hostname">Key Server URL</label>
             <input name="vault-address" id="hostname" type="text" style='width:90%;display:inline' value="https://vault-dev.frdr.ca"/>
-            <a data-placement="right" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
+            <a data-placement="top" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
               <span class="glyphicon glyphicon-question-sign" ></span>
             </a>
           </div>
 
           <div id="oauth2_login" class="text-center">
-            <a id="globus_submit" href="#" class="globus btn"> Login with Globus </a>
+            <a id="globus_submit" href="#" class="btn-primary btn-login"> Login with Globus </a>
           </div>
         </div>
   
