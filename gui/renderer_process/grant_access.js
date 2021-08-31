@@ -9,7 +9,8 @@ var defaultDate = new Date().fp_incr(14);
 var defaultDateStr = defaultDate.toISOString().substring(0, 10);
 document.getElementById("expiry_date").value = defaultDateStr;
 const picker = flatpickr('#expiry_date', {
-  minDate: "today",
+  minDate: new Date().fp_incr(7),
+  maxDate: new Date().fp_incr(30),
   defaultDate: defaultDate,
   allowInput: true,
   onChange: function(selectedDates, dateStr, instance) {
