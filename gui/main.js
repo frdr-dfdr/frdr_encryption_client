@@ -34,11 +34,6 @@ let mainWindow = null
 let input_path = null;
 let selected_path = null;
 
-const fs = require("fs");
-let colors;
-let file = fs.readFileSync(path.join(__dirname, "theme", "frdr.json"), "utf-8");
-colors = JSON.parse(file);
-
 //TODO: this is for?
 const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
 
@@ -57,7 +52,7 @@ const getScriptPath = () => {
   return path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE)
 }
 
-function createWindow(colors){
+function createWindow(){
   mainWindow = new BrowserWindow({
     width: 800,
     height: 628,
@@ -75,16 +70,6 @@ function createWindow(colors){
     protocol: 'file:',
     slashes: true
   }))
-
-  // mainWindow.on("ready-to-show", () => {
-  //   try {
-  //       mainWindow.webContents.send("loaded", {
-  //           colors: colors
-  //       });
-  //   } catch (err) {
-  //       console.log(err);
-  //   }
-  // });
 
   // Load the login page when user is unauthenticated.
   ipcMain.on("unauthenticated", (event) => {
@@ -117,7 +102,7 @@ app.on('ready', () => {
     details.requestHeaders["User-Agent"] = "Chrome";
     callback({ cancel: false, requestHeaders: details.requestHeaders });
   });
-  createWindow(colors);
+  createWindow();
   mainWindow.webContents.session.clearStorageData();
 })
 
