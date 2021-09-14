@@ -4,7 +4,7 @@ import datetime
 from collections import defaultdict
 import datetime
 from util.util import Util
-from config import app_config
+from util.config_loader import config
 from dateutil import parser
 import os
 from pytz import timezone
@@ -32,7 +32,7 @@ class AccessManager(object):
         metadata = read_group_response["data"]["metadata"]
         if metadata is None:
             metadata = {}
-        access_updated_time = datetime.datetime.now(timezone(app_config.TIMEZONE)).isoformat()
+        access_updated_time = datetime.datetime.now(timezone(config.TIMEZONE)).isoformat()
         metadata[requester_entity_id] = expiry_date + "," + access_updated_time
         self._vault_client.create_or_update_group_by_name(group_name, policies, member_entity_ids, metadata)
 
@@ -146,7 +146,7 @@ class AccessManager(object):
             read_group_response = self._vault_client.read_group_by_name(each_group)
             metadata = read_group_response["data"]["metadata"]
             group_last_update_time = parser.isoparse(read_group_response["data"]["last_update_time"])
-            now = datetime.datetime.now(timezone(app_config.TIMEZONE)) 
+            now = datetime.datetime.now(timezone(config.TIMEZONE)) 
             if (group_last_update_time <= (now - datetime.timedelta(hours=6))):
                 continue  
 

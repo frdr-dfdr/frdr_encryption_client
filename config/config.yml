@@ -1,0 +1,33 @@
+# App configuration
+VERSION: '0.0.3'
+EXCLUDED_FILES: [".*", 
+                  "Thumbs.db", 
+                  ".DS_Store", 
+                  "._.DS_Store", 
+                  ".localized", 
+                  "desktop.ini", 
+                  "*.pyc", 
+                  "*.swx",
+                  "*.swp", 
+                  "*~", 
+                  "~$*", 
+                  "NULLEXT"]
+APP_NAME: "fdrd-encryption-client"
+APP_AUTHOR: "Compute Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)"
+TIMEZONE: "America/Regina"
+GLOBUS_DATA_PUBLICATION_CLIENT_ID: "7dbc22b3-60c1-4e75-b148-3ee89f95792d"
+GLOBUS_DATA_PUBLICATION_CLIENT_NAME: "DataPublication Client v0.1"
+FRDR_API_BASE_URL: "https://dev4.frdr.ca/v1/api"
+
+# Dataset key server configuration
+VAULT_DATASET_KEY_PATH: "dataset"
+VAULT_HOSTNAME: "https://vault-dev.frdr.ca"
+
+# Person key server configuration
+VAULT_PUBLIC_KEY_PATH: "public_key"
+VAULT_GENERATE_CERT_ROLE_NAME: "example-dot-com"
+VAULT_GENERATE_CERT_COMMON_NAME: "test.206-12-90-40.cloud.computecanada.ca"
+VAULT_GENERATE_CERT_MOUNT_NAME: "pki_int"
+LOCAL_KEY_DIR_NAME: "frdr_keys"
+LOCAL_PRIVATE_KEY_FILENAME: "private.key"
+LOCAL_PUBLIC_KEY_FILENAME: "public.key"

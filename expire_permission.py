@@ -11,12 +11,12 @@ Options:
 
 from docopt import docopt
 from modules.VaultClient import VaultClient
-from config import app_config
+from util.config_loader import config
 from util.util import Util
 from modules.AccessManager import AccessManager
 import os
 
-__version__ = app_config.VERSION
+__version__ = config.VERSION
 
 if __name__ == "__main__":
     arguments = docopt(__doc__, version=__version__)

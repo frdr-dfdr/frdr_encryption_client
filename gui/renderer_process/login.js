@@ -7,6 +7,21 @@ const {ipcRenderer} = require("electron");
 let client = remote.getGlobal('client');
 const ipc = require('electron').ipcRenderer;
 const root = document.documentElement;
+const fs = require('fs');
+const yaml = require('js-yaml');
+
+let vault_authenticated = false;
+let frdr_api_authenticated = false;
+
+try {
+    let fileContents = fs.readFileSync(path.join(__dirname, '../../config/config.yml'), 'utf8');
+    let config = yaml.load(fileContents);
+    document.getElementById('hostname').value = config['VAULT_HOSTNAME'];
+    document.getElementById('api_base_url').value = config['FRDR_API_BASE_URL'];
+} catch (e) {
+  // TODO: log error?
+  console.log(e);
+}
 
 $(function () {
   $('[data-toggle="tooltip"]').tooltip();
@@ -24,10 +39,15 @@ function oidcGlobusLogin() {
   client.invoke("login_oidc_globus", hostname, hostnamePKI, function(error, res, more) {
     var success = res[0];
     var errMessage = res[1];
+    success = false;
     if (success) {
-      ipcRenderer.send("authenticated")
+      vault_authenticated = true;
+      if (vault_authenticated && frdr_api_authenticated) {
+        ipcRenderer.send("authenticated");
+      }
     }
     else {
+      // FIXME: alert not working
       alert({"title" : "FRDR Encryption Application", "message" : `Error logging in with Globus OAuth. \n${errMessage}`});
       // notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error logging in with Globus OAuth. \n${errMessage}`});
     }
@@ -36,11 +56,24 @@ function oidcGlobusLogin() {
 
 document.getElementById("globus_submit").addEventListener("click", oidcGlobusLogin);
 
+function APIGlobusLogin() {
+  var baseUrl = document.getElementById("api_base_url").value;
 
+  client.invoke("login_frdr_api_globus", baseUrl, function(error, res, more) {
+    var success = res[0];
+    var errMessage = res[1];
+    if (success) {
+      frdr_api_authenticated = true;
+      if (vault_authenticated && frdr_api_authenticated) {
+        ipcRenderer.send("authenticated");
+      }
+    }
+    else {
+      alert({"title" : "FRDR Encryption Application", "message" : `Error logging in with Globus OAuth for FRDR API Usage. \n${errMessage}`});
+      // notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error logging in with Globus OAuth. \n${errMessage}`});
+    }
+  });
+}
 
-ipc.on("loaded", (e, data) => {
-  colors = data.colors;
-  console.log(colors);
-  root.style.setProperty("--heading-text-color", colors.general.header_color);
-  ipc.send("load-end");
-});
+document.getElementById("api_globus_submit").addEventListener("click", APIGlobusLogin);
+

@@ -6,7 +6,7 @@ import nacl.utils
 import nacl.secret
 import os
 from util.util import Util
-from config import app_config, person_key_server_config, dataset_key_server_config
+from util.config_loader import config
 import logging
 import shutil
 import tempfile
@@ -66,7 +66,7 @@ class EncryptionClient(object):
 
         # save key
         self._dataset_key_manager.encrypt_key(self._person_key_manager.my_public_key)
-        self._dataset_key_manager.save_key("/".join([dataset_key_server_config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid]))
+        self._dataset_key_manager.save_key("/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid]))
         
         return bag_output_path
 
@@ -76,11 +76,11 @@ class EncryptionClient(object):
         depositor_uuid, dataset_uuid, requester_uuid = self._parse_url(url)
         if requester_uuid == "" :
             assert self._dataset_key_manager.get_vault_entity_id() == depositor_uuid, "The url you provide is not correct"
-            encrypted_data_key_path =  "/".join([dataset_key_server_config.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid])
+            encrypted_data_key_path =  "/".join([config.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid])
         else:
-            encrypted_data_key_path = "/".join([dataset_key_server_config.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid, requester_uuid])
+            encrypted_data_key_path = "/".join([config.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid, requester_uuid])
         self._dataset_key_manager.read_key(encrypted_data_key_path)
-        private_key_path = os.path.join(Util.get_key_dir(self._dataset_key_manager.get_vault_entity_id()), person_key_server_config.LOCAL_PRIVATE_KEY_FILENAME)
+        private_key_path = os.path.join(Util.get_key_dir(self._dataset_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
         user_private_key = self._person_key_manager.read_private_key(private_key_path)
         self._dataset_key_manager.decrypt_key(user_private_key)
         self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
@@ -112,23 +112,23 @@ class EncryptionClient(object):
             expiry_date = (datetime.date.today() + datetime.timedelta(days=14)).strftime("%Y-%m-%d")
 
         # read encrypted data key from Vault
-        encrypted_data_key_path = "/".join([dataset_key_server_config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_id])
+        encrypted_data_key_path = "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_id])
         self._dataset_key_manager.read_key(encrypted_data_key_path)
         
         # decrypt the encrypted data key with the depositor private key
-        private_key_path = os.path.join(Util.get_key_dir(self._dataset_key_manager.get_vault_entity_id()), person_key_server_config.LOCAL_PRIVATE_KEY_FILENAME)
+        private_key_path = os.path.join(Util.get_key_dir(self._dataset_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
         depositor_private_key = self._person_key_manager.read_private_key(private_key_path)
         self._dataset_key_manager.decrypt_key(depositor_private_key)
 
         # encrypt the encrypted data key with the requester public key
         requester_public_key = self._person_key_manager.read_public_key_from_vault(requester_entity_id)
         self._dataset_key_manager.encrypt_key(requester_public_key)
-        path_on_vault = "/".join([dataset_key_server_config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_id, requester_entity_id])
+        path_on_vault = "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_id, requester_entity_id])
         self._dataset_key_manager.set_key_expiry_date(path_on_vault, expiry_date)
         self._dataset_key_manager.save_key(path_on_vault)
         
     def _encrypt_file(self, filename, logger):
-        if self._file_excluded(filename, app_config.EXCLUDED_FILES):
+        if self._file_excluded(filename, config.EXCLUDED_FILES):
             return False
         encrypted_filename = os.path.join(os.path.dirname(filename), os.path.basename(filename) + ".encrypted")
         with open(filename, 'rb') as f:
@@ -195,7 +195,7 @@ class EncryptionClient(object):
             zipfile_name = os.path.join(output_path, os.path.basename(input_path) + ".zip")
             zip_obj = ZipFile(zipfile_name, "w")
             for filename in all_files:
-                if self._file_excluded(filename, app_config.EXCLUDED_FILES):
+                if self._file_excluded(filename, config.EXCLUDED_FILES):
                     pass
                 else:
                     zip_obj.write(os.path.join(input_path, filename))

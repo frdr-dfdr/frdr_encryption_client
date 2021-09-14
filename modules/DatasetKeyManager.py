@@ -1,5 +1,5 @@
 import datetime
-from config import app_config
+from util.config_loader import config
 import logging
 
 from pytz import timezone
@@ -67,7 +67,7 @@ class DatasetKeyManager(object):
                                 )
                             )
     def set_key_expiry_date(self, path, expiry_date):
-        tz = timezone(app_config.TIMEZONE)
+        tz = timezone(config.TIMEZONE)
         now = datetime.datetime.now(tz)
         # date + 1 00:00:00
         expiry_time = tz.localize(datetime.datetime.strptime(expiry_date, '%Y-%m-%d') + datetime.timedelta(days=1))

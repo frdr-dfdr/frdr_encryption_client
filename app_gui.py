@@ -8,15 +8,16 @@ import zerorpc
 import os
 from modules.VaultClient import VaultClient
 from modules.AccessManager import AccessManager
-from config import app_config
+from util.config_loader import config
 import logging
 from util.util import Util
 import uuid
 from modules.DatasetKeyManager import DatasetKeyManager
+from modules.FRDRAPIClient import FRDRAPIClient
 
 
-__version__ = app_config.VERSION
-dirs = AppDirs(app_config.APP_NAME, app_config.APP_AUTHOR)
+__version__ = config.VERSION
+dirs = AppDirs(config.APP_NAME, config.APP_AUTHOR)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
 
@@ -28,6 +29,7 @@ class EncryptionClientGui(object):
                         filepath=os.path.join(dirs.user_data_dir, "fdrd-encryption-client_log.txt"))
         self._logger = logging.getLogger("fdrd-encryption-client.gui")
         self._vault_client = VaultClient()
+        self._frdr_api_client = FRDRAPIClient()
         # self._vault_client_pki = VaultClient()
 
     def login_oidc_google(self, hostname):
@@ -48,6 +50,15 @@ class EncryptionClientGui(object):
                                      auth_method="oidc")  
             # self._vault_client_pki.login(vault_addr=hostname_pki, 
             #                          auth_method="oidc")           
+            return (True, None)
+        except Exception as e:
+            self._logger.info(str(e))
+            return (False, str(e))
+    
+    def login_frdr_api_globus(self, base_url):
+        try:
+            self._logger.info("Login with globus acccount for FRDR REST API usage") 
+            self._frdr_api_client.login(base_url=base_url)    
             return (True, None)
         except Exception as e:
             self._logger.info(str(e))
@@ -93,6 +104,7 @@ class EncryptionClientGui(object):
             person_key_manager = PersonKeyManager(self._vault_client)
             encryptor = EncryptionClient(dataset_key_manager, person_key_manager)
             encryptor.grant_access(requester_uuid, dataset_uuid, expire_date) 
+            print (self._frdr_api_client.get_submission(130))
             return (True, None)
         except Exception as e:
             return (False, str(e))

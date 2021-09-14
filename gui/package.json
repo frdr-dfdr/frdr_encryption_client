@@ -22,7 +22,8 @@
     "node-notifier": "^8.0.1",
     "portfinder": "^1.0.20",
     "update-electron-app": "^1.3.0",
-    "zerorpc": "hokiedsp/zerorpc-node#dev_zmq6"
+    "zerorpc": "hokiedsp/zerorpc-node#dev_zmq6", 
+    "config-yml": "4.1.0"
   },
   "files": [
     "app_gui/*"
