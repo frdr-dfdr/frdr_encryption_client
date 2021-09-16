@@ -1,7 +1,5 @@
-const time1 = new Date().getTime();
-
 if(require('electron-squirrel-startup')) return;
-const {app, Menu, BrowserWindow, ipcMain, shell} = require("electron");
+const {app, BrowserWindow, ipcMain} = require("electron");
 // Does not allow a second instance
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -32,9 +30,6 @@ const PY_MODULE = 'app_gui'
 
 let pythonChild = null
 let mainWindow = null
-let input_path = null;
-let selected_path = null;
-let $ = require('jquery');
 
 //TODO: this is for?
 const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
@@ -136,12 +131,6 @@ let port = portfinder.getPort(function (err, port) {
   app.on('ready', createApp);
 });
 
-ipcMain.on("load-end", () => {
-  let time2 = new Date().getTime();
-  let time = time2 - time1;
-  console.log("launch in :" + time + "ms");
-});
-
 const exitApp = () => {
   pythonChild.kill()
   pythonChild = null
@@ -152,7 +141,6 @@ app.on("before-quit", ev => {
   if (mainWindow != null){
     mainWindow.close();
   }
-  top = null;
 });
 
 app.on('will-quit', ev => {
@@ -183,68 +171,7 @@ if (process.argv.slice(-1)[0] === '--run-tests') {
   });
 };
 
-let top = {};
-
-// // Main process to open a file/folder selector dialog
-// const ipc = require('electron').ipcMain
-// ipc.on('open-file-dialog', function (event) {
-//   input_path = dialog.showOpenDialogSync({properties: ['openFile']});
-//   if (input_path) {
-//     client.invoke("set_input_path", input_path[0], function(error, res, more) {} );
-//     event.reply('selected-file', input_path)
-//   }
-// })
-
-// ipc.on('open-input-dir-dialog', function (event) {
-//   selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
-//   if (selected_path) {
-//     event.reply('selected-input-dir', selected_path)
-//   }
-// })
-
-// ipc.on('open-output-dir-dialog', function (event) {
-//   selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
-//   if (selected_path) {
-//     event.reply('selected-output-dir', selected_path)
-//   }
-// })
-
 function loadMainProcessJs () {
   const files = glob.sync(path.join(__dirname, 'main_process/*.js'))
   files.forEach((file) => { require(file) })
 }
-
-ipcMain.on('encrypt', (event, input_path, output_path) => {
-  var childWindow = new BrowserWindow({ 
-    parent: mainWindow, 
-    modal: true, 
-    show: false, 
-    width: 400, 
-    height: 200, 
-    webPreferences: {
-      nodeIntegration: true
-    }
-  });
-  childWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, 'pages/depositor-encrypt-in-progress.html'),
-    protocol: 'file:',
-    slashes: true
-  }));
-  childWindow.once('ready-to-show', () => {
-    childWindow.show()
-  });
-  console.log(input_path);
-  client.invoke("encrypt", input_path, output_path, function(error, res, more) {
-    var success = res[0];
-    var result = res[1];
-    childWindow.close();
-    if (success){
-      // TODO: add a pop up window for notification
-      notifier.notify({"title" : $.i18n('app-name'), "message" : $.i18n('app-depositor-encrypt-done', result)});
-      shell.showItemInFolder(result);
-    } else {
-      // TODO: add a pop up window for notification
-      notifier.notify({"title" : $.i18n('app-name'), "message" : $.i18n('app-depositor-encrypt-error', result)});
-    }
-  });
-});

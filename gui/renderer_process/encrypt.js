@@ -1,50 +1,7 @@
-const notifier = require('node-notifier');
-const path = require('path');
-const remote = require('electron').remote;
-const {shell} = require('electron').remote;
-let client = remote.getGlobal('client');
 const {ipcRenderer} = require('electron');
 
 let input_path = null;
 let output_path = null;
-
-function encrypt() {
-  // var window = remote.getCurrentWindow();
-  // var childWindow = new remote.BrowserWindow({ 
-  //   parent: window, 
-  //   modal: true, 
-  //   show: false, 
-  //   width: 400, 
-  //   height: 200, 
-  //   webPreferences: {
-  //     nodeIntegration: true
-  //   }
-  // });
-  // childWindow.loadURL(require('url').format({
-  //   pathname: path.join(__dirname, 'depositor-encrypt-in-progress.html'),
-  //   protocol: 'file:',
-  //   slashes: true
-  // }));
-  // childWindow.once('ready-to-show', () => {
-  //   childWindow.show()
-  // });
-
-  ipcRenderer.send("encrypt", input_path[0], output_path[0]);
-
-  // client.invoke("encrypt", input_path[0], output_path[0], function(error, res, more) {
-  //   var success = res[0];
-  //   var result = res[1];
-  //   childWindow.close();
-  //   if (success){
-  //     // TODO: add a pop up window for notification
-  //     notifier.notify({"title" : $.i18n('app-name'), "message" : $.i18n('app-depositor-encrypt-done', result)});
-  //     shell.showItemInFolder(result);
-  //   } else {
-  //     // TODO: add a pop up window for notification
-  //     notifier.notify({"title" : $.i18n('app-name'), "message" : $.i18n('app-depositor-encrypt-error', result)});
-  //   }
-  // });
-}
 
 // Send a open directory selector dialog message from a renderer process to main process 
 const selectInputDirBtn = document.getElementById('input_path_dir')
@@ -70,4 +27,15 @@ ipcRenderer.on('selected-output-dir', function (event, path) {
   document.getElementById('selected-output-dir').innerHTML = $.i18n('app-depositor-encrypt-selected', path);
 });
 
+function encrypt() {
+  ipcRenderer.send("encrypt", input_path[0], output_path[0]);
+}
 document.getElementById("encrypt").addEventListener("click", encrypt);
+
+ipcRenderer.on('notify-encrypt-done', function (event, result) {
+  alert($.i18n('app-depositor-encrypt-done', result), "");
+});
+
+ipcRenderer.on('notify-encrypt-error', function (event, result) {
+  alert($.i18n('app-depositor-encrypt-error', result), "");
+});
