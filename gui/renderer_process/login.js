@@ -36,22 +36,62 @@ function oidcGlobusLogin() {
     var hostnamePKI = hostname
   }
 
-  client.invoke("login_oidc_globus", hostname, hostnamePKI, function(error, res, more) {
-    var success = res[0];
+  client.invoke("get_auth_url", hostname, hostnamePKI, function(error, res, more) {
+    var url = res[0];
     var errMessage = res[1];
-    success = false;
-    if (success) {
-      vault_authenticated = true;
-      if (vault_authenticated && frdr_api_authenticated) {
-        ipcRenderer.send("authenticated");
-      }
+    if (url) {
+      console.log(url);
+      // var window = remote.getCurrentWindow();
+      // var childWindow = new remote.BrowserWindow({ 
+      //   parent: window, 
+      //   modal: true, 
+      //   show: false, 
+      //   width: 800, 
+      //   height: 600,
+      //   webPreferences: {
+      //     nodeIntegration: true
+      //   } 
+      // });
+      const win = new remote.BrowserWindow({width: 800, height: 600});
+      win.loadURL(url);
+      // childWindow.once('ready-to-show', () => {
+      //   childWindow.show()
+      // });
+      client.invoke("login_oidc_temp", url, function(error, res, more) {
+        console.log("inside here");
+        var success = res[0];
+        var errMessage = res[1];
+        if (success) {
+          win.close();
+          ipcRenderer.send("authenticated")
+        }
+        else {
+          alert({"title" : "FRDR Encryption Application", "message" : `Error reviewing shares. \n${errMessage}`});
+          // notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error reviewing shares. \n${errMessage}`});
+        }
+      });
     }
     else {
-      // FIXME: alert not working
-      alert({"title" : "FRDR Encryption Application", "message" : `Error logging in with Globus OAuth. \n${errMessage}`});
-      // notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error logging in with Globus OAuth. \n${errMessage}`});
+      alert({"title" : "FRDR Encryption Application", "message" : `Error reviewing shares. \n${errMessage}`});
     }
   });
+
+  // client.invoke("login_oidc_globus", hostname, hostnamePKI, function(error, res, more) {
+  //   var success = res[0];
+  //   var errMessage = res[1];
+  //   success = false;
+  //   if (success) {
+  //     vault_authenticated = true;
+  //     if (vault_authenticated && frdr_api_authenticated) {
+  //       ipcRenderer.send("authenticated");
+  //     }
+  //   }
+  //   else {
+  //     // FIXME: alert not working
+  //     alert({"title" : "FRDR Encryption Application", "message" : `Error logging in with Globus OAuth. \n${errMessage}`});
+  //     // notifier.notify({"title" : "FRDR Encryption Application", "message" : `Error logging in with Globus OAuth. \n${errMessage}`});
+  //   }
+  // });
 }
 
 document.getElementById("globus_submit").addEventListener("click", oidcGlobusLogin);

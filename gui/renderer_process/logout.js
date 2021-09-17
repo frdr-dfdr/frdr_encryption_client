@@ -8,7 +8,9 @@ const ipc = require('electron').ipcRenderer;
 document.getElementById("logout").addEventListener("click", logout);
 
 function logout() {
-  // document.location.href = "https://auth.globus.org/v2/web/logout"
+  var url = "https://auth.globus.org/v2/web/logout";
+  const win = new remote.BrowserWindow({width: 800, height: 600});
+  win.loadURL(url);
   client.invoke("logout", function(error, res, more) {
     var success = res[0];
     var result = res[1];
