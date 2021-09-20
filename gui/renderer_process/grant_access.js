@@ -1,8 +1,5 @@
-const notifier = require('node-notifier');
-const remote = require('electron').remote;
-const {dialog} = require('electron').remote;
 const flatpickr = require('flatpickr');
-let client = remote.getGlobal('client');
+const {ipcRenderer} = require('electron');
 
 var expiryDate = null;
 var defaultDate = new Date().fp_incr(14);
@@ -22,36 +19,32 @@ function grantAccess() {
   var dataset = document.getElementById("dataset").value;
   var requester = document.getElementById("requester").value;
 
-  client.invoke("get_entity_name", requester, function(error, res, more) {
-    var success = res[0];
-    var result = res[1];
-    if (success && result != null) {
-      var options = {
-        type: "question",
-        buttons: [$.i18n("app-depositor-grant-access-confirm-btn1"), $.i18n("app-depositor-grant-access-confirm-btn2")],
-        defaultId: 1,
-        title: "Confirmation",
-        message: $.i18n("app-depositor-grant-access-confirm", result, dataset)
-      }
-      const response = dialog.showMessageBoxSync(options);
-      if (response == 0){
-        client.invoke("grant_access", dataset, requester, expiryDate, function(error, res, more) {
-          var grant_access_success = res[0];
-          var grant_access_result = res[1];
-          if (grant_access_success){
-            // TODO: add a pop up window for notification
-            notifier.notify({"title" : $.i18n('app-name'), "message" : $.i18n('app-depositor-grant-access-done')});
-          } else {
-            // TODO: add a pop up window for notification
-            notifier.notify({"title" : $.i18n('app-name'), "message" : $.i18n('app-depositor-grant-access-error', grant_access_result)});
-          }
-        });
-      }
+  ipcRenderer.send("get-entity-name", requester);
+
+  ipcRenderer.on('notify-get-entity-name-done', function (event, result) {
+    var dialogOptions = {
+      type: "question",
+      buttons: [$.i18n("app-depositor-grant-access-confirm-btn1"), $.i18n("app-depositor-grant-access-confirm-btn2")],
+      defaultId: 1,
+      title: "Confirmation",
+      message: $.i18n("app-depositor-grant-access-confirm", result, dataset)
     }
-    else {
-      notifier.notify({"title" : $.i18n('app-name'), "message" : $.i18n('app-depositor-grant-access-find-user-error', result)});
-    }
+
+    ipcRenderer.send("grant-access", dataset, requester, expiryDate, dialogOptions);
+  
   });
 }
 
 document.getElementById("grant_access").addEventListener("click", grantAccess);
+
+ipcRenderer.on('notify-get-entity-name-error', function (event, result) {
+  alert($.i18n('app-depositor-grant-access-find-user-error', result), "");
+});
+
+ipcRenderer.on('notify-grant-access-done', function (event) {
+  alert($.i18n('app-depositor-grant-access-done'), "");
+});
+
+ipcRenderer.on('notify-grant-access-error', function (event, errMessage) {
+  alert($.i18n('app-depositor-grant-access-error', errMessage), "");
+});

@@ -1,7 +1,5 @@
-const time1 = new Date().getTime();
-
 if(require('electron-squirrel-startup')) return;
-const {app, dialog, Menu, BrowserWindow, ipcMain} = require("electron");
+const {app, BrowserWindow, ipcMain} = require("electron");
 // Does not allow a second instance
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -13,6 +11,7 @@ if (!gotTheLock) {
 }
 
 require('update-electron-app')();
+const glob = require('glob');
 const notifier = require("node-notifier");
 const zerorpc = require("zerorpc");
 const constLargeEnoughHeartbeat = 1000 * 60 * 60 * 2 // 2 hour in ms
@@ -31,8 +30,6 @@ const PY_MODULE = 'app_gui'
 
 let pythonChild = null
 let mainWindow = null
-let input_path = null;
-let selected_path = null;
 
 //TODO: this is for?
 const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
@@ -52,13 +49,14 @@ const getScriptPath = () => {
   return path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE)
 }
 
+loadMainProcessJs();
+
 function createWindow(){
   mainWindow = new BrowserWindow({
     width: 800,
     height: 628,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true
     }
   });
 
@@ -132,12 +130,6 @@ let port = portfinder.getPort(function (err, port) {
   app.on('ready', createApp);
 });
 
-ipcMain.on("load-end", () => {
-  let time2 = new Date().getTime();
-  let time = time2 - time1;
-  console.log("launch in :" + time + "ms");
-});
-
 const exitApp = () => {
   pythonChild.kill()
   pythonChild = null
@@ -148,7 +140,6 @@ app.on("before-quit", ev => {
   if (mainWindow != null){
     mainWindow.close();
   }
-  top = null;
 });
 
 app.on('will-quit', ev => {
@@ -179,28 +170,7 @@ if (process.argv.slice(-1)[0] === '--run-tests') {
   });
 };
 
-let top = {};
-
-// Main process to open a file/folder selector dialog
-const ipc = require('electron').ipcMain
-ipc.on('open-file-dialog', function (event) {
-  input_path = dialog.showOpenDialogSync({properties: ['openFile']});
-  if (input_path) {
-    client.invoke("set_input_path", input_path[0], function(error, res, more) {} );
-    event.reply('selected-file', input_path)
-  }
-})
-
-ipc.on('open-input-dir-dialog', function (event) {
-  selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
-  if (selected_path) {
-    event.reply('selected-input-dir', selected_path)
-  }
-})
-
-ipc.on('open-output-dir-dialog', function (event) {
-  selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
-  if (selected_path) {
-    event.reply('selected-output-dir', selected_path)
-  }
-})
+function loadMainProcessJs () {
+  const files = glob.sync(path.join(__dirname, 'main_process/*.js'))
+  files.forEach((file) => { require(file) })
+}
