@@ -6,10 +6,10 @@ let output_path = null;
 // Send a open directory selector dialog message from a renderer process to main process 
 const selectInputDirBtn = document.getElementById('input_path_dir')
 selectInputDirBtn.addEventListener('click', function (event) {
-  ipcRenderer.send('open-input-dir-dialog')
+  ipcRenderer.send('encrypt-open-input-dir-dialog')
 });
 //Getting back the information after selecting the dir
-ipcRenderer.on('selected-input-dir', function (event, path) {
+ipcRenderer.on('encrypt-selected-input-dir', function (event, path) {
   //print the path selected
   input_path = path;
   document.getElementById('selected-input-dir').innerHTML = $.i18n('app-depositor-encrypt-selected', path);
@@ -18,10 +18,10 @@ ipcRenderer.on('selected-input-dir', function (event, path) {
 // Send a open directory selector dialog message from a renderer process to main process 
 const selectOutputDirBtn = document.getElementById('output_path_dir')
 selectOutputDirBtn.addEventListener('click', function (event) {
-  ipcRenderer.send('open-output-dir-dialog')
+  ipcRenderer.send('encrypt-open-output-dir-dialog')
 });
 //Getting back the information after selecting the dir
-ipcRenderer.on('selected-output-dir', function (event, path) {
+ipcRenderer.on('encrypt-selected-output-dir', function (event, path) {
   //print the path selected
   output_path = path;
   document.getElementById('selected-output-dir').innerHTML = $.i18n('app-depositor-encrypt-selected', path);
