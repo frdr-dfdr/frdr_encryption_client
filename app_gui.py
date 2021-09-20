@@ -85,6 +85,7 @@ class EncryptionClientGui(object):
             encryptor.decrypt(url)
             return (True, None)
         except Exception as e:
+            self._logger.info(str(e))
             return (False, str(e))
 
     def grant_access(self, dataset_uuid, requester_uuid, expire_date):
