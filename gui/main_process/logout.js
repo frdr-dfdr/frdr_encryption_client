@@ -1,7 +1,9 @@
-const {ipcMain} = require('electron');
+const {ipcMain, BrowserWindow} = require('electron');
  
 ipcMain.on('logout', (event) => {
-
+  var url = "https://auth.globus.org/v2/web/logout";
+  const win = new BrowserWindow({width: 800, height: 600});
+  win.loadURL(url);
   client.invoke("logout", function(error, res, more) {
     var success = res[0];
     var result = res[1];
