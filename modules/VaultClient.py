@@ -87,7 +87,6 @@ class VaultClient(object):
         auth_url_nonce = params['nonce'][0]
         auth_url_state = params['state'][0]
 
-        print ("here")
         token = self._login_odic_get_token()
 
         auth_result = self.hvac_client.auth.oidc.oidc_callback(

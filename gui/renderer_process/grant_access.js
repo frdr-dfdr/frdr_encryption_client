@@ -15,24 +15,20 @@ const picker = flatpickr('#expiry_date', {
   }
 });
 
+
+
 function grantAccess() {
   var dataset = document.getElementById("dataset").value;
   var requester = document.getElementById("requester").value;
-
-  ipcRenderer.send("get-entity-name", requester);
-
-  ipcRenderer.on('notify-get-entity-name-done', function (event, result) {
-    var dialogOptions = {
-      type: "question",
-      buttons: [$.i18n("app-depositor-grant-access-confirm-btn1"), $.i18n("app-depositor-grant-access-confirm-btn2")],
-      defaultId: 1,
-      title: "Confirmation",
-      message: $.i18n("app-depositor-grant-access-confirm", result, dataset)
-    }
-
-    ipcRenderer.send("grant-access", dataset, requester, expiryDate, dialogOptions);
-  
-  });
+  var result;
+  var dialogOptions = {
+    type: "question",
+    buttons: [$.i18n("app-depositor-grant-access-confirm-btn1"), $.i18n("app-depositor-grant-access-confirm-btn2")],
+    defaultId: 1,
+    title: "Confirmation",
+    message: $.i18n("app-depositor-grant-access-confirm")
+  }
+  ipcRenderer.send("get-entity-name", requester, dataset, expiryDate, dialogOptions);
 }
 
 document.getElementById("grant_access").addEventListener("click", grantAccess);

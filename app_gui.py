@@ -105,7 +105,7 @@ class EncryptionClientGui(object):
             person_key_manager = PersonKeyManager(self._vault_client)
             encryptor = EncryptionClient(dataset_key_manager, person_key_manager)
             encryptor.grant_access(requester_uuid, dataset_uuid, expire_date) 
-            print (self._frdr_api_client.get_submission(130))
+            # print (self._frdr_api_client.get_submission(130))
             return (True, None)
         except Exception as e:
             return (False, str(e))
@@ -159,7 +159,6 @@ class EncryptionClientGui(object):
     
     def login_oidc_temp(self, auth_url):
         try:
-            print("herehere")
             self._vault_client.login_oidc_temp(auth_url)
             return (True, None)
         except Exception as e:

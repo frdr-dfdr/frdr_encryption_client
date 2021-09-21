@@ -19,7 +19,7 @@ const clientOptions = {
   "heartbeatInterval": constLargeEnoughHeartbeat,
   "timeout": 60 * 60 * 2
 }
-global.client = new zerorpc.Client(clientOptions)
+client = new zerorpc.Client(clientOptions)
 const portfinder = require("portfinder");
 const session = require('electron').session;
 
@@ -133,7 +133,7 @@ let port = portfinder.getPort(function (err, port) {
 const exitApp = () => {
   pythonChild.kill()
   pythonChild = null
-  global.client.close();
+  client.close();
 }
 
 app.on("before-quit", ev => {

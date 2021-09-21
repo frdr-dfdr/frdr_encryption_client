@@ -45,6 +45,9 @@ ipcRenderer.on('notify-login-oidc-done', function (event) {
   if (vault_authenticated && frdr_api_authenticated) {
     ipcRenderer.send("authenticated");
   }
+  else {
+    alert(`You have successfully logged into Hashicorp Vault. Please click the second login button to use FRDR REST API.`, "")
+  }
 });
 
 ipcRenderer.on('notify-login-oidc-error', function (event, errMessage) {
@@ -59,6 +62,9 @@ ipcRenderer.on('notify-login-frdr-api-done', function (event) {
   frdr_api_authenticated = true;
   if (vault_authenticated && frdr_api_authenticated) {
     ipcRenderer.send("authenticated");
+  }
+  else {
+    alert(`You have successfully logged in to use FRDR REST API. Please click the first login button to log into Hashicorp Vault.`, "")
   }
 });
 

@@ -6,7 +6,7 @@ let output_path = null;
 // Send a open directory selector dialog message from a renderer process to main process 
 const selectInputDirBtn = document.getElementById('input_path_dir')
 selectInputDirBtn.addEventListener('click', function (event) {
-  ipcRenderer.send('encrypt-open-input-dir-dialog')
+  ipcRenderer.send('encrypt-open-input-dir-dialog');
 });
 //Getting back the information after selecting the dir
 ipcRenderer.on('encrypt-selected-input-dir', function (event, path) {

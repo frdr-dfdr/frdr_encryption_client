@@ -90,5 +90,12 @@
   "app-requester-decrypt-done": "Dataset has been decrypted for access.",
   "app-requester-decrypt-error": "Error decrypting. $1",
 
+  "app-profile-title": "User Profile",
+  "app-profile-email": "Email",
+  "app-profile-user-id": "Vault User ID",
+
+  "app-get-entity-id-error": "Error getting user entity id on Vault. \n$1.",
+  "app-get-entity-name-error": "Error getting user email on Vault. \n$1.",
+
   "app-footer": "© 2021 FRDR Encryption Application 0.0.3"
 }
