@@ -94,20 +94,24 @@ def main():
                 encryptor = EncryptionClient(dataset_key_manager, person_key_manager, arguments["--input"], arguments["--output"])
                 encryptor.decrypt(url)
             elif arguments["grant_access"]:
-                frdr_api_url = arguments["--frdr_api_url"]
-                if frdr_api_url is None:
-                    frdr_api_url = config.FRDR_API_BASE_URL
-                frdr_api_client = FRDRAPIClient()
-                frdr_api_client.login(base_url=config.FRDR_API_BASE_URL)
-                print (frdr_api_client.get_submission(130))
-                requester_uuid = arguments["--requester"]
-                dataset_uuid = arguments["--dataset"]
-                expire_date = arguments["--expire"]
                 if click.confirm("Do you want to continue?", default=False):
+                    requester_uuid = arguments["--requester"]
+                    dataset_uuid = arguments["--dataset"]
+                    expire_date = arguments["--expire"]
                     dataset_key_manager = DatasetKeyManager(vault_client)
                     person_key_manager = PersonKeyManager(vault_client)
                     encryptor = EncryptionClient(dataset_key_manager, person_key_manager)
                     encryptor.grant_access(requester_uuid, dataset_uuid, expire_date)  
+
+                    # make api call to FRDR to put grant access info in db
+                    frdr_api_url = arguments["--frdr_api_url"]
+                    if frdr_api_url is None:
+                        frdr_api_url = config.FRDR_API_BASE_URL
+                    frdr_api_client = FRDRAPIClient()
+                    frdr_api_client.login(base_url=config.FRDR_API_BASE_URL)
+                    data = {"expires": expire_date, "vault_dataset_id": dataset_uuid, "vault_requester_id": requester_uuid}
+                    print(frdr_api_client.update_requestitem(data))
+
             elif arguments["generate_access_request"]:
                 entity_id = vault_client.entity_id
                 person_key_manager = PersonKeyManager(vault_client)

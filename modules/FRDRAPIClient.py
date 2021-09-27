@@ -20,6 +20,9 @@ class DataPublicationClient(BaseClient):
         return self.get('submissions/{}'.format(submission_id),
                         params=params)
 
+    def update_requestitem(self, data):
+        return self.put('requestitem', json_body=data)
+
 class FRDRAPIClient(BaseClient):
 
     def __init__(self):
@@ -101,6 +104,9 @@ class FRDRAPIClient(BaseClient):
 
     def get_submission(self, submission_id):
         return self._pub_client.get_submission(submission_id)
+
+    def update_requestitem(self, data):
+        return self._pub_client.update_requestitem(data)
 
 
 

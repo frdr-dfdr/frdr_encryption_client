@@ -5,6 +5,7 @@ var expiryDate = null;
 var defaultDate = new Date().fp_incr(14);
 var defaultDateStr = defaultDate.toISOString().substring(0, 10);
 document.getElementById("expiry_date").value = defaultDateStr;
+expiryDate = defaultDateStr;
 const picker = flatpickr('#expiry_date', {
   minDate: new Date().fp_incr(7),
   maxDate: new Date().fp_incr(30),
@@ -14,8 +15,6 @@ const picker = flatpickr('#expiry_date', {
     expiryDate = dateStr;
   }
 });
-
-
 
 function grantAccess() {
   var dataset = document.getElementById("dataset").value;

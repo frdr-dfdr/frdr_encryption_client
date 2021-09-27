@@ -105,7 +105,8 @@ class EncryptionClientGui(object):
             person_key_manager = PersonKeyManager(self._vault_client)
             encryptor = EncryptionClient(dataset_key_manager, person_key_manager)
             encryptor.grant_access(requester_uuid, dataset_uuid, expire_date) 
-            # print (self._frdr_api_client.get_submission(130))
+            data = {"expires": expire_date, "vault_dataset_id": dataset_uuid, "vault_requester_id": requester_uuid}
+            self._frdr_api_client.update_requestitem(data)
             return (True, None)
         except Exception as e:
             return (False, str(e))
