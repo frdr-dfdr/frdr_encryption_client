@@ -13,7 +13,7 @@ EXCLUDED_FILES: [".*",
                   "~$*", 
                   "NULLEXT"]
 APP_NAME: "fdrd-encryption-client"
-APP_AUTHOR: "Compute Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)"
+APP_AUTHOR: "Compute Canada"
 TIMEZONE: "America/Regina"
 GLOBUS_DATA_PUBLICATION_CLIENT_ID: "7dbc22b3-60c1-4e75-b148-3ee89f95792d"
 GLOBUS_DATA_PUBLICATION_CLIENT_NAME: "DataPublication Client v0.1"
