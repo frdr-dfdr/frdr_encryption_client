@@ -19,3 +19,4 @@ python-dateutil==2.8.1
 pytz==2020.4
 zerorpc==0.6.3
 globus_sdk==2.0.1
+PyYAML==5.4.1
