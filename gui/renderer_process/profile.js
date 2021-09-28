@@ -4,7 +4,7 @@ ipcRenderer.send("get-entity-id");
 
 ipcRenderer.on('notify-get-entity-id-done', function (event, result) {
   document.getElementById("vault_user_id").innerHTML = result;
-  ipcRenderer.send("get-entity-name", result);
+  // ipcRenderer.send("get-entity-name", result);
 });
 
 ipcRenderer.on('notify-get-entity-id-error', function (event, errMessage) {
