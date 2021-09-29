@@ -54,10 +54,6 @@ ipcRenderer.on('notify-login-oidc-error', function (event, errMessage) {
   alert(`Error logging in with Globus OAuth. \n${errMessage}`, "")
 });
 
-ipcRenderer.on('notify-get-auth-url-error', function (event, errMessage) {
-  alert(`Error getting oauth url to log into Vault. \n${errMessage}`, "")
-});
-
 ipcRenderer.on('notify-login-frdr-api-done', function (event) {
   frdr_api_authenticated = true;
   if (vault_authenticated && frdr_api_authenticated) {

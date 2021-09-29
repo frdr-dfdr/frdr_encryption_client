@@ -155,16 +155,6 @@ class EncryptionClientGui(object):
         except Exception as e:
             return (False, str(e))
 
-    def get_auth_url(self, hostname, hostname_pki):
-        return (self._vault_client.get_oidc_auth_url(hostname), None)
-    
-    def login_oidc_temp(self, auth_url):
-        try:
-            self._vault_client.login_oidc_temp(auth_url)
-            return (True, None)
-        except Exception as e:
-            return (False, str(e)) 
-
 if __name__ == "__main__":
     s = zerorpc.Server(EncryptionClientGui(tokenfile=tokenfile))
     s.bind("tcp://127.0.0.1:" + str(sys.argv[1]))
