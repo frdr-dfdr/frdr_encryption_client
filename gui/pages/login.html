@@ -95,24 +95,6 @@
       color: var(--login-banner-text);
     }
 
-    .hr-sect {
-      display: flex;
-      flex-basis: 100%;
-      align-items: center;
-      color: rgba(0, 0, 0, 0.35);
-      margin: 8px 0px 16px 0px;
-    }
-    .hr-sect::before,
-    .hr-sect::after {
-      content: "";
-      flex-grow: 1;
-      background: rgba(0, 0, 0, 0.35);
-      height: 1px;
-      font-size: 0px;
-      line-height: 0px;
-      margin: 0px 8px;
-    }
-
   </style>
 </head>
 
@@ -142,21 +124,6 @@
           <div class="text-center">
             <a id="globus_submit" href="#" class="btn-primary btn-login"> Login with Globus </a>
           </div>
-          
-          <div class="hr-sect">AND</div>
-
-          <div>
-            <label for="api_base_url">FRDR API Base URL</label>
-            <input id="api_base_url" type="text" style='width:90%;display:inline'/>
-            <a data-placement="top" data-toggle="tooltip" title="If running for development, probably http://127.0.0.1:8200.">
-              <span class="glyphicon glyphicon-question-sign" ></span>
-            </a>
-          </div>
-
-          <div class="text-center">
-            <a id="api_globus_submit" href="#" class="btn-primary btn-login"> Login with Globus </a>
-          </div>
-        </div>
   
     </div>
   </div>

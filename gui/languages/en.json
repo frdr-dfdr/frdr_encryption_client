@@ -59,6 +59,10 @@
   "app-depositor-grant-access-confirm-btn1": "Yes",
   "app-depositor-grant-access-confirm-btn2": "Cancel",
 
+  "app-depositor-grant-access-login-api": "You need to log into FRDR for access granting.",
+  "app-depositor-grant-access-login-api-btn1": "Login with Globus",
+  "app-depositor-grant-access-login-api-btn2": "Cancel",
+
   "app-depositor-grant-access-done": "Access Granted",
   "app-depositor-grant-access-error": "Error granting access. $1",
   "app-depositor-grant-access-find-user-error": "Error finding the user in Vault. \n$1.",

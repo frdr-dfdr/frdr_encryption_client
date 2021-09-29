@@ -19,7 +19,6 @@ const picker = flatpickr('#expiry_date', {
 function grantAccess() {
   var dataset = document.getElementById("dataset").value;
   var requester = document.getElementById("requester").value;
-  var result;
   var dialogOptions = {
     type: "question",
     buttons: [$.i18n("app-depositor-grant-access-confirm-btn1"), $.i18n("app-depositor-grant-access-confirm-btn2")],
@@ -27,7 +26,14 @@ function grantAccess() {
     title: "Confirmation",
     message: $.i18n("app-depositor-grant-access-confirm")
   }
-  ipcRenderer.send("get-entity-name", requester, dataset, expiryDate, dialogOptions);
+  var dialogOptions2 = {
+    type: "question",
+    buttons: [$.i18n("app-depositor-grant-access-login-api-btn1"), $.i18n("app-depositor-grant-access-login-api-btn2")],
+    defaultId: 1,
+    title: "Confirmation",
+    message: $.i18n("app-depositor-grant-access-login-api")
+  }
+  ipcRenderer.send("grant-access", requester, dataset, expiryDate, dialogOptions, dialogOptions2);
 }
 
 document.getElementById("grant_access").addEventListener("click", grantAccess);
@@ -42,4 +48,8 @@ ipcRenderer.on('notify-grant-access-done', function (event) {
 
 ipcRenderer.on('notify-grant-access-error', function (event, errMessage) {
   alert($.i18n('app-depositor-grant-access-error', errMessage), "");
+});
+
+ipcRenderer.on('notify-login-frdr-api-error', function (event, errMessage) {
+  alert(`Error logging in with Globus OAuth for FRDR API Usage.  \n${errMessage}`, "")
 });

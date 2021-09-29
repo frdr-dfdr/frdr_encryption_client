@@ -55,9 +55,11 @@ class EncryptionClientGui(object):
             self._logger.info(str(e))
             return (False, str(e))
     
-    def login_frdr_api_globus(self, base_url):
+    def login_frdr_api_globus(self, base_url=None):
         try:
             self._logger.info("Login with globus acccount for FRDR REST API usage") 
+            if base_url is None:
+                base_url = config.FRDR_API_BASE_URL
             self._frdr_api_client.login(base_url=base_url)    
             return (True, None)
         except Exception as e:
