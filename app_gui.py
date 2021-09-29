@@ -67,7 +67,7 @@ class EncryptionClientGui(object):
     def logout(self):
         try:
             self._vault_client.logout()
-            # webbrowser.open("https://auth.globus.org/v2/web/logout")
+            webbrowser.open("https://auth.globus.org/v2/web/logout")
             self._logger.info("Log out successfully")
             return (True, None)
         except Exception as e:

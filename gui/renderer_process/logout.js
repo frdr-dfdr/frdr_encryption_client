@@ -4,7 +4,6 @@ const {ipcRenderer} = require('electron');
 document.getElementById("logout").addEventListener("click", logout);
 
 function logout() {
-  // document.location.href = "https://auth.globus.org/v2/web/logout"
   ipcRenderer.send("logout");
 }
 
