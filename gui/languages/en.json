@@ -8,6 +8,12 @@
   },
   "app-name": "FRDR Encryption App",
   "app-desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.",
+  
+  "app-login-title": "Login Now",
+  "app-login-url-title": "Key Server URL",
+  "app-login-url-tooltip": "If running for development, probably http://127.0.0.1:8200.",
+  "app-login-btn": "Login with Globus",
+  
   "app-home-dep-btn": "Use as Depositor",
   "app-home-req-btn": "Use as Requester",
   "app-logout": "You have successfully logged out.",

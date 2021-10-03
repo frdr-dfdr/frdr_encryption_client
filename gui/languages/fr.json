@@ -8,6 +8,12 @@
   },
   "app-name": "Exemple d'application",
   "app-desc": "An example application with jquery.i18n",
+
+  "app-login-title": "FR Login Now",
+  "app-login-url-title": "FR Key Server URL",
+  "app-login-url-tooltip": "FR If running for development, probably http://127.0.0.1:8200.",
+  "app-login-btn": "FR Login with Globus",
+
   "app-home-dep-btn": "Utiliser en tant que déposant",
   "app-home-req-btn": "Utiliser en tant que demandeur",
   "app-logout": "Vous vous êtes déconnecté avec succès.",

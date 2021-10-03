@@ -16,6 +16,8 @@ var update_texts = function() {
       $('#locale-dropdown').html($.i18n('app-navbar-locale') + '<span class="caret"></span>');
 
       // tooltip
+      $('#login-url-tooltip').attr("data-original-title", $.i18n('app-login-url-tooltip'));
+
       $('#encrypt-input-tooltip').attr("data-original-title", $.i18n('app-depositor-encrypt-input-tooltip'));
       $('#encrypt-output-tooltip').attr("data-original-title", $.i18n('app-depositor-encrypt-output-tooltip'));
 
