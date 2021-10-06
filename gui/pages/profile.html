@@ -18,6 +18,11 @@
   <script src="../assests/js/jquery_i18n/jquery.i18n.parser.js"></script>
   <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.js"></script>
   <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.bidi.js"></script>
+  <style>
+    .tooltip-inner {
+      min-width: 50px;
+    }
+  </style>
 </head>
 
 <body>
@@ -38,7 +43,11 @@
 
     <div class="row">
       <label class="col-sm-offset-2 col-sm-3" data-i18n="app-profile-user-id"></label>
-      <div id="vault_user_id" class="col-sm-7"></div>
+        <div style="position: relative;">
+          <div id="vault_user_id" class="col-sm-6"></div>
+          <span id="copy_to_clipboard" data-toggle="tooltip" data-placement="bottom" class="glyphicon glyphicon-file js-copy"></span>
+        </div>
+      </div>
     </div>
   </div>
 

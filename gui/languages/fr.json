@@ -57,5 +57,14 @@
   "app-depositor-grant-access-expire-tooltip": "The date that this access is going to expire111111",
   "app-depositor-grant-access-button": "Grant Access111111",
   "app-depositor-grant-access-confirm": "!!!!! $1 22222 $2. \n\nDo you want to continue?",
-  "app-footer": "© 2021 DFDR Chiffrement Application 0.0.3"
+  "app-footer": "© 2021 DFDR Chiffrement Application 0.0.3",
+  "app-profile-title": "FR User Profile",
+  "app-profile-email": "FR Email",
+  "app-profile-user-id": "FR Vault User ID",
+  "app-profile-copy-to-clipboard": "FR Copy to clipboard",
+  "app-profile-copied": "FR Copied!",
+  "app-profile-copy-error": "FR Whoops, not copied!",
+  "app-profile-copy-error-2": "FR Copy to clipboard: Ctrl+C or Command+C, Enter",
+  "app-depositor-encrypt-input-missing": "FR Please select the dataset directory that you want to encrpyt."
+
 }

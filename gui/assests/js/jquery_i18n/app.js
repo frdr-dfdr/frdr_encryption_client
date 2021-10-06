@@ -28,6 +28,8 @@ var update_texts = function() {
       $('#decrypt-url-tooltip').attr("data-original-title", $.i18n('app-requester-decrypt-url-tooltip'));
       $('#decrypt-input-tooltip').attr("data-original-title", $.i18n('app-requester-decrypt-input-tooltip'));
       $('#decrypt-output-tooltip').attr("data-original-title", $.i18n('app-requester-decrypt-output-tooltip'));
+
+      $('#copy_to_clipboard').attr("data-original-title", $.i18n('app-profile-copy-to-clipboard'));
       
       $('[data-toggle="tooltip"]').tooltip();
     }
