@@ -40,13 +40,25 @@ function decrypt() {
   ipcRenderer.send("decrypt", options, input_path[0], output_path[0], url);
 }
 
-document.getElementById("decrypt").addEventListener("click", decrypt);
-
-
 ipcRenderer.on('notify-decrypt-done', function (event) {
   alert($.i18n('app-requester-decrypt-done'), "");
 });
 
 ipcRenderer.on('notify-decrypt-error', function (event, errMessage) {
   alert($.i18n('app-requester-decrypt-error', errMessage), "");
+});
+
+$('#decrypt').on("click", function(){
+  if ($("#key_url").val() == "") {
+    alert($.i18n('app-requester-decrypt-url-missing'));
+  }
+  else if (input_path == null){
+      alert($.i18n('app-requester-decrypt-input-missing'));
+  }
+  else if (output_path == null) {
+    alert($.i18n('app-requester-decrypt-output-missing'));
+  }
+  else {
+    decrypt();
+  }
 });

@@ -36,8 +36,6 @@ function grantAccess() {
   ipcRenderer.send("grant-access", requester, dataset, expiryDate, dialogOptions, dialogOptions2);
 }
 
-document.getElementById("grant_access").addEventListener("click", grantAccess);
-
 ipcRenderer.on('notify-get-entity-name-error', function (event, result) {
   alert($.i18n('app-depositor-grant-access-find-user-error', result), "");
 });
@@ -52,4 +50,16 @@ ipcRenderer.on('notify-grant-access-error', function (event, errMessage) {
 
 ipcRenderer.on('notify-login-frdr-api-error', function (event, errMessage) {
   alert(`Error logging in with Globus OAuth for FRDR API Usage.  \n${errMessage}`, "")
+});
+
+$('#grant_access').on("click", function(){
+  if ($("#dataset").val() == "") {
+    alert($.i18n('app-depositor-grant-access-dataset-missing'));
+  }
+  else if ($("#requester").val() == "") {
+    alert($.i18n('app-depositor-grant-access-requester-missing'));
+  }
+  else {
+    grantAccess();
+  }
 });

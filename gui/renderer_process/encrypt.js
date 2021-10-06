@@ -30,7 +30,6 @@ ipcRenderer.on('encrypt-selected-output-dir', function (event, path) {
 function encrypt() {
   ipcRenderer.send("encrypt", input_path[0], output_path[0]);
 }
-document.getElementById("encrypt").addEventListener("click", encrypt);
 
 ipcRenderer.on('notify-encrypt-done', function (event, result) {
   alert($.i18n('app-depositor-encrypt-done', result), "");
@@ -38,4 +37,16 @@ ipcRenderer.on('notify-encrypt-done', function (event, result) {
 
 ipcRenderer.on('notify-encrypt-error', function (event, result) {
   alert($.i18n('app-depositor-encrypt-error', result), "");
+});
+
+$('#encrypt').on("click", function(){
+  if (input_path == null){
+      alert($.i18n('app-depositor-encrypt-input-missing'));
+  }
+  else if (output_path == null) {
+    alert($.i18n('app-depositor-encrypt-output-missing'));
+  }
+  else {
+    encrypt();
+  }
 });
