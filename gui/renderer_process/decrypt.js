@@ -28,7 +28,7 @@ ipcRenderer.on('decrypt-selected-output-dir', function (event, path) {
 });
 
 function decrypt() {
-  var url = document.getElementById("key_url").value;
+  var url = document.getElementById("key_url").value.trim();
   var dataset = url.split("/").reverse()[1];
   var options = {
     type: "question",

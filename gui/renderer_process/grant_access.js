@@ -17,8 +17,8 @@ const picker = flatpickr('#expiry_date', {
 });
 
 function grantAccess() {
-  var dataset = document.getElementById("dataset").value;
-  var requester = document.getElementById("requester").value;
+  var dataset = document.getElementById("dataset").value.trim();
+  var requester = document.getElementById("requester").value.trim();
   var dialogOptions = {
     type: "question",
     buttons: [$.i18n("app-depositor-grant-access-confirm-btn1"), $.i18n("app-depositor-grant-access-confirm-btn2")],
