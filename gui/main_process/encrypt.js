@@ -42,6 +42,16 @@ ipcMain.on('encrypt', (event, input_path, output_path) => {
     if (success){
       event.reply('notify-encrypt-done', result);
       shell.showItemInFolder(result);
+      var currentWindow = BrowserWindow.getFocusedWindow();
+      currentWindow.loadURL(require('url').format({
+        pathname: path.join(__dirname, '../pages/depositor-encrypt-done.html'),
+        protocol: 'file:',
+        slashes: true
+      }));
+    
+      currentWindow.once('ready-to-show', () => {
+        currentWindow.show()
+      });
     } else {
       event.reply('notify-encrypt-error', result);
     }

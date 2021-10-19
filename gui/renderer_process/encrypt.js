@@ -1,4 +1,4 @@
-const {ipcRenderer} = require('electron');
+const {ipcRenderer, BrowserWindow} = require('electron');
 
 let input_path = null;
 let output_path = null;
