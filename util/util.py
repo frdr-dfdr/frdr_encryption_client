@@ -11,6 +11,7 @@ from email.mime.multipart import MIMEMultipart
 from configparser import ConfigParser
 from pathlib import Path
 from util.config_loader import config
+import socket
 
 logger = logging.getLogger("fdrd-encryption-client.util")
 
@@ -147,3 +148,20 @@ class Util(object):
     
         with smtplib.SMTP(host) as server:
             server.sendmail(from_addr, to_addr, message.as_string())
+
+    @classmethod
+    def find_free_port(cls, 
+            port=config.VAULT_CLIENT_LOGIN_REDIRECT_PORT_MIN, 
+            max_port=config.VAULT_CLIENT_LOGIN_REDIRECT_PORT_MAX):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        while port <= max_port:
+            try:
+                sock.bind(('', port))
+                sock.close()
+                print (port)
+                return port
+            except OSError:
+                port += 1
+        raise IOError("The app needs to use a port between {} and {} for login process. \
+                        Please free a port." \
+                        .format(config.VAULT_CLIENT_LOGIN_REDIRECT_PORT_MIN, config.VAULT_CLIENT_LOGIN_REDIRECT_PORT_MAX))

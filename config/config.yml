@@ -18,10 +18,14 @@ TIMEZONE: "America/Regina"
 GLOBUS_DATA_PUBLICATION_CLIENT_ID: "7dbc22b3-60c1-4e75-b148-3ee89f95792d"
 GLOBUS_DATA_PUBLICATION_CLIENT_NAME: "DataPublication Client v0.1"
 FRDR_API_BASE_URL: "https://dev4.frdr.ca/v1/api"
+FRDR_API_LOGIN_TIMEOUT: 60
 
 # Dataset key server configuration
 VAULT_DATASET_KEY_PATH: "dataset"
 VAULT_HOSTNAME: "https://vault-dev.frdr.ca"
+VAULT_CLIENT_LOGIN_REDIRECT_PORT_MIN: 8250
+VAULT_CLIENT_LOGIN_REDIRECT_PORT_MAX: 8254
+VAULT_LOGIN_TIMEOUT: 60
 
 # Person key server configuration
 VAULT_PUBLIC_KEY_PATH: "public_key"

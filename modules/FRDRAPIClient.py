@@ -1,3 +1,4 @@
+from util.util import Util
 from globus_sdk import RefreshTokenAuthorizer, NativeAppAuthClient
 from globus_sdk.base import BaseClient
 import logging
@@ -51,18 +52,22 @@ class FRDRAPIClient(BaseClient):
     def _interactive_login(self):
         native_client = self._load_auth_client()
 
+        port = Util.find_free_port()
         native_client.oauth2_start_flow(
             requested_scopes=('urn:globus:auth:scope:publish.api.frdr.org:all'),
             refresh_tokens=True, 
-            redirect_uri='http://localhost:8350')
+            redirect_uri='http://localhost:{}'.format(port))
         auth_url = native_client.oauth2_get_authorize_url()
         webbrowser.open(auth_url)
-        auth_code = self._login_get_token()
+        auth_code = self._login_get_token(port)
+
+        if auth_code is None:
+            raise TimeoutError("You login process has expired. Please try again")      
 
         tkns = native_client.oauth2_exchange_code_for_tokens(auth_code)
         return self._token_response_to_dict(tkns)
 
-    def _login_get_token(self):
+    def _login_get_token(self, port):
 
         class HttpServ(HTTPServer):
             def __init__(self, *args, **kwargs):
@@ -79,8 +84,9 @@ class FRDRAPIClient(BaseClient):
                 self.end_headers()
                 self.wfile.write(str.encode('<div>Authentication successful, you can close the browser now.</div>'))
 
-        server_address = ('', 8350)
+        server_address = ('', port)
         httpd = HttpServ(server_address, AuthHandler)
+        httpd.timeout = config.FRDR_API_LOGIN_TIMEOUT
         httpd.handle_request()
         return httpd.token
 
@@ -100,7 +106,7 @@ class FRDRAPIClient(BaseClient):
             self._pub_client = pub_client
         except Exception as e: 
             self._logger.error("Failed to auth for FRDR API usage. {}".format(e))
-            raise Exception
+            raise Exception(e)
 
     def get_submission(self, submission_id):
         return self._pub_client.get_submission(submission_id)

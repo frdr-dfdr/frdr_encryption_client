@@ -29,7 +29,12 @@
       line-height: 20px;
       text-decoration: none; /* remove underline from anchors */
       text-align: center;
-      
+    }
+
+    .btn-login:disabled,
+    .btn-login:disabled:hover
+    {
+      background-color: rgb(214, 214, 214);
     }
 
     .login-block{
@@ -145,7 +150,7 @@
           </div>
 
           <div class="text-center">
-            <a id="globus_submit" href="#" class="btn-primary btn-login" data-i18n="app-login-btn"></a>
+            <button id="globus_submit" class="btn-primary btn-login" data-i18n="app-login-btn"></button>
           </div>
   
     </div>

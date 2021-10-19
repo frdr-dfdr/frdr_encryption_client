@@ -3,6 +3,9 @@ import os
 import logging 
 import webbrowser
 from urllib import parse
+from util.util import Util
+from util.config_loader import config
+from hvac.exceptions import InvalidRequest
 
 class VaultClient(object):
     def __init__(self):
@@ -39,9 +42,10 @@ class VaultClient(object):
                     # return False
                 else:
                     path = "oidc/" + oauth_type
+                port = Util.find_free_port()
                 response = self.hvac_client.auth.jwt.oidc_authorization_url_request(
                     role='',
-                    redirect_uri='http://localhost:8250/{}/callback'.format(path),
+                    redirect_uri='http://localhost:{}/{}/callback'.format(port, path),
                     path=path
                 )
                 auth_url = response['data']['auth_url']
@@ -50,17 +54,20 @@ class VaultClient(object):
                 auth_url_state = params['state'][0]
 
                 webbrowser.open(auth_url)
-                token = self._login_odic_get_token()
+                token = self._login_odic_get_token(port)
 
                 auth_result = self.hvac_client.auth.oidc.oidc_callback(
                     code=token, path=path, nonce=auth_url_nonce, state=auth_url_state
                 )
                 self._vault_token = auth_result['auth']['client_token']
                 self._entity_id = auth_result['auth']['entity_id']                
-                                                 
+            except InvalidRequest as ir:
+                self._logger.error("Failed to auth with {} account using oidc method. {}".format(oauth_type, ir))  
+                #TODO: rewording
+                raise TimeoutError("You login process has expired. Please try again")      
             except Exception as e:
                 self._logger.error("Failed to auth with {} account using oidc method. {}".format(oauth_type, e))
-                raise Exception
+                raise Exception(e)
 
         self.hvac_client.token = self._vault_token
         try:
@@ -192,13 +199,14 @@ class VaultClient(object):
                 self._logger.error("error {}".format(e))
                  
     # handles the callback
-    def _login_odic_get_token(self):
+    def _login_odic_get_token(self, port):
         from http.server import BaseHTTPRequestHandler, HTTPServer
 
         class HttpServ(HTTPServer):
             def __init__(self, *args, **kwargs):
                 HTTPServer.__init__(self, *args, **kwargs)
                 self.token = None
+                self.allow_reuse_address = True
 
         class AuthHandler(BaseHTTPRequestHandler):
             token = ''
@@ -210,8 +218,9 @@ class VaultClient(object):
                 self.end_headers()
                 self.wfile.write(str.encode('<div>Authentication successful, you can close the browser now.</div>'))
 
-        server_address = ('', 8250)
+        server_address = ('', port)
         httpd = HttpServ(server_address, AuthHandler)
+        httpd.timeout = config.VAULT_LOGIN_TIMEOUT
         httpd.handle_request()
         return httpd.token 
 
