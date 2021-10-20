@@ -15,6 +15,13 @@ var update_texts = function() {
       $('#requester-dropdown').html($.i18n('app-navbar-requester') + '<span class="caret"></span>');
       $('#locale-dropdown').html($.i18n('app-navbar-locale') + '<span class="caret"></span>');
 
+      // Add hyperlink to open FRDR profile page on request access page
+      $('#vault-id-intro').html($.i18n('app-requester-request-access-intro1') 
+          + '<a id="open-frdr-profile">' + $.i18n('app-requester-request-access-profile') +'</a>'
+          + $.i18n('app-requester-request-access-intro2'));
+
+      document.getElementById("open-frdr-profile").addEventListener("click", openFRDRProfile);
+
       // tooltip
       $('#login-url-tooltip').attr("data-original-title", $.i18n('app-login-url-tooltip'));
 
@@ -30,6 +37,7 @@ var update_texts = function() {
       $('#decrypt-output-tooltip').attr("data-original-title", $.i18n('app-requester-decrypt-output-tooltip'));
 
       $('#copy_to_clipboard').attr("data-original-title", $.i18n('app-profile-copy-to-clipboard'));
+      
       
       $('[data-toggle="tooltip"]').tooltip();
     }

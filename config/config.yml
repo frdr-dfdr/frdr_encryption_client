@@ -19,6 +19,7 @@ GLOBUS_DATA_PUBLICATION_CLIENT_ID: "7dbc22b3-60c1-4e75-b148-3ee89f95792d"
 GLOBUS_DATA_PUBLICATION_CLIENT_NAME: "DataPublication Client v0.1"
 FRDR_API_BASE_URL: "https://dev4.frdr.ca/v1/api"
 FRDR_API_LOGIN_TIMEOUT: 60
+FRDR_PROFILE_URL: "https://dev4.frdr.ca/repo/profile"
 
 # Dataset key server configuration
 VAULT_DATASET_KEY_PATH: "dataset"

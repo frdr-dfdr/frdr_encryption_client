@@ -83,6 +83,9 @@
   "app-depositor-grant-access-find-user-error": "Error finding the user in Vault. \n$1.",
 
   "app-requester-request-access-title": "Show Vault ID",
+  "app-requester-request-access-intro1": "You can either copy this ID to the Vault ID field when you create a new access request on FRDR, or save this ID on ",
+  "app-requester-request-access-profile": "Profile",
+  "app-requester-request-access-intro2": " page on FRDR.",
   "app-requester-request-access-button": "Show Vault ID",
   "app-requester-request-access-confirm-msg": "Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.",
   "app-requester-request-access-confirm-btn": "Copy to Clipboard",

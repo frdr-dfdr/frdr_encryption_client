@@ -1,4 +1,18 @@
-const {ipcRenderer} = require('electron');
+const {ipcRenderer, shell} = require('electron');
+const fs = require('fs');
+const yaml = require('js-yaml');
+const path = require('path');
+
+var profileURL = null;
+
+try {
+  let fileContents = fs.readFileSync(path.join(__dirname, '../../config/config.yml'), 'utf8');
+  let config = yaml.load(fileContents);
+  profileURL = config["FRDR_PROFILE_URL"];
+} catch (e) {
+  // TODO: log error?
+  console.log(e);
+}
 
 function generateAccessRequest() {
   var dialogOptions = {
@@ -24,3 +38,9 @@ document.getElementById("request-access").addEventListener("click", generateAcce
 ipcRenderer.on('notify-request-access-error', function (event, result) {
   alert($.i18n('app-requester-request-access-error', result), "");
 });
+
+function openFRDRProfile() {
+  shell.openExternal(profileURL);
+}
+
+document.getElementById("open-frdr-profile").addEventListener("click", openFRDRProfile);
