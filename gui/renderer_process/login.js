@@ -10,9 +10,8 @@ try {
     let config = yaml.load(fileContents);
     document.getElementById('hostname').value = config['VAULT_HOSTNAME'];
     timeout = config["VAULT_LOGIN_TIMEOUT"];
-
 } catch (e) {
-  // TODO: log error?
+  // log error, but the login workflow still works
   console.log(e);
 }
 

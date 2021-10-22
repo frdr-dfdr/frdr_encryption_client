@@ -13,7 +13,6 @@ class VaultClient(object):
         self._vault_auth = None
         self._entity_id = None
         self.hvac_client = hvac.Client()
-        # TODO: decide whether need this
         self._vault_token = None
 
     def login(self, vault_addr, auth_method, username=None, password=None, oauth_type=None):
@@ -25,8 +24,6 @@ class VaultClient(object):
             try:
                 response = self.hvac_client.auth.userpass.login(username, password)
                 self._vault_token = response["auth"]["client_token"]
-                if self._tokenfile:
-                    self.write_token_to_file()
                 return True
             except Exception:
                 self._logger.error("Failed to auth with userpass method.")
@@ -84,20 +81,6 @@ class VaultClient(object):
         except Exception:
             self._logger.error("Failed to log out of Vault.")
             raise Exception
-        
-    def load_token_from_file(self):
-        if os.path.exists(self._tokenfile):
-            with open(self._tokenfile) as f:
-                self._vault_token = f.read()
-            if self._vault_token is not None:
-                return True
-        return None
-    
-    def write_token_to_file(self):
-        #TODO: decide whether to save auth to file or not
-        pass
-        # with open(self._tokenfile, "w") as f:
-        #     f.write(self._vault_token)  
    
     def enable_transit_engine(self):
         try:
@@ -229,16 +212,6 @@ class VaultClient(object):
         if self._vault_auth is None:
             self._vault_auth = self.lookup_token()
         return self._vault_auth
-
-    # @property
-    # def vault_token(self):
-    #     # self._vault_token is an empty string, not None
-    #     if not self._vault_token:
-    #         if self.load_token_from_file():
-    #             self._logger.info("Token loaded from file")
-    #         else:
-    #             self.login(self._auth_method, self._username, self._password, self._oauth_type)
-    #     return self._vault_token
 
     @property
     def entity_id(self):

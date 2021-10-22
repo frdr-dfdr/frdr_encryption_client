@@ -22,6 +22,7 @@ Options:
   --frdr_api_url=<url>
   --loglevel=<l>  loglevel [default: info].
 """
+
 from modules.FRDRAPIClient import FRDRAPIClient
 from modules.PersonKeyManager import PersonKeyManager
 from modules.EncryptionClient import EncryptionClient
@@ -52,20 +53,13 @@ def main():
         vault_client = VaultClient()
 
         if (arguments["encrypt"]) and (not Util.check_dir_exists(arguments["--input"])):
-            logger.error("The input directory does not exist.")
-            # TODO: raise Exception or return to exit
-            # raise Exception
-            return 
+            raise ValueError("The input directory does not exist.")
 
         if (arguments["decrypt"]) and (not Util.check_dir_exists(arguments["--input"])):
-            logger.error("The input zip file does not exist.")
-            # TODO: raise Exception or return to exit
-            return 
+            raise ValueError("The input zip file does not exist.") 
         
         if (arguments["--output"] is not None) and (not Util.check_dir_exists(arguments["--output"])):
-            logger.error("The output directory does not exist.")
-            # TODO: raise Exception or return to exit
-            return 
+            raise ValueError("The output directory does not exist.") 
 
         if arguments["--vault"]:
             if arguments["--username"]:
@@ -79,9 +73,8 @@ def main():
             
             if arguments["encrypt"]:
                 if not Util.check_dir_exists(arguments["--input"]):
-                    logger.error("The input directory does not exist.")
-                    # TODO: raise Exception or return to exit
-                    return 
+                    raise ValueError("The input directory does not exist.")
+
                 dataset_uuid = str(uuid.uuid4())  
                 dataset_key_manager = DatasetKeyManager(vault_client)
                 person_key_manager = PersonKeyManager(vault_client)
@@ -119,7 +112,9 @@ def main():
                 person_key_manager.create_or_retrieve_public_key()
                 print ("Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.")
                 print (Util.wrap_text(entity_id))
-                           
+
+    except ValueError as ve:
+        logger.error(ve)              
     except Exception as e:
         logger.error("Exception caught, exiting. {}".format(e), exc_info=True)
 

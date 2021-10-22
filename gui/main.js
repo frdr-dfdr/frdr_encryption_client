@@ -31,7 +31,6 @@ const PY_MODULE = 'app_gui'
 let pythonChild = null
 let mainWindow = null
 
-//TODO: this is for?
 const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
 
 const guessPackaged = () => {

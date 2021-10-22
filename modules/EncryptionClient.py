@@ -21,6 +21,9 @@ class EncryptionClient(object):
         if input_dir is not None:
             self._input = Util.clean_dir_path(input_dir)
         self._output = output_dir
+        if self._output is None:
+            # default output path is the desktop
+            self._output = os.path.expanduser("~/Desktop/")
 
     def encrypt(self, dataset_uuid):
         logger = logging.getLogger('fdrd-encryption-client.encrypt')
@@ -33,14 +36,9 @@ class EncryptionClient(object):
         if os.path.isdir(bag_dir_parent):
             shutil.rmtree(bag_dir_parent)
         bag_dir = os.path.join(bag_dir_parent, 'bag')
-        #TODO: check the difference between makedirs and mkdir
         os.makedirs(bag_dir)   
-        # encrypt each file in the dirname
-        # TODO: move this to the init function
-        if self._output is None:
-            # default output path is the desktop
-            self._output = os.path.expanduser("~/Desktop/")
-        
+
+        # encrypt each file in the dirname        
         if os.path.isdir(self._input):
             zip_filepath = self._compress_folder(self._input, bag_dir)
             self._encrypt_file(zip_filepath, logger)
@@ -54,7 +52,7 @@ class EncryptionClient(object):
             bag.info['Dataset-UUID'] = dataset_uuid
             bag.save()
         except (bagit.BagError, Exception) as e:
-            # TODO: log error
+            logger.error("Error creating a bag of the encrypted package.")
             return False
         
         # zip bag dir and move it to the output path

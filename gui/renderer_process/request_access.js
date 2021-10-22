@@ -10,7 +10,7 @@ try {
   let config = yaml.load(fileContents);
   profileURL = config["FRDR_PROFILE_URL"];
 } catch (e) {
-  // TODO: log error?
+  // log error, the link to FRDR profile page is not working
   console.log(e);
 }
 
