@@ -37,6 +37,12 @@ class PersonKeyManager(object):
             private_key = f.read()
         self._logger.info("Private key is read from local path {}".format(filename))
         return private_key
+    
+    def read_public_key_locally(self, filename):
+        with open(filename, "rb") as f:
+            public_key = f.read()
+        self._logger.info("Public key is read from local path {}".format(filename))
+        return public_key
 
     def extract_public_key_from_cert(self, cert):
         certificate = x509.load_pem_x509_certificate(
@@ -68,6 +74,9 @@ class PersonKeyManager(object):
 
     def create_or_retrieve_public_key(self):
         public_key_on_vault = self.read_public_key_from_vault(self.get_vault_entity_id())
+
+        # If there is no public key saved on Vault, a new pair of keys is generated and saved locally, and the public
+        # key is saved on Vault
         if public_key_on_vault is None:
             self._logger.info("No public key is saved on Vault for the current user, generating a pair of public and private key")
             cert, private_key = self.generate_certificate()
@@ -79,6 +88,12 @@ class PersonKeyManager(object):
             self.save_public_key_to_vault(public_key)
             return public_key
         else:
+            # # Check if public key saved on Vault is the same as the public key saved locally. 
+            # # If not, raise ValueError
+            # public_key_path = os.path.join(Util.get_key_dir(self.get_vault_entity_id()), config.LOCAL_PUBLIC_KEY_FILENAME)
+            # public_key_local = self.read_public_key_locally(public_key_path)
+            # if public_key_local != public_key_on_vault:
+            #     raise ValueError("The public key saved locally does not match the key saved on Vault.")
             return public_key_on_vault
 
     @property
