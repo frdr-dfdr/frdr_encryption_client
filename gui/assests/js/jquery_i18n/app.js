@@ -20,7 +20,9 @@ var update_texts = function() {
           + '<a id="open-frdr-profile">' + $.i18n('app-requester-request-access-profile') +'</a>'
           + $.i18n('app-requester-request-access-intro2'));
 
-      document.getElementById("open-frdr-profile").addEventListener("click", openFRDRProfile);
+      $('#open-frdr-profile').on("click", function(){
+        openFRDRProfile();
+      });
 
       // tooltip
       $('#login-url-tooltip').attr("data-original-title", $.i18n('app-login-url-tooltip'));
