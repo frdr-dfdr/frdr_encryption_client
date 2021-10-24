@@ -1,17 +1,20 @@
 # App configuration
-VERSION: '0.0.3'
-EXCLUDED_FILES: [".*", 
-                  "Thumbs.db", 
-                  ".DS_Store", 
-                  "._.DS_Store", 
-                  ".localized", 
-                  "desktop.ini", 
-                  "*.pyc", 
-                  "*.swx",
-                  "*.swp", 
-                  "*~", 
-                  "~$*", 
-                  "NULLEXT"]
+VERSION: "0.0.3"
+EXCLUDED_FILES:
+  [
+    ".*",
+    "Thumbs.db",
+    ".DS_Store",
+    "._.DS_Store",
+    ".localized",
+    "desktop.ini",
+    "*.pyc",
+    "*.swx",
+    "*.swp",
+    "*~",
+    "~$*",
+    "NULLEXT",
+  ]
 APP_NAME: "fdrd-encryption-client"
 APP_AUTHOR: "Compute Canada"
 TIMEZONE: "America/Regina"
@@ -20,10 +23,12 @@ GLOBUS_DATA_PUBLICATION_CLIENT_NAME: "DataPublication Client v0.1"
 FRDR_API_BASE_URL: "https://dev4.frdr.ca/v1/api"
 FRDR_API_LOGIN_TIMEOUT: 60
 FRDR_PROFILE_URL: "https://dev4.frdr.ca/repo/profile"
+FRDR_CONTACTUS_URL: "https://dev4.frdr.ca/repo/contactus?locale="
 
 # Dataset key server configuration
 VAULT_DATASET_KEY_PATH: "dataset"
 VAULT_HOSTNAME: "https://vault-dev.frdr.ca"
+# VAULT_HOSTNAME: "https://frdrvault.mit.c3.ca/"
 VAULT_CLIENT_LOGIN_REDIRECT_PORT_MIN: 8250
 VAULT_CLIENT_LOGIN_REDIRECT_PORT_MAX: 8254
 VAULT_LOGIN_TIMEOUT: 60
@@ -31,7 +36,9 @@ VAULT_LOGIN_TIMEOUT: 60
 # Person key server configuration
 VAULT_PUBLIC_KEY_PATH: "public_key"
 VAULT_GENERATE_CERT_ROLE_NAME: "example-dot-com"
+# VAULT_GENERATE_CERT_ROLE_NAME: "frdr-dot-ca"
 VAULT_GENERATE_CERT_COMMON_NAME: "test.vault-dev.frdr.ca"
+# VAULT_GENERATE_CERT_COMMON_NAME: "test.frdr-dfdr.ca"
 VAULT_GENERATE_CERT_MOUNT_NAME: "pki_int"
 LOCAL_KEY_DIR_NAME: "frdr_keys"
 LOCAL_PRIVATE_KEY_FILENAME: "private.key"

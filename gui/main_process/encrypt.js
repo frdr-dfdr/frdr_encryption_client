@@ -35,7 +35,7 @@ ipcMain.on('encrypt', (event, input_path, output_path) => {
   childWindow.once('ready-to-show', () => {
     childWindow.show()
   });
-  client.invoke("encrypt", input_path, output_path, function(error, res, more) {
+  client.invoke("encrypt", input_path, output_path, function(_error, res) {
     childWindow.close();
     var success = res[0];
     var result = res[1];

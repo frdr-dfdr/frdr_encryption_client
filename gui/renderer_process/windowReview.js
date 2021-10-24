@@ -1,3 +1,4 @@
+// Not using it now, keep it for future feature
 "use strict";
 
 const notifier = require('node-notifier');

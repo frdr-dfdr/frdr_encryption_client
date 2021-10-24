@@ -1,7 +1,7 @@
-const {ipcMain, BrowserWindow} = require('electron');
+const {ipcMain} = require('electron');
  
 ipcMain.on('logout', (event) => {
-  client.invoke("logout", function(error, res, more) {
+  client.invoke("logout", function(_error, res) {
     var success = res[0];
     var result = res[1];
     console.log(success);

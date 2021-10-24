@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from collections import defaultdict
 import datetime
+import hvac
 import nacl.utils
 import nacl.secret
 import os
@@ -13,6 +15,8 @@ import tempfile
 from zipfile import ZipFile
 import bagit
 import re
+import json
+
 
 class EncryptionClient(object):
     def __init__(self, dataset_key_manager, person_key_manager, input_dir=None, output_dir=None):
@@ -28,7 +32,7 @@ class EncryptionClient(object):
     def encrypt(self, dataset_uuid):
         logger = logging.getLogger('fdrd-encryption-client.encrypt')
 
-        # generate key 
+        # generate key
         self._dataset_key_manager.generate_key()
         self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
 
@@ -36,16 +40,16 @@ class EncryptionClient(object):
         if os.path.isdir(bag_dir_parent):
             shutil.rmtree(bag_dir_parent)
         bag_dir = os.path.join(bag_dir_parent, 'bag')
-        os.makedirs(bag_dir)   
+        os.makedirs(bag_dir)
 
-        # encrypt each file in the dirname        
+        # encrypt each file in the dirname
         if os.path.isdir(self._input):
             zip_filepath = self._compress_folder(self._input, bag_dir)
             self._encrypt_file(zip_filepath, logger)
             os.remove(zip_filepath)
         else:
             self._encrypt_file(self._input, logger)
-        
+
         try:
             bag = bagit.make_bag(bag_dir, None, 1, ['sha256'])
             bag.info['Depositor-Entity-ID'] = self._dataset_key_manager.get_vault_entity_id()
@@ -54,32 +58,40 @@ class EncryptionClient(object):
         except (bagit.BagError, Exception) as e:
             logger.error("Error creating a bag of the encrypted package.")
             return False
-        
+
         # zip bag dir and move it to the output path
-        bag_destination = os.path.join(str(bag_dir_parent), (os.path.basename(self._input)+"_bag"))
+        bag_destination = os.path.join(
+            str(bag_dir_parent), (os.path.basename(self._input)+"_bag"))
         zipname = shutil.make_archive(bag_destination, 'zip', bag_dir)
         shutil.rmtree(bag_dir)
         bag_output_path = os.path.join(self._output, os.path.basename(zipname))
         shutil.move(zipname, bag_output_path)
 
         # save key
-        self._dataset_key_manager.encrypt_key(self._person_key_manager.my_public_key)
-        self._dataset_key_manager.save_key("/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid]))
-        
+        self._dataset_key_manager.encrypt_key(
+            self._person_key_manager.my_public_key)
+        self._dataset_key_manager.save_key(
+            "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid]))
+
         return bag_output_path
 
     def decrypt(self, url):
         logger = logging.getLogger('fdrd-encryption-client.decrypt')
 
         depositor_uuid, dataset_uuid, requester_uuid = self._parse_url(url)
-        if requester_uuid == "" :
-            assert self._dataset_key_manager.get_vault_entity_id() == depositor_uuid, "The url you provide is not correct"
-            encrypted_data_key_path =  "/".join([config.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid])
+        if requester_uuid == "":
+            assert self._dataset_key_manager.get_vault_entity_id(
+            ) == depositor_uuid, "The url you provide is not correct"
+            encrypted_data_key_path = "/".join(
+                [config.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid])
         else:
-            encrypted_data_key_path = "/".join([config.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid, requester_uuid])
+            encrypted_data_key_path = "/".join(
+                [config.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid, requester_uuid])
         self._dataset_key_manager.read_key(encrypted_data_key_path)
-        private_key_path = os.path.join(Util.get_key_dir(self._dataset_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
-        user_private_key = self._person_key_manager.read_private_key(private_key_path)
+        private_key_path = os.path.join(Util.get_key_dir(
+            self._dataset_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
+        user_private_key = self._person_key_manager.read_private_key(
+            private_key_path)
         self._dataset_key_manager.decrypt_key(user_private_key)
         self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
 
@@ -88,8 +100,9 @@ class EncryptionClient(object):
             self._output = os.path.expanduser("~/Desktop/")
         # if the input is the decrypted package
         if os.path.basename(self._input).endswith("encrypted"):
-            decrypted_filename = self._decrypt_file(self._input, logger)  
-            shutil.move(decrypted_filename, os.path.join(self._output, os.path.basename(decrypted_filename))) 
+            decrypted_filename = self._decrypt_file(self._input, logger)
+            shutil.move(decrypted_filename, os.path.join(
+                self._output, os.path.basename(decrypted_filename)))
         # if the input is the zipped bag
         else:
             bag_dir_parent = tempfile.mkdtemp()
@@ -101,45 +114,92 @@ class EncryptionClient(object):
                 for filename in files:
                     encrypted_filename = os.path.join(root, filename)
             decrypted_filename = self._decrypt_file(encrypted_filename, logger)
-            shutil.move(decrypted_filename, os.path.join(self._output, os.path.basename(decrypted_filename)))
+            shutil.move(decrypted_filename, os.path.join(
+                self._output, os.path.basename(decrypted_filename)))
             shutil.rmtree(bag_dir_parent)
         return True
 
     def grant_access(self, requester_entity_id, dataset_id, expiry_date=None):
         if expiry_date is None:
-            expiry_date = (datetime.date.today() + datetime.timedelta(days=14)).strftime("%Y-%m-%d")
+            expiry_date = (datetime.date.today() +
+                           datetime.timedelta(days=14)).strftime("%Y-%m-%d")
 
         # read encrypted data key from Vault
-        encrypted_data_key_path = "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_id])
+        encrypted_data_key_path = "/".join([config.VAULT_DATASET_KEY_PATH,
+                                           self._dataset_key_manager.get_vault_entity_id(), dataset_id])
         self._dataset_key_manager.read_key(encrypted_data_key_path)
-        
+
         # decrypt the encrypted data key with the depositor private key
-        private_key_path = os.path.join(Util.get_key_dir(self._dataset_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
-        depositor_private_key = self._person_key_manager.read_private_key(private_key_path)
+        private_key_path = os.path.join(Util.get_key_dir(
+            self._dataset_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
+        depositor_private_key = self._person_key_manager.read_private_key(
+            private_key_path)
         self._dataset_key_manager.decrypt_key(depositor_private_key)
 
         # encrypt the encrypted data key with the requester public key
-        requester_public_key = self._person_key_manager.read_public_key_from_vault(requester_entity_id)
+        requester_public_key = self._person_key_manager.read_public_key_from_vault(
+            requester_entity_id)
         self._dataset_key_manager.encrypt_key(requester_public_key)
-        path_on_vault = "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_id, requester_entity_id])
-        self._dataset_key_manager.set_key_expiry_date(path_on_vault, expiry_date)
+        path_on_vault = "/".join([config.VAULT_DATASET_KEY_PATH,
+                                 self._dataset_key_manager.get_vault_entity_id(), dataset_id, requester_entity_id])
+        self._dataset_key_manager.set_key_expiry_date(
+            path_on_vault, expiry_date)
         self._dataset_key_manager.save_key(path_on_vault)
-        
+
+    # TODO: keep for future feature
+    def list_shares(self):
+        members = {}
+        members["entity_id"] = self._depositor_entity_id
+        members["data"] = []
+        depositor_datasets = self._list_datasets()
+        if depositor_datasets is None:
+            return None
+        for each_dataset_id in depositor_datasets:
+            group_name = "_".join(
+                (self._depositor_entity_id, each_dataset_id, "share_group"))
+            each_dataset_members = {}
+            each_dataset_members["dataset_id"] = each_dataset_id
+            each_dataset_members["members"] = []
+            try:
+                read_group_response = self._vault_client.read_group_by_name(
+                    group_name)
+            except hvac.exceptions.InvalidPath:
+                continue
+            metadata = read_group_response["data"]["metadata"]
+            if metadata is None:
+                continue
+            metadata_defaultdict = defaultdict(lambda: 'None', metadata)
+            for each_member_id in self._list_shares_per_group(group_name):
+                each_member_name = self._vault_client.read_entity_by_id(
+                    each_member_id)
+                each_member = {"entity_id": each_member_id, "entity_name": each_member_name,
+                               "expiry_date": metadata_defaultdict[each_member_id].split(",")[0]}
+                each_dataset_members["members"].append(each_member)
+            members["data"].append(each_dataset_members)
+        return json.dumps(members)
+
+    # TODO: keep for future feature
+    def _list_datasets(self):
+        return self._vault_client.list_secrets(self._depositor_entity_id)
+
     def _encrypt_file(self, filename, logger):
         if self._file_excluded(filename, config.EXCLUDED_FILES):
             return False
-        encrypted_filename = os.path.join(os.path.dirname(filename), os.path.basename(filename) + ".encrypted")
+        encrypted_filename = os.path.join(os.path.dirname(filename),
+                                          os.path.basename(filename) + ".encrypted")
         with open(filename, 'rb') as f:
             message = f.read()
         encrypted = self.box.encrypt(message)
         with open(encrypted_filename, 'wb') as f:
-            f.write(encrypted) 
-        assert len(encrypted) == len(message) + self.box.NONCE_SIZE + self.box.MACBYTES
+            f.write(encrypted)
+        assert len(encrypted) == len(message) + \
+            self.box.NONCE_SIZE + self.box.MACBYTES
         logger.info("File {} is encrypted.".format(filename))
         return True
 
     def _decrypt_file(self, filename, logger):
-        decrypted_filename = os.path.join(os.path.dirname(filename), '.'.join(os.path.basename(filename).split('.')[:-1])) 
+        decrypted_filename = os.path.join(os.path.dirname(filename),
+                                          '.'.join(os.path.basename(filename).split('.')[:-1]))
         with open(filename, 'rb') as f:
             encrypted_message = f.read()
         decrypted = self.box.decrypt(encrypted_message)
@@ -150,7 +210,7 @@ class EncryptionClient(object):
 
     # get relative path of all files in the input dir
     # return relative paths of all files and subdirs in the dir
-    def _get_files_list(self, dirname):  
+    def _get_files_list(self, dirname):
         files_list = os.listdir(dirname)
         all_files = list()
         all_subdirs = list()
@@ -165,7 +225,7 @@ class EncryptionClient(object):
             else:
                 all_files.append(relative_path)
         return all_files, all_subdirs
-    
+
     def _create_output_dirs(self, dirs):
         Util.make_dir(self._output)
         for each_dir_rel_path in dirs:
@@ -184,13 +244,14 @@ class EncryptionClient(object):
                 (filename.endswith('~') and u'*~' in excluded_list) or \
                 (filename.startswith('~$') and u'~$*' in excluded_list):
             return True
-        return False 
+        return False
 
     def _compress_folder(self, input_path, output_path, filter=False):
         if filter:
             # for each file in the folder
             all_files, all_subdirs = self._get_files_list(input_path)
-            zipfile_name = os.path.join(output_path, os.path.basename(input_path) + ".zip")
+            zipfile_name = os.path.join(
+                output_path, os.path.basename(input_path) + ".zip")
             zip_obj = ZipFile(zipfile_name, "w")
             for filename in all_files:
                 if self._file_excluded(filename, config.EXCLUDED_FILES):
@@ -202,13 +263,15 @@ class EncryptionClient(object):
                 zip_obj.write(os.path.join(input_path, subdir))
             zip_obj.close()
         else:
-            zipfile_path = os.path.join(output_path, os.path.basename(input_path))
+            zipfile_path = os.path.join(
+                output_path, os.path.basename(input_path))
             zipfile_name = shutil.make_archive(zipfile_path, 'zip', input_path)
         return zipfile_name
 
     def _parse_url(self, url):
-        print (url)
-        match = re.match(r"^.*secret/data/dataset/([0-9a-f\-]*)/([0-9a-f\-]*)/?(.*)?", url)
+        print(url)
+        match = re.match(
+            r"^.*secret/data/dataset/([0-9a-f\-]*)/([0-9a-f\-]*)/?(.*)?", url)
         depositor_uuid = match.group(1)
         dataset_uuid = match.group(2)
         requester_uuid = match.group(3)

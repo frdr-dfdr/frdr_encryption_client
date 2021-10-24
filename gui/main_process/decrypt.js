@@ -40,7 +40,7 @@ ipcMain.on('decrypt', function (event, options, input_path, output_path, url) {
       childWindow.show()
     });
   
-    client.invoke("decrypt", input_path, output_path, url, function(error, res, more) {
+    client.invoke("decrypt", input_path, output_path, url, function(_error, res) {
       childWindow.close();
       var success = res[0];
       var errMessage = res[1];

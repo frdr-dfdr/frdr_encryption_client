@@ -5,7 +5,7 @@ const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
+  app.on('second-instance', (_event, _commandLine, _workingDirectory) => {
     notifier.notify({"title" : "FRDR Encryption Application", "message" : "FRDR Encryption Application is already running."});
   });
 }
@@ -18,25 +18,23 @@ const constLargeEnoughHeartbeat = 1000 * 60 * 60 * 2 // 2 hour in ms
 const clientOptions = {
   "heartbeatInterval": constLargeEnoughHeartbeat,
   "timeout": 60 * 60 * 2
-}
-client = new zerorpc.Client(clientOptions)
+};
+client = new zerorpc.Client(clientOptions);
 const portfinder = require("portfinder");
 const session = require('electron').session;
 
-const path = require('path')
-const PY_APP_GUI_FOLDER = 'app_gui'
-const PY_FOLDER = '..'
-const PY_MODULE = 'app_gui'
+const path = require('path');
+const PY_APP_GUI_FOLDER = 'app_gui';
+const PY_FOLDER = '..';
+const PY_MODULE = 'app_gui';
 
-let pythonChild = null
-let mainWindow = null
-
-const sleep = (waitTimeInMs) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
+let pythonChild = null;
+let mainWindow = null;
 
 const guessPackaged = () => {
   const fullPath = path.join(__dirname, PY_APP_GUI_FOLDER)
   return require('fs').existsSync(fullPath)
-}
+};
 
 const getScriptPath = () => {
   if (!guessPackaged()) {
@@ -46,7 +44,7 @@ const getScriptPath = () => {
     return path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE + '.exe')
   }
   return path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE)
-}
+};
 
 loadMainProcessJs();
 
@@ -66,27 +64,27 @@ function createWindow(){
     pathname: path.join(__dirname, 'pages/login.html'),
     protocol: 'file:',
     slashes: true
-  }))
+  }));
 
   // Load the login page when user is unauthenticated.
-  ipcMain.on("unauthenticated", (event) => {
+  ipcMain.on("unauthenticated", (_event) => {
     mainWindow.loadURL(require('url').format({
       pathname: path.join(__dirname, 'pages/login.html'),
       protocol: 'file:',
       slashes: true
     }))
-  })
+  });
 
   // Load our app when user is authenticated.
-  ipcMain.on("authenticated", async event => {
+  ipcMain.on("authenticated", (_event) => {
     mainWindow.loadURL(require('url').format({
       pathname: path.join(__dirname, 'pages/home.html'),
       protocol: 'file:',
       slashes: true
     }))
-  })
+  });
 
-  mainWindow.on('close', (event) => {
+  mainWindow.on('close', (_event) => {
     if (mainWindow != null){
       mainWindow.hide();
     }
@@ -101,13 +99,14 @@ app.on('ready', () => {
   });
   createWindow();
   mainWindow.webContents.session.clearStorageData();
-})
+});
 
 portfinder.basePort = 4242;
-let port = portfinder.getPort(function (err, port) {
+portfinder.getPort(function (_err, port) {
   client.connect("tcp://127.0.0.1:" + String(port));
+  console.log(port);
   const createApp = () => {
-    let script = getScriptPath()
+    let script = getScriptPath();
     if (guessPackaged()) {
       pythonChild = require('child_process').spawn(script, [port])
     } else {
@@ -129,13 +128,14 @@ let port = portfinder.getPort(function (err, port) {
   app.on('ready', createApp);
 });
 
+
 const exitApp = () => {
   pythonChild.kill()
   pythonChild = null
   client.close();
 }
 
-app.on("before-quit", ev => {
+app.on("before-quit", () => {
   if (mainWindow != null){
     mainWindow.close();
   }
@@ -145,29 +145,6 @@ app.on('will-quit', ev => {
   exitApp();
   app.quit();
 })
-
-
-if (process.argv.slice(-1)[0] === '--run-tests') {
-  sleep(2000).then(() => {
-    const total_tests = 1
-    let tests_passing = 0
-    let failed_tests = []
-
-    if (pythonChild != null) {
-      tests_passing++;
-    } else {
-      failed_tests.push('spawn_python');
-    }
-
-    console.log(`of ${total_tests} tests, ${tests_passing} passing`);
-
-    if (tests_passing < total_tests) {
-      console.error(`failed tests: ${failed_tests}`);  
-    }
-
-    app.quit();
-  });
-};
 
 function loadMainProcessJs () {
   const files = glob.sync(path.join(__dirname, 'main_process/*.js'))

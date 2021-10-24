@@ -11,7 +11,7 @@ const picker = flatpickr('#expiry_date', {
   maxDate: new Date().fp_incr(30),
   defaultDate: defaultDate,
   allowInput: true,
-  onChange: function(selectedDates, dateStr, instance) {
+  onChange: function(_selectedDates, dateStr) {
     expiryDate = dateStr;
   }
 });
@@ -36,19 +36,19 @@ function grantAccess() {
   ipcRenderer.send("grant-access", requester, dataset, expiryDate, dialogOptions, dialogOptions2);
 }
 
-ipcRenderer.on('notify-get-entity-name-error', function (event, result) {
+ipcRenderer.on('notify-get-entity-name-error', function (_event, result) {
   alert($.i18n('app-depositor-grant-access-find-user-error', result), "");
 });
 
-ipcRenderer.on('notify-grant-access-done', function (event) {
+ipcRenderer.on('notify-grant-access-done', function (_event) {
   alert($.i18n('app-depositor-grant-access-done'), "");
 });
 
-ipcRenderer.on('notify-grant-access-error', function (event, errMessage) {
+ipcRenderer.on('notify-grant-access-error', function (_event, errMessage) {
   alert($.i18n('app-depositor-grant-access-error', errMessage), "");
 });
 
-ipcRenderer.on('notify-login-frdr-api-error', function (event, errMessage) {
+ipcRenderer.on('notify-login-frdr-api-error', function (_event, errMessage) {
   alert(`Error logging in with Globus OAuth for FRDR API Usage.  \n${errMessage}`, "")
 });
 

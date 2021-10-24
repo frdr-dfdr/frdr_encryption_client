@@ -2,19 +2,19 @@ const {ipcRenderer} = require('electron');
 
 ipcRenderer.send("get-entity-id");
 
-ipcRenderer.on('notify-get-entity-id-done', function (event, result) {
+ipcRenderer.on('notify-get-entity-id-done', function (_event, result) {
   document.getElementById("vault_user_id").innerHTML = result;
 });
 
-ipcRenderer.on('notify-get-entity-id-error', function (event, errMessage) {
+ipcRenderer.on('notify-get-entity-id-error', function (_event, errMessage) {
   alert($.i18n('app-get-entity-id-error', errMessage), "");
 });
 
-ipcRenderer.on('notify-get-entity-name-done', function (event, result) {
+ipcRenderer.on('notify-get-entity-name-done', function (_event, result) {
   document.getElementById("vault_email").innerHTML = result;
 });
 
-ipcRenderer.on('notify-get-entity-name-error', function (event, errMessage) {
+ipcRenderer.on('notify-get-entity-name-error', function (_event, errMessage) {
   alert($.i18n('app-get-entity-name-error', errMessage), "");
 });
 
@@ -49,14 +49,12 @@ function copyToClipboard(text, el) {
   }
 }
 
-$(document).ready(function() {
-  $('[data-toggle="tooltip"]').tooltip({
-    container: 'body'
-  });
-  
-  $('.js-copy').click(function() {
-    var text = $("#vault_user_id").html();
-    var el = $(this);
-    copyToClipboard(text, el);
-  });
+$('[data-toggle="tooltip"]').tooltip({
+  container: 'body'
+});
+
+$('.js-copy').click(function() {
+  var text = $("#vault_user_id").html();
+  var el = $(this);
+  copyToClipboard(text, el);
 });

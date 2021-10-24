@@ -1,7 +1,7 @@
-const {ipcMain} = require('electron');
+const {ipcMain, BrowserWindow} = require('electron');
 
 ipcMain.on('login-vault-oidc-globus', (event, hostname, hostnamePKI) => {
-  client.invoke("login_oidc_globus", hostname, hostnamePKI, function(error, res, more) {
+  client.invoke("login_oidc_globus", hostname, hostnamePKI, function(_error, res) {
     var success = res[0];
     var errMessage = res[1];
     if (success) {
@@ -12,5 +12,3 @@ ipcMain.on('login-vault-oidc-globus', (event, hostname, hostnamePKI) => {
     }
   });
 });
-
-

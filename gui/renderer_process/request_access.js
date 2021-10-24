@@ -35,7 +35,7 @@ function generateAccessRequest() {
 
 document.getElementById("request-access").addEventListener("click", generateAccessRequest);
 
-ipcRenderer.on('notify-request-access-error', function (event, result) {
+ipcRenderer.on('notify-request-access-error', function (_event, result) {
   alert($.i18n('app-requester-request-access-error', result), "");
 });
 

@@ -41,12 +41,13 @@ __version__ = config.VERSION
 dirs = AppDirs(config.APP_NAME, config.APP_AUTHOR)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 
+
 def main():
     try:
         arguments = docopt(__doc__, version=__version__)
-        logger = Util.get_logger("fdrd-encryption-client", 
-                                log_level=arguments["--loglevel"],
-                                filepath=os.path.join(dirs.user_data_dir, "fdrd-encryption-client_log.txt"))
+        logger = Util.get_logger("fdrd-encryption-client",
+                                 log_level=arguments["--loglevel"],
+                                 filepath=os.path.join(dirs.user_data_dir, "fdrd-encryption-client_log.txt"))
         if sys.version_info[0] < 3:
             raise Exception("Python 3 is required to run the local client.")
 
@@ -56,36 +57,40 @@ def main():
             raise ValueError("The input directory does not exist.")
 
         if (arguments["decrypt"]) and (not Util.check_dir_exists(arguments["--input"])):
-            raise ValueError("The input zip file does not exist.") 
-        
+            raise ValueError("The input zip file does not exist.")
+
         if (arguments["--output"] is not None) and (not Util.check_dir_exists(arguments["--output"])):
-            raise ValueError("The output directory does not exist.") 
+            raise ValueError("The output directory does not exist.")
 
         if arguments["--vault"]:
             if arguments["--username"]:
                 vault_client.login(vault_addr=arguments["--vault"],
                                    auth_method="userpass",
-                                   username=arguments["--username"], 
+                                   username=arguments["--username"],
                                    password=arguments["--password"])
             elif arguments["--oauth"]:
                 vault_client.login(vault_addr=arguments["--vault"],
                                    auth_method="oidc")
-            
+
             if arguments["encrypt"]:
                 if not Util.check_dir_exists(arguments["--input"]):
                     raise ValueError("The input directory does not exist.")
 
-                dataset_uuid = str(uuid.uuid4())  
+                dataset_uuid = str(uuid.uuid4())
                 dataset_key_manager = DatasetKeyManager(vault_client)
                 person_key_manager = PersonKeyManager(vault_client)
-                encryptor = EncryptionClient(dataset_key_manager, person_key_manager, arguments["--input"], arguments["--output"])
+                encryptor = EncryptionClient(
+                    dataset_key_manager, person_key_manager, arguments["--input"], arguments["--output"])
                 encryptor.encrypt(dataset_uuid)
+
             elif arguments["decrypt"]:
                 url = arguments["--url"]
                 dataset_key_manager = DatasetKeyManager(vault_client)
                 person_key_manager = PersonKeyManager(vault_client)
-                encryptor = EncryptionClient(dataset_key_manager, person_key_manager, arguments["--input"], arguments["--output"])
+                encryptor = EncryptionClient(
+                    dataset_key_manager, person_key_manager, arguments["--input"], arguments["--output"])
                 encryptor.decrypt(url)
+
             elif arguments["grant_access"]:
                 if click.confirm("Do you want to continue?", default=False):
                     requester_uuid = arguments["--requester"]
@@ -93,8 +98,10 @@ def main():
                     expire_date = arguments["--expire"]
                     dataset_key_manager = DatasetKeyManager(vault_client)
                     person_key_manager = PersonKeyManager(vault_client)
-                    encryptor = EncryptionClient(dataset_key_manager, person_key_manager)
-                    encryptor.grant_access(requester_uuid, dataset_uuid, expire_date)  
+                    encryptor = EncryptionClient(
+                        dataset_key_manager, person_key_manager)
+                    encryptor.grant_access(
+                        requester_uuid, dataset_uuid, expire_date)
 
                     # make api call to FRDR to put grant access info in db
                     frdr_api_url = arguments["--frdr_api_url"]
@@ -102,7 +109,8 @@ def main():
                         frdr_api_url = config.FRDR_API_BASE_URL
                     frdr_api_client = FRDRAPIClient()
                     frdr_api_client.login(base_url=config.FRDR_API_BASE_URL)
-                    data = {"expires": expire_date, "vault_dataset_id": dataset_uuid, "vault_requester_id": requester_uuid}
+                    data = {"expires": expire_date, "vault_dataset_id": dataset_uuid,
+                            "vault_requester_id": requester_uuid}
                     print(frdr_api_client.update_requestitem(data))
 
             elif arguments["generate_access_request"]:
@@ -110,13 +118,15 @@ def main():
                 person_key_manager = PersonKeyManager(vault_client)
                 # make sure there is a public key saved on Vault for the requester
                 person_key_manager.create_or_retrieve_public_key()
-                print ("Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.")
-                print (Util.wrap_text(entity_id))
+                print(
+                    "Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.")
+                print(Util.wrap_text(entity_id))
 
     except ValueError as ve:
-        logger.error(ve)              
+        logger.error(ve)
     except Exception as e:
         logger.error("Exception caught, exiting. {}".format(e), exc_info=True)
+
 
 if __name__ == "__main__":
     main()

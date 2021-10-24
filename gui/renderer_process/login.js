@@ -26,15 +26,15 @@ function oidcGlobusLogin() {
 
   function incTimer(){
     setTimeout (function(){
-        if(countdownNum != 0){
-          countdownNum--;
-          document.getElementById("globus_submit").disabled = true;
-          document.getElementById('globus_submit').innerHTML = $.i18n('app-login-btn') + ' (' + countdownNum + 's)';
-          incTimer();
-        } else {
-          document.getElementById("globus_submit").disabled = false;
-          document.getElementById('globus_submit').innerHTML = $.i18n('app-login-btn');
-        }
+      if(countdownNum != 0){
+        countdownNum--;
+        document.getElementById("globus_submit").disabled = true;
+        document.getElementById('globus_submit').innerHTML = $.i18n('app-login-btn') + ' (' + countdownNum + 's)';
+        incTimer();
+      } else {
+        document.getElementById("globus_submit").disabled = false;
+        document.getElementById('globus_submit').innerHTML = $.i18n('app-login-btn');
+      }
     },1000);
   }
 
@@ -43,18 +43,17 @@ function oidcGlobusLogin() {
     var hostnamePKI = document.getElementById("pki-hostname").value;
   }
   else {
-    var hostnamePKI = hostname
+    var hostnamePKI = hostname;
   }
   ipcRenderer.send("login-vault-oidc-globus", hostname, hostnamePKI);
 }
 
 document.getElementById("globus_submit").addEventListener("click", oidcGlobusLogin);
 
-
-ipcRenderer.on('notify-login-oidc-done', function (event) {
+ipcRenderer.on('notify-login-oidc-done', function (_event) {
   ipcRenderer.send("authenticated");
 });
 
-ipcRenderer.on('notify-login-oidc-error', function (event, errMessage) {
-  alert(`Error logging in with Globus OAuth. \n${errMessage}`)
+ipcRenderer.on('notify-login-oidc-error', function (_event, errMessage) {
+  alert($.i18n('app-login-error', errMessage), "");
 });

@@ -1,7 +1,7 @@
 const {dialog, ipcMain, clipboard} = require('electron');
  
 ipcMain.on('request-access', (event, dialogOptions, copiedDoneDialogOptions) => {
-  client.invoke("get_entity_id", function(error, res, more) {
+  client.invoke("get_entity_id", function(_error, res) {
     var success = res[0];
     var result = res[1];
     if (success) {

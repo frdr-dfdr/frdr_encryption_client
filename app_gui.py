@@ -1,5 +1,4 @@
 import webbrowser
-
 from modules.PersonKeyManager import PersonKeyManager
 from modules.EncryptionClient import EncryptionClient
 from appdirs import AppDirs
@@ -7,7 +6,6 @@ import sys
 import zerorpc
 import os
 from modules.VaultClient import VaultClient
-from modules.AccessManager import AccessManager
 from util.config_loader import config
 import logging
 from util.util import Util
@@ -19,12 +17,11 @@ from modules.FRDRAPIClient import FRDRAPIClient
 __version__ = config.VERSION
 dirs = AppDirs(config.APP_NAME, config.APP_AUTHOR)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
-tokenfile = os.path.join(dirs.user_data_dir, "vault_token")
+
 
 class EncryptionClientGui(object):
-    def __init__(self, tokenfile):
-        self._tokenfile = tokenfile
-        Util.get_logger("fdrd-encryption-client", 
+    def __init__(self):
+        Util.get_logger("fdrd-encryption-client",
                         log_level="info",
                         filepath=os.path.join(dirs.user_data_dir, "fdrd-encryption-client_log.txt"))
         self._logger = logging.getLogger("fdrd-encryption-client.gui")
@@ -34,33 +31,36 @@ class EncryptionClientGui(object):
 
     def login_oidc_google(self, hostname):
         try:
-            self._logger.info("Log into Vault using oidc method with google acccount")
+            self._logger.info(
+                "Log into Vault using oidc method with google acccount")
             self._vault_client.login(vault_addr=hostname,
                                      auth_method="oidc",
-                                     oauth_type="google")          
+                                     oauth_type="google")
             return (True, None)
         except Exception as e:
             self._logger.info(str(e))
             return (False, str(e))
-    
+
     def login_oidc_globus(self, hostname, hostname_pki):
         try:
-            self._logger.info("Log into Vault using oidc method with globus acccount") 
+            self._logger.info(
+                "Log into Vault using oidc method with globus acccount")
             self._vault_client.login(vault_addr=hostname,
-                                     auth_method="oidc")  
-            # self._vault_client_pki.login(vault_addr=hostname_pki, 
-            #                          auth_method="oidc")           
+                                     auth_method="oidc")
+            # self._vault_client_pki.login(vault_addr=hostname_pki,
+            #                          auth_method="oidc")
             return (True, None)
         except Exception as e:
             self._logger.info(str(e))
             return (False, str(e))
-    
+
     def login_frdr_api_globus(self, base_url=None):
         try:
-            self._logger.info("Login with globus acccount for FRDR REST API usage") 
+            self._logger.info(
+                "Login with globus acccount for FRDR REST API usage")
             if base_url is None:
                 base_url = config.FRDR_API_BASE_URL
-            self._frdr_api_client.login(base_url=base_url)    
+            self._frdr_api_client.login(base_url=base_url)
             return (True, None)
         except Exception as e:
             self._logger.info(str(e))
@@ -78,11 +78,13 @@ class EncryptionClientGui(object):
 
     def encrypt(self, input_path, output_path):
         try:
-            self._logger.info("Encrypt files in the path {}".format(input_path))
-            dataset_uuid = str(uuid.uuid4()) 
+            self._logger.info(
+                "Encrypt files in the path {}".format(input_path))
+            dataset_uuid = str(uuid.uuid4())
             dataset_key_manager = DatasetKeyManager(self._vault_client)
             person_key_manager = PersonKeyManager(self._vault_client)
-            encryptor = EncryptionClient(dataset_key_manager, person_key_manager, input_path, output_path)
+            encryptor = EncryptionClient(
+                dataset_key_manager, person_key_manager, input_path, output_path)
             bag_path = encryptor.encrypt(dataset_uuid)
             return (True, bag_path)
         except Exception as e:
@@ -91,10 +93,12 @@ class EncryptionClientGui(object):
 
     def decrypt(self, input_path, output_path, url):
         try:
-            self._logger.info("Decrypt files in the path {}".format(input_path))
+            self._logger.info(
+                "Decrypt files in the path {}".format(input_path))
             dataset_key_manager = DatasetKeyManager(self._vault_client)
             person_key_manager = PersonKeyManager(self._vault_client)
-            encryptor = EncryptionClient(dataset_key_manager, person_key_manager, input_path, output_path)
+            encryptor = EncryptionClient(
+                dataset_key_manager, person_key_manager, input_path, output_path)
             encryptor.decrypt(url)
             return (True, None)
         except Exception as e:
@@ -105,42 +109,32 @@ class EncryptionClientGui(object):
         try:
             dataset_key_manager = DatasetKeyManager(self._vault_client)
             person_key_manager = PersonKeyManager(self._vault_client)
-            encryptor = EncryptionClient(dataset_key_manager, person_key_manager)
-            encryptor.grant_access(requester_uuid, dataset_uuid, expire_date) 
-            data = {"expires": expire_date, "vault_dataset_id": dataset_uuid, "vault_requester_id": requester_uuid}
+            encryptor = EncryptionClient(
+                dataset_key_manager, person_key_manager)
+            encryptor.grant_access(requester_uuid, dataset_uuid, expire_date)
+            data = {"expires": expire_date, "vault_dataset_id": dataset_uuid,
+                    "vault_requester_id": requester_uuid}
             self._frdr_api_client.update_requestitem(data)
             return (True, None)
         except Exception as e:
             return (False, str(e))
 
-    def create_access_granter(self, username, password, vault_token, hostname):
-        try:
-            vault_client = VaultClient(hostname, username, password, tokenfile, vault_token)
-            # TODO: add another method to set self._access_granter to null when the review window is closed
-            access_granter = AccessManager(vault_client)
-            self._access_granter = access_granter
-            return (True, None)
-        except Exception as e:
-            return (False, str(e))
-
+    # TODO: keep for future feature
     def review_shares(self):
         try:
-            return self._access_granter.list_members()
+            dataset_key_manager = DatasetKeyManager(self._vault_client)
+            person_key_manager = PersonKeyManager(self._vault_client)
+            encryptor = EncryptionClient(
+                dataset_key_manager, person_key_manager)
+            encryptor.list_shares()
         except Exception as e:
             self._logger.error(e, exc_info=True)
 
+    # TODO: keep for future feature
     def revoke_access(self, dataset_name, requester_id):
         self._access_granter.revoke_access(requester_id, dataset_name)
         return True
 
-    def set_input_path(self, input_path):
-        self._logger.info("Setting input path.")
-        self._input_path = input_path
-    
-    def unset_input_path(self):
-        self._logger.info("Clearing input path.")
-        self._input_path = None
-    
     def get_entity_name(self, entity_id):
         try:
             return (True, self._vault_client.read_entity_by_id(entity_id))
@@ -157,7 +151,8 @@ class EncryptionClientGui(object):
         except Exception as e:
             return (False, str(e))
 
+
 if __name__ == "__main__":
-    s = zerorpc.Server(EncryptionClientGui(tokenfile=tokenfile))
+    s = zerorpc.Server(EncryptionClientGui())
     s.bind("tcp://127.0.0.1:" + str(sys.argv[1]))
     s.run()

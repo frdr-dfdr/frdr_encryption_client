@@ -13,10 +13,12 @@
   "app-login-url-title": "Key Server URL",
   "app-login-url-tooltip": "If running for development, probably http://127.0.0.1:8200.",
   "app-login-btn": "Login with Globus",
+  "app-login-error": "Error logging in with Globus OAuth. \n$1",
 
   "app-home-dep-btn": "Use as Depositor",
   "app-home-req-btn": "Use as Requester",
   "app-logout": "You have successfully logged out.",
+  "app-logout-error": "Error logging out. \n$1",
   "app-depositor-home-title": "You are using this app as a depositor",
   "app-depositor-home-info": "As a depositor, you can use this app to encrypt sensitive datasets, and grant other users access to the key of sensitive datasets.",
   "app-encrypt-title": "Encrypt Dataset",

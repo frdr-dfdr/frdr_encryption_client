@@ -1,26 +1,30 @@
 :root {
-    --login-background-gradient-start: #a2bdf8;
-    --login-background-gradient-end: #3B5998;
-    --login-banner-text: #ffffff;
-    --login-banner-background: #a0bbd4;
-    --login-login-sec-background: #ffffff;
-    --login-heading: #3B5998;
-    --login-dividing-line: #FEB58A;
+  --login-background-gradient-start: #a2bdf8;
+  --login-background-gradient-end: #3b5998;
+  --login-banner-text: #ffffff;
+  --login-banner-background: #a0bbd4;
+  --login-login-sec-background: #ffffff;
+  --login-heading: #3b5998;
+  --login-dividing-line: #feb58a;
 
-    --navbar-background: #424242; 
-    --navbar-nav: #FAFAFA;
-    --navbar-open-focus: #333333;
-    --navbar-open-focus-border: #e0e0e0;
-    --navbar-open-focus-background: #f0f0f0;
-    --navbar-caret: #f0f0f0;
-    --navbar-caret-hover: #2191c5;
-    --navbar-brand: #999999;
-    --navbar-highlight: #2191C5;
-    --navbar-collapse: #64B635;
-    --navbar-collapse-border: #dcdcdc;
-    --box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1);
+  --navbar-background: #424242;
+  --navbar-nav: #fafafa;
+  --navbar-open-focus: #333333;
+  --navbar-open-focus-border: #e0e0e0;
+  --navbar-open-focus-background: #f0f0f0;
+  --navbar-caret: #f0f0f0;
+  --navbar-caret-hover: #2191c5;
+  --navbar-brand: #999999;
+  --navbar-highlight: #2191c5;
+  --navbar-collapse: #64b635;
+  --navbar-collapse-border: #dcdcdc;
+  --box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.1);
 
-    --white: #ffffff;
+  --white: #ffffff;
 
-    --heading-text-color: #708fca;
-  }
+  --heading-text-color: #708fca;
+
+  --footer-backgroud: #d1d1d1;
+  --footer-text-color: black;
+}
