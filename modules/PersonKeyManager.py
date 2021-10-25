@@ -98,12 +98,14 @@ class PersonKeyManager(object):
             self.save_public_key_to_vault(public_key)
             return public_key
         else:
-            # # Check if public key saved on Vault is the same as the public key saved locally.
-            # # If not, raise ValueError
-            # public_key_path = os.path.join(Util.get_key_dir(self.get_vault_entity_id()), config.LOCAL_PUBLIC_KEY_FILENAME)
-            # public_key_local = self.read_public_key_locally(public_key_path)
-            # if public_key_local != public_key_on_vault:
-            #     raise ValueError("The public key saved locally does not match the key saved on Vault.")
+            # Check if public key saved on Vault is the same as the public key saved locally.
+            # If not, raise ValueError
+            public_key_path = os.path.join(Util.get_key_dir(self.get_vault_entity_id()), config.LOCAL_PUBLIC_KEY_FILENAME)
+            public_key_local = self.read_public_key_locally(public_key_path)
+            if isinstance(public_key_local, bytes):
+             public_key_local = Util.byte_to_base64(public_key_local)
+            if public_key_local != public_key_on_vault:
+                raise ValueError("The public key saved locally does not match the key saved on Vault.")
             return public_key_on_vault
 
     @property
