@@ -6,7 +6,7 @@ const path = require('path');
 function contactus() {
   var contactURL = "";
   try {
-    let fileContents = fs.readFileSync(path.join(__dirname, '../../config/config.yml'), 'utf8');
+    let fileContents = fs.readFileSync(path.join(__dirname, '..', 'app_gui','config', 'config.yml'), 'utf8');
     let config = yaml.load(fileContents);
     contactURL = config["FRDR_CONTACTUS_URL"];
   } catch (e) {

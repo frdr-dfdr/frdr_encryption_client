@@ -6,7 +6,7 @@ const path = require('path');
 var profileURL = null;
 
 try {
-  let fileContents = fs.readFileSync(path.join(__dirname, '../../config/config.yml'), 'utf8');
+  let fileContents = fs.readFileSync(path.join(__dirname, '..', 'app_gui','config', 'config.yml'), 'utf8');
   let config = yaml.load(fileContents);
   profileURL = config["FRDR_PROFILE_URL"];
 } catch (e) {

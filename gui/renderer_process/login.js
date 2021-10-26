@@ -6,7 +6,7 @@ const path = require('path');
 var timeout = null;
 
 try {
-    let fileContents = fs.readFileSync(path.join(__dirname, '../../config/config.yml'), 'utf8');
+    let fileContents = fs.readFileSync(path.join(__dirname, '..', 'app_gui','config', 'config.yml'), 'utf8');
     let config = yaml.load(fileContents);
     document.getElementById('hostname').value = config['VAULT_HOSTNAME'];
     timeout = config["VAULT_LOGIN_TIMEOUT"];
