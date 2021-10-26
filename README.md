@@ -35,7 +35,7 @@ The Electron GUI in /gui should work for development after runing  `cd gui` and 
 ## Building
 The Python code needs to be built on its target platform using `pyinstaller`:
 
-`pyinstaller -w app_gui.py --distpath gui`
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml;./config'`
 
 (On Mac, this also builds a .app version of the Python code, which you'll actually want to delete -- just keep the folder of CLI tools.)
 
