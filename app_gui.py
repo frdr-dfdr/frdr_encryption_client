@@ -117,6 +117,7 @@ class EncryptionClientGui(object):
             self._frdr_api_client.update_requestitem(data)
             return (True, None)
         except Exception as e:
+            self._logger.error(e, exc_info=True)
             return (False, str(e))
 
     # TODO: keep for future feature
