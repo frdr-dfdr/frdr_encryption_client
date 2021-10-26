@@ -1,5 +1,5 @@
 {
-  "name": "fdrd-encryption-client",
+  "name": "frdr-encryption-client",
   "version": "0.3.0",
   "homepage": "https://github.com/frdr-dfdr/frdr_encryption_client",
   "main": "main.js",

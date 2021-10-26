@@ -141,9 +141,10 @@ cython_debug/
 .DS_Store
 gui/FRDR-Crypto.dmg
 gui/FRDR-Encryption-Client.dmg
-gui/fdrd-encryption-client-darwin-x64/
+gui/frdr-encryption-client-darwin-x64/
 gui/app_gui/
-gui/fdrd-encryption-client-win32-x64/
+gui/frdr-encryption-client-win32-x64/
 gui/install/
 gui/node_modules
 gui/package-lock.json
+*.ipynb

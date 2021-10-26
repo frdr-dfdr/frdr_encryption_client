@@ -7,7 +7,7 @@ from pathlib import Path
 from util.config_loader import config
 import socket
 
-logger = logging.getLogger("fdrd-encryption-client.util")
+logger = logging.getLogger("frdr-encryption-client.util")
 
 
 class Util(object):

@@ -49,7 +49,7 @@ class EncryptionClient(object):
         Returns:
             string: The output path of the generated bag including the encrypted package
         """
-        logger = logging.getLogger('fdrd-encryption-client.encrypt')
+        logger = logging.getLogger('frdr-encryption-client.encrypt')
 
         # generate key
         self._dataset_key_manager.generate_key()
@@ -101,7 +101,7 @@ class EncryptionClient(object):
         Args:
             url (string): The path of the encrypted dataset key saved on the key server
         """
-        logger = logging.getLogger('fdrd-encryption-client.decrypt')
+        logger = logging.getLogger('frdr-encryption-client.decrypt')
 
         depositor_uuid, dataset_uuid, requester_uuid = self._parse_url(url)
 

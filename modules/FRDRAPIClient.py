@@ -13,7 +13,7 @@ class DataPublicationClient(BaseClient):
 
     def __init__(self, base_url, **kwargs):
         self._logger = logging.getLogger(
-            "fdrd-encryption-client.DataPublicationClient")
+            "frdr-encryption-client.DataPublicationClient")
         app_name = kwargs.pop(
             'app_name', config.GLOBUS_DATA_PUBLICATION_CLIENT_NAME)
         BaseClient.__init__(self, "datapublication", base_url=base_url,
@@ -28,7 +28,7 @@ class FRDRAPIClient(BaseClient):
 
     def __init__(self):
         self._logger = logging.getLogger(
-            "fdrd-encryption-client.FRDR-API-client")
+            "frdr-encryption-client.FRDR-API-client")
         self._pub_client = None
 
     def login(self, base_url):

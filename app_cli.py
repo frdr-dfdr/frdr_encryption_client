@@ -45,9 +45,9 @@ os.makedirs(dirs.user_data_dir, exist_ok=True)
 def main():
     try:
         arguments = docopt(__doc__, version=__version__)
-        logger = Util.get_logger("fdrd-encryption-client",
+        logger = Util.get_logger("frdr-encryption-client",
                                  log_level=arguments["--loglevel"],
-                                 filepath=os.path.join(dirs.user_data_dir, "fdrd-encryption-client_log.txt"))
+                                 filepath=os.path.join(dirs.user_data_dir, "frdr-encryption-client_log.txt"))
         if sys.version_info[0] < 3:
             raise Exception("Python 3 is required to run the local client.")
 

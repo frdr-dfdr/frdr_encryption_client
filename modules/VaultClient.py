@@ -9,7 +9,7 @@ from hvac.exceptions import InvalidRequest
 
 class VaultClient(object):
     def __init__(self):
-        self._logger = logging.getLogger("fdrd-encryption-client.vault-client")
+        self._logger = logging.getLogger("frdr-encryption-client.vault-client")
         self._entity_id = None
         self.hvac_client = hvac.Client()
         self._vault_token = None

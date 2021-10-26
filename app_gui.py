@@ -21,10 +21,10 @@ os.makedirs(dirs.user_data_dir, exist_ok=True)
 
 class EncryptionClientGui(object):
     def __init__(self):
-        Util.get_logger("fdrd-encryption-client",
+        Util.get_logger("frdr-encryption-client",
                         log_level="info",
-                        filepath=os.path.join(dirs.user_data_dir, "fdrd-encryption-client_log.txt"))
-        self._logger = logging.getLogger("fdrd-encryption-client.gui")
+                        filepath=os.path.join(dirs.user_data_dir, "frdr-encryption-client_log.txt"))
+        self._logger = logging.getLogger("frdr-encryption-client.gui")
         self._vault_client = VaultClient()
         self._frdr_api_client = FRDRAPIClient()
         # self._vault_client_pki = VaultClient()

@@ -15,7 +15,7 @@ class PersonKeyManager(object):
             vault_client (VaultClient): Wrapper of HashiCorp Vault API client
         """
         self._logger = logging.getLogger(
-            "fdrd-encryption-client.person-key-manager.vault")
+            "frdr-encryption-client.person-key-manager.vault")
         self._vault_client = vault_client
         self._public_key = None
 

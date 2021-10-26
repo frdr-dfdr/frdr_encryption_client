@@ -47,15 +47,15 @@ After building the crawler, the GUI can be built from the `gui` subdirectory wit
 
 On Mac, you can sign for distribution with `electron-osx-sign` and `electron-notarize-cli`, and you need to include the embedded Python binaries:
 
-`IFS=$'\n' && electron-osx-sign fdrd-encryption-client-darwin-x64/fdrd-encryption-client.app/ $(find fdrd-encryption-client-darwin-x64/fdrd-encryption-client.app/Contents/ -type f -perm -u+x) --identity [hash] --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
+`IFS=$'\n' && electron-osx-sign frdr-encryption-client-darwin-x64/frdr-encryption-client.app/ $(find frdr-encryption-client-darwin-x64/frdr-encryption-client.app/Contents/ -type f -perm -u+x) --identity [hash] --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
 
-`electron-notarize --bundle-id ca.frdr-dfdr.secure --username my.apple.id@example.com --password @keystore:AC_PASSWORD fdrd-encryption-client-darwin-x64/fdrd-encryption-client.app/`
+`electron-notarize --bundle-id ca.frdr-dfdr.secure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-encryption-client-darwin-x64/frdr-encryption-client.app/`
 
 Finally, to package for install:
 
-`electron-installer-windows --src fdrd-encryption-client-win32-x64/ --dest install/ --config config.json` (Windows)
+`electron-installer-windows --src frdr-encryption-client-win32-x64/ --dest install/ --config config.json` (Windows)
 
-`hdiutil create tmp.dmg -ov -volname "FRDRSecure" -fs HFS+ -srcfolder fdrd-encryption-client-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDRSecure.dmg && rm tmp.dmg` (Mac)
+`hdiutil create tmp.dmg -ov -volname "FRDRSecure" -fs HFS+ -srcfolder frdr-encryption-client-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDRSecure.dmg && rm tmp.dmg` (Mac)
 
 
 ## CLI Usage
