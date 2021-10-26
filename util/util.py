@@ -114,7 +114,6 @@ class Util(object):
             try:
                 sock.bind(('', port))
                 sock.close()
-                print(port)
                 return port
             except OSError:
                 port += 1
