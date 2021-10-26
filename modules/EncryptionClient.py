@@ -20,6 +20,15 @@ import json
 
 class EncryptionClient(object):
     def __init__(self, dataset_key_manager, person_key_manager, input_dir=None, output_dir=None):
+        """Class init function
+
+        Args:
+            dataset_key_manager (DatasetKeyManager): Generates dataset key, encrypts it, saves it and etc.
+            person_key_manager (PersonKeyManager): Generates public/private key pairs and uses the public key to 
+                                                   encrypt the dataset key and etc. 
+            input_dir (string, optional): The directory containing the dataset to encrypt. Defaults to None.
+            output_dir (string, optional): The directory to put the encrypted package. Defaults to None.
+        """
         self._dataset_key_manager = dataset_key_manager
         self._person_key_manager = person_key_manager
         if input_dir is not None:
@@ -30,6 +39,16 @@ class EncryptionClient(object):
             self._output = os.path.expanduser("~/Desktop/")
 
     def encrypt(self, dataset_uuid):
+        """Compress the input package, encrypt it, put the encrypted package in a bag. 
+           Encrypt the dataset key with the owner's public key and save this encrypted
+           dataset key to a key server.
+
+        Args:
+            dataset_uuid (string): The unique id for the dataset
+
+        Returns:
+            string: The output path of the generated bag including the encrypted package
+        """
         logger = logging.getLogger('fdrd-encryption-client.encrypt')
 
         # generate key
@@ -76,9 +95,16 @@ class EncryptionClient(object):
         return bag_output_path
 
     def decrypt(self, url):
+        """Retrive the encrypted dataset key from the key server, decrypt it with the user's private key, 
+           then decrypt the encrypted package with the dataset key.
+
+        Args:
+            url (string): The path of the encrypted dataset key saved on the key server
+        """
         logger = logging.getLogger('fdrd-encryption-client.decrypt')
 
         depositor_uuid, dataset_uuid, requester_uuid = self._parse_url(url)
+
         if requester_uuid == "":
             assert self._dataset_key_manager.get_vault_entity_id(
             ) == depositor_uuid, "The url you provide is not correct"
@@ -87,6 +113,7 @@ class EncryptionClient(object):
         else:
             encrypted_data_key_path = "/".join(
                 [config.VAULT_DATASET_KEY_PATH, depositor_uuid, dataset_uuid, requester_uuid])
+
         self._dataset_key_manager.read_key(encrypted_data_key_path)
         private_key_path = os.path.join(Util.get_key_dir(
             self._dataset_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
@@ -95,9 +122,6 @@ class EncryptionClient(object):
         self._dataset_key_manager.decrypt_key(user_private_key)
         self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
 
-        if self._output is None:
-            # default output path is the desktop
-            self._output = os.path.expanduser("~/Desktop/")
         # if the input is the decrypted package
         if os.path.basename(self._input).endswith("encrypted"):
             decrypted_filename = self._decrypt_file(self._input, logger)
@@ -117,16 +141,23 @@ class EncryptionClient(object):
             shutil.move(decrypted_filename, os.path.join(
                 self._output, os.path.basename(decrypted_filename)))
             shutil.rmtree(bag_dir_parent)
-        return True
 
-    def grant_access(self, requester_entity_id, dataset_id, expiry_date=None):
+    def grant_access(self, requester_entity_id, dataset_uuid, expiry_date=None):
+        """Share the dataset key to another user by decrypting the key with the 
+           owner's private key first then encrypting it with the requester's public key 
+
+
+        Args:
+            requester_entity_id (string): The requester's vault user ID
+            dataset_uuid (string): The unique id for the dataset 
+            expiry_date (string, optional): The expiry date of the access to the dataset key. Defaults to None.
+        """
         if expiry_date is None:
             expiry_date = (datetime.date.today() +
                            datetime.timedelta(days=14)).strftime("%Y-%m-%d")
 
         # read encrypted data key from Vault
-        encrypted_data_key_path = "/".join([config.VAULT_DATASET_KEY_PATH,
-                                           self._dataset_key_manager.get_vault_entity_id(), dataset_id])
+        encrypted_data_key_path = "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid])
         self._dataset_key_manager.read_key(encrypted_data_key_path)
 
         # decrypt the encrypted data key with the depositor private key
@@ -140,8 +171,7 @@ class EncryptionClient(object):
         requester_public_key = self._person_key_manager.read_public_key_from_vault(
             requester_entity_id)
         self._dataset_key_manager.encrypt_key(requester_public_key)
-        path_on_vault = "/".join([config.VAULT_DATASET_KEY_PATH,
-                                 self._dataset_key_manager.get_vault_entity_id(), dataset_id, requester_entity_id])
+        path_on_vault = "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid, requester_entity_id])
         self._dataset_key_manager.set_key_expiry_date(
             path_on_vault, expiry_date)
         self._dataset_key_manager.save_key(path_on_vault)
@@ -269,7 +299,6 @@ class EncryptionClient(object):
         return zipfile_name
 
     def _parse_url(self, url):
-        print(url)
         match = re.match(
             r"^.*secret/data/dataset/([0-9a-f\-]*)/([0-9a-f\-]*)/?(.*)?", url)
         depositor_uuid = match.group(1)

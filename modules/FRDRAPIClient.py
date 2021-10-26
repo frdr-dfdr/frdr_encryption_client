@@ -20,10 +20,6 @@ class DataPublicationClient(BaseClient):
                             app_name=app_name, **kwargs)
         self._headers['Content-Type'] = 'application/json'
 
-    def get_submission(self, submission_id, **params):
-        return self.get('submissions/{}'.format(submission_id),
-                        params=params)
-
     def update_requestitem(self, data):
         return self.put('requestitem', json_body=data)
 
@@ -34,6 +30,46 @@ class FRDRAPIClient(BaseClient):
         self._logger = logging.getLogger(
             "fdrd-encryption-client.FRDR-API-client")
         self._pub_client = None
+
+    def login(self, base_url):
+        """Log into FRDR for API usage.
+
+        Args:
+            base_url (string): FRDR API base url
+
+        Raises:
+            Exception: If there is any error when logging into FRDR
+        """
+        try:
+            tokens = self._interactive_login()
+
+            pub_tokens = tokens['publish.api.frdr.ca']
+
+            pub_authorizer = RefreshTokenAuthorizer(
+                pub_tokens['refresh_token'], self._load_auth_client(),
+                pub_tokens['access_token'], pub_tokens['expires_at_seconds'])
+
+            pub_client = DataPublicationClient(
+                base_url, authorizer=pub_authorizer)
+            self._pub_client = pub_client
+        except Exception as e:
+            self._logger.error(
+                "Failed to auth for FRDR API usage. {}".format(e))
+            raise Exception(e)
+
+    def update_requestitem(self, data):
+        """Update requestitem data on FRDR when depositors grant access
+           to the key on FRDR Encryption App.
+
+        Args:
+            data (dict): {"expires": The expiry data of the granted access, 
+                          "vault_dataset_id": The id for the dataset on Vault,
+                          "vault_requester_id": The id for the requester on Vault}
+
+        Returns:
+            [string]: REST API call response 
+        """
+        return self._pub_client.update_requestitem(data)
 
     def _load_auth_client(self):
         return NativeAppAuthClient(
@@ -96,28 +132,3 @@ class FRDRAPIClient(BaseClient):
         httpd.timeout = config.FRDR_API_LOGIN_TIMEOUT
         httpd.handle_request()
         return httpd.token
-
-    def login(self, base_url):
-
-        try:
-            tokens = self._interactive_login()
-
-            pub_tokens = tokens['publish.api.frdr.ca']
-
-            pub_authorizer = RefreshTokenAuthorizer(
-                pub_tokens['refresh_token'], self._load_auth_client(),
-                pub_tokens['access_token'], pub_tokens['expires_at_seconds'])
-
-            pub_client = DataPublicationClient(
-                base_url, authorizer=pub_authorizer)
-            self._pub_client = pub_client
-        except Exception as e:
-            self._logger.error(
-                "Failed to auth for FRDR API usage. {}".format(e))
-            raise Exception(e)
-
-    def get_submission(self, submission_id):
-        return self._pub_client.get_submission(submission_id)
-
-    def update_requestitem(self, data):
-        return self._pub_client.update_requestitem(data)
