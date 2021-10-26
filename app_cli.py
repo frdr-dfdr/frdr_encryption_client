@@ -5,7 +5,7 @@ Usage:
   app_cli.py encrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> [--output=<op>] [--loglevel=<l>]
   app_cli.py decrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> --url=<key_addr> [--output=<op>] [--loglevel=<l>]
   app_cli.py grant_access --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --dataset=<id> --requester=<id> --expire=<date> --frdr_api_url=<url> [--loglevel=<l>]
-  app_cli.py generate_access_request --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>)
+  app_cli.py show_vault_id --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>)
   app_cli.py -h | --help
 
 Options:
@@ -73,9 +73,6 @@ def main():
                                    auth_method="oidc")
 
             if arguments["encrypt"]:
-                if not Util.check_dir_exists(arguments["--input"]):
-                    raise ValueError("The input directory does not exist.")
-
                 dataset_uuid = str(uuid.uuid4())
                 dataset_key_manager = DatasetKeyManager(vault_client)
                 person_key_manager = PersonKeyManager(vault_client)
@@ -113,7 +110,7 @@ def main():
                             "vault_requester_id": requester_uuid}
                     print(frdr_api_client.update_requestitem(data))
 
-            elif arguments["generate_access_request"]:
+            elif arguments["show_vault_id"]:
                 entity_id = vault_client.entity_id
                 person_key_manager = PersonKeyManager(vault_client)
                 # make sure there is a public key saved on Vault for the requester
