@@ -1,8 +1,10 @@
-# FRDR Secure Data Desktop Client
+# FRDR Encryption Application
+
+FRDR Encryption Application allows users to encrypt dataset saved on their local machine, with the dataset key encrypted with the data owner's public key. HashiCorp Vault is used as the key server to save the encrypted dataset key and users' public key.
 
 ## Getting Started
 
-Python 3 is required to run the FRDR Vault client from the command line. Ensure that the output of `python3 --version` shows 3.6 or higher.  
+Python 3 is required to run the FRDR Encryption Application from the command line. Ensure that the output of `python3 --version` shows 3.6 or higher.  
 
 You may want to run inside a virutal environment (see below) before running this command.
 ```sh
@@ -57,122 +59,68 @@ Finally, to package for install:
 
 
 ## CLI Usage
-### Key Stored Locally
-To encrypt a file or a directory,
+### Encryption
 ```sh
-$ python app_cli.py -e -i <path to the file or dir you want to encrypt> -o <output path to the encrypted file or dir>
+$ python app_cli.py encrypt \
+    --vault <HashiCorp Vault address> \
+    --input <path to the dir you want to encrypt> \
+    --output <output path to the encrypted package> \
+    --oauth
 ```
 The output path is optional.
 
-For example,
+### Decryption
 ```sh
-$ python app_cli.py -e -i ./test_dataset  -o ./test_dataset_enc_local
-```
-To decrypt a file or a directory,
-```sh
-$ python app_cli.py -d -i <path to the encrypted file or dir> -k <path to the key>
-```
-The output path is optional.
-
-For example,
-```sh
-$ python app_cli.py -d -i ./test_dataset_enc_local -k e9d63a50-bbdb-42ec-b5dd-3a6ad88b58da_key.pem
-```
-### Use Hashicorp Vault for Key Management
-To encrypt a file or a directory,
-```sh
-# log into vault with username and password
-$ python app_cli.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --username <vault username> --password <vault password>
-# or log into vault with oauth
-$ python app_cli.py -e -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --oauth
-```
-The output path is optional.
-For example,
-```sh
-# log into vault with username and password
-$ python app_cli.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --username bob --password training
-# or log into vault with oauth
-$ python app_cli.py -e -i ./test_dataset  -o ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --oauth
-
-```
-To decrypt a file or a directory,
-
-```sh
-$ python app_cli.py -d -i <path to the file or dir you want to encrypt>  -o <output path to the encrypted file or dir> --vault <vault server address> --username <vault username> --password <vault password> --url <api path to fetch the secret>
+$ python app_cli.py decrypt \
+    --vault <HashiCorp Vault address> \
+    --input <path to the encrypted package> \
+    --output <path to put the decrypted package> \
+    --url <path to fetch the key saved on the key server> \
+    --oauth
 ```
 The output path is optional.
 
-For example,
+### Granting Access
 ```sh
-$ python app_cli.py -d -i ./test_dataset_enc_vault/ --vault http://127.0.0.1:8200/ --username bob --password training --url http://127.0.0.1:8200/v1/secret/data/4186db38-9ebe-0512-8c32-4552220324aa/test_dataset
+$ python app_cli.py grant_access \
+    --vault <HashiCorp Vault address> \
+    --dataset <dataset ID> \
+    --requester <vault ID of the requester> \
+    --expire <date this access is going to expire>
+    --frdr_api_url <FRDR API base url> \
+    --oauth
 ```
 
-#### CLI Usage Patterns
+### Show User's Vault ID
+This ID is required when users create access request on FRDR.
+```sh
+$ python app_cli.py show_vault_id \
+    --vault <HashiCorp Vault address> \
+    --oauth
+```
+
+### CLI Usage Patterns
+```sh
 Usage:
-```sh
-app_cli.py -e -i <input_path> [-o <output_path>] [--vault <vault_addr>] [--username <vault_username>] [--password <vault_password>] [--oauth] [--loglevel=<loglevel>] 
-app_cli.py -d -i <input_path> [-o <output_path>] (--key <key_path> | --vault <vault_addr> (--username <vault_username> --password <vault_password> | --oauth) --url <API_path>) [--loglevel=<loglevel>] 
-app_cli.py --logout_vault
-```
+  app_cli.py encrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> [--output=<op>] [--loglevel=<l>]
+  app_cli.py decrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> --url=<key_addr> [--output=<op>] [--loglevel=<l>]
+  app_cli.py grant_access --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --dataset=<id> --requester=<id> --expire=<date> --frdr_api_url=<url> [--loglevel=<l>]
+  app_cli.py show_vault_id --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>)
+  app_cli.py -h | --help
+
 Options:
-```sh
--e --encrypt           encrypt
--d --decrypt           decrypt
---oauth 
--i <input_path>, --input <input_path>
--o <output_path>, --output <output_path> 
--k <key_path>, --key <key_path>
---vault <vault_addr> using hashicorp vault for key generation and storage
--u <vault_username>, --username <vault_username>
--p <vault_password>, --password <vault_password>
---token <vault_token> 
---logout_vault  Remove old vault tokens
---url <API_path>  API Path to fetch secret on vault
--l --loglevel The logging level(debug, error, warning or info) [default: info]
-```
-
-### Grant Access, Review Shares, and Revoke Access
-```sh
-$ python access_manager_test.py --mode <access manager mode> --vault <vault server address> (--username <vault_username> --password <vault_password> | --oauth) [--name <dataset uuid>] [--requester <requester entity id on vault>]
-```
-For example, to grant access
-```sh
-# log into vault with username and password
-$ python access_manager_test.py --mode grant-access --vault http://127.0.0.1:8200/ --username "bob" --password "training" --requester 9d32d549-69ac-8685-8abb-bc10b9bc31c4 --name 104a3f2b-de39-4132-9bd6-f2a32499d647
-# or log into vault with oauth
-$ python access_manager_test.py --mode grant-access --vault http://127.0.0.1:8200/ --oauth --requester 9d32d549-69ac-8685-8abb-bc10b9bc31c4 --name 104a3f2b-de39-4132-9bd6-f2a32499d647
-```
-To review existing shares
-```sh
-python access_manager_test.py --mode review-shares --vault http://127.0.0.1:8200/ --username "bob" --password "training"
-```
-#### CLI Usage Patterns
-Usage:
-```sh
-access_manager_test.py --mode <mode> --vault <vault_addr> (--username <vault_username> --password <vault_password> | --oauth) [--requester <requester_vault_entity_id>] [--name <dataset_name>] [--expire <expiry_date>]
-
-```
-Options:
-```sh
--m <mode>, --mode <mode> grant-access, revoke-access, review-shares or generate-access-request
---vault <vault_addr> using hashicorp vault for key generation and storage
--u <vault_username>, --username <vault_username>
--p <vault_password>, --password <vault_password>
---oauth
--r <requester_vault_entity_id>, --requester <requester_vault_entity_id>
--n <dataset_name>, --name <dataset_name>
---expire <expiry date> the permission expiry date in format YYYY-mm-dd
-```
-
-### Generate Access Request
-Researchers need to log into Vault to generate a unique entity ID on vault before they request access on FRDR, which is performed on this client applcaiton. 
-
-```sh
-$ python access_manager_test.py --mode generate-access-request --vault <vault server address> (--username <vault_username> --password <vault_password> | --oauth) 
-```
-For example, 
-```sh
-python access_manager_test.py --mode generate-access-request --vault http://127.0.0.1:8200/ --username "bob" --password "training"
+  -h --help     Show this screen.
+  --username=<un>  username.
+  --password=<pd>  password.
+  --vault=<vault_addr>
+  --input=<ip>
+  --output=<op>
+  --url=<key_addr>
+  --dataset=<id>
+  --requester=<id>
+  --expire=<date>  the permission expiry date in format YYYY-mm-dd
+  --frdr_api_url=<url>
+  --loglevel=<l>  loglevel [default: info].
 ```
 
 ## GUI Usage
