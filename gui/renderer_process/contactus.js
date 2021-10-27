@@ -6,7 +6,14 @@ const path = require('path');
 function contactus() {
   var contactURL = "";
   try {
-    let fileContents = fs.readFileSync(path.join(__dirname, '..', 'app_gui','config', 'config.yml'), 'utf8');
+    var configPath = "";
+    if (process.env.NODE_ENV == "development") {
+      configPath = path.join(__dirname, '..', '..','config', 'config.yml');
+    }
+    else {
+      var configPath = path.join(__dirname, '..', 'app_gui','config', 'config.yml');
+    }
+    let fileContents = fs.readFileSync(configPath, 'utf8');
     let config = yaml.load(fileContents);
     contactURL = config["FRDR_CONTACTUS_URL"];
   } catch (e) {
