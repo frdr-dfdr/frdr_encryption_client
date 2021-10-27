@@ -3,14 +3,14 @@ const path = require('path');
  
 // Main process to open a folder selector dialog
 ipcMain.on('encrypt-open-input-dir-dialog', function (event) {
-  selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
+  var selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
   if (selected_path) {
     event.reply('encrypt-selected-input-dir', selected_path);
   }
 })
 
 ipcMain.on('encrypt-open-output-dir-dialog', function (event) {
-  selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
+  var selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
   if (selected_path) {
     event.reply('encrypt-selected-output-dir', selected_path);
   }

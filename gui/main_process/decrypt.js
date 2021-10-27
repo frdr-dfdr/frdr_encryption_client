@@ -3,14 +3,14 @@ const path = require('path');
 
 // Main process to open a file or folder selector dialog
 ipcMain.on('decrypt-open-file-dialog', function (event) {
-  input_path = dialog.showOpenDialogSync({properties: ['openFile']});
+  var input_path = dialog.showOpenDialogSync({properties: ['openFile']});
   if (input_path) {
     event.reply('decrypt-selected-file', input_path);
   }
 })
 
 ipcMain.on('decrypt-open-output-dir-dialog', function (event) {
-  selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
+  var selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
   if (selected_path) {
     event.reply('decrypt-selected-output-dir', selected_path);
   }

@@ -105,7 +105,7 @@ def main():
                     if frdr_api_url is None:
                         frdr_api_url = config.FRDR_API_BASE_URL
                     frdr_api_client = FRDRAPIClient()
-                    frdr_api_client.login(base_url=config.FRDR_API_BASE_URL)
+                    frdr_api_client.login(base_url=frdr_api_url)
                     data = {"expires": expire_date, "vault_dataset_id": dataset_uuid,
                             "vault_requester_id": requester_uuid}
                     print(frdr_api_client.update_requestitem(data))

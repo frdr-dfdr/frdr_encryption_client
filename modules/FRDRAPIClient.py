@@ -24,7 +24,7 @@ class DataPublicationClient(BaseClient):
         return self.put('requestitem', json_body=data)
 
 
-class FRDRAPIClient(BaseClient):
+class FRDRAPIClient():
 
     def __init__(self):
         self._logger = logging.getLogger(

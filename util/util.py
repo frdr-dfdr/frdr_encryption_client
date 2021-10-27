@@ -112,7 +112,7 @@ class Util(object):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         while port <= max_port:
             try:
-                sock.bind(('', port))
+                sock.bind(('127.0.0.1', port))
                 sock.close()
                 return port
             except OSError:
