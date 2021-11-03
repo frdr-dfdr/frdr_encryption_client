@@ -1,6 +1,6 @@
 from util.util import Util
 from globus_sdk import RefreshTokenAuthorizer, NativeAppAuthClient
-from globus_sdk.base import BaseClient
+from globus_sdk import BaseClient
 import logging
 from util.config_loader import config
 import webbrowser
@@ -10,18 +10,18 @@ from urllib import parse
 
 class DataPublicationClient(BaseClient):
     allowed_authorizer_types = [RefreshTokenAuthorizer]
-
+    service_name = "datapublication"
     def __init__(self, base_url, **kwargs):
         self._logger = logging.getLogger(
             "frdr-encryption-client.DataPublicationClient")
         app_name = kwargs.pop(
             'app_name', config.GLOBUS_DATA_PUBLICATION_CLIENT_NAME)
-        BaseClient.__init__(self, "datapublication", base_url=base_url,
+        BaseClient.__init__(self, base_url=base_url,
                             app_name=app_name, **kwargs)
-        self._headers['Content-Type'] = 'application/json'
+        self._headers = {'Content-Type': 'application/json'}
 
     def update_requestitem(self, data):
-        return self.put('requestitem', json_body=data)
+        return self.put('requestitem', data=data, headers=self._headers)
 
 
 class FRDRAPIClient():
@@ -46,8 +46,10 @@ class FRDRAPIClient():
             pub_tokens = tokens['publish.api.frdr.ca']
 
             pub_authorizer = RefreshTokenAuthorizer(
-                pub_tokens['refresh_token'], self._load_auth_client(),
-                pub_tokens['access_token'], pub_tokens['expires_at_seconds'])
+                refresh_token=pub_tokens['refresh_token'], 
+                auth_client=self._load_auth_client(),
+                access_token=pub_tokens['access_token'], 
+                expires_at=pub_tokens['expires_at_seconds'])
 
             pub_client = DataPublicationClient(
                 base_url, authorizer=pub_authorizer)
