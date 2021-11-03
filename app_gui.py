@@ -23,7 +23,7 @@ class EncryptionClientGui(object):
     def __init__(self):
         Util.get_logger("frdr-encryption-client",
                         log_level="info",
-                        filepath=os.path.join(dirs.user_data_dir, "frdr-encryption-client_log.txt"))
+                        filepath=os.path.join(dirs.user_data_dir, config.APP_LOG_FILENAME))
         self._logger = logging.getLogger("frdr-encryption-client.gui")
         self._vault_client = VaultClient()
         self._frdr_api_client = FRDRAPIClient()
@@ -69,7 +69,7 @@ class EncryptionClientGui(object):
     def logout(self):
         try:
             self._vault_client.logout()
-            webbrowser.open("https://auth.globus.org/v2/web/logout")
+            webbrowser.open(config.GLOBUS_LOGOUT_URL)
             self._logger.info("Log out successfully")
             return (True, None)
         except Exception as e:

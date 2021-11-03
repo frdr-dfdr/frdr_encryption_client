@@ -47,7 +47,7 @@ def main():
         arguments = docopt(__doc__, version=__version__)
         logger = Util.get_logger("frdr-encryption-client",
                                  log_level=arguments["--loglevel"],
-                                 filepath=os.path.join(dirs.user_data_dir, "frdr-encryption-client_log.txt"))
+                                 filepath=os.path.join(dirs.user_data_dir, config.APP_LOG_FILENAME))
         if sys.version_info[0] < 3:
             raise Exception("Python 3 is required to run the local client.")
 
