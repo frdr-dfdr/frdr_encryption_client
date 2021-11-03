@@ -1,3 +1,5 @@
+from ctypes import c_char_p, c_bool
+from multiprocessing import Process, Manager
 import webbrowser
 from modules.PersonKeyManager import PersonKeyManager
 from modules.EncryptionClient import EncryptionClient
@@ -12,12 +14,37 @@ from util.util import Util
 import uuid
 from modules.DatasetKeyManager import DatasetKeyManager
 from modules.FRDRAPIClient import FRDRAPIClient
+import traceback
 
 
 __version__ = config.VERSION
 dirs = AppDirs(config.APP_NAME, config.APP_AUTHOR)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 
+def encrypt_in_process(input_path, output_path, vault_client_token, 
+                       vault_client_entity_id, vault_client_addr, 
+                       return_message, return_successful):
+    try:
+        Util.get_logger("frdr-encryption-client",
+                        log_level="info",
+                        filepath=os.path.join(dirs.user_data_dir, "frdr-encryption-client_log.txt"))
+        logger = logging.getLogger("frdr-encryption-client.gui.encrypt")
+        logger.info("Encrypt files in the path {}".format(input_path))
+        with open(os.path.join(dirs.user_data_dir, "pid"), 'w') as f:
+            f.write(str(os.getpid()))
+        dataset_uuid = str(uuid.uuid4())
+        vault_client = VaultClient(token=vault_client_token, entity_id=vault_client_entity_id, url=vault_client_addr)
+        dataset_key_manager = DatasetKeyManager(vault_client)
+        person_key_manager = PersonKeyManager(vault_client)
+        encryptor = EncryptionClient(
+            dataset_key_manager, person_key_manager, input_path, output_path)
+        bag_path = encryptor.encrypt(dataset_uuid)
+        return_message.value = bag_path
+        return_successful.value = True
+    except Exception as e:
+        return_message.value = str(e)
+        return_successful.value = False
+        logger.info(e, exc_info=True)
 
 class EncryptionClientGui(object):
     def __init__(self):
@@ -77,19 +104,17 @@ class EncryptionClientGui(object):
             return (False, str(e))
 
     def encrypt(self, input_path, output_path):
-        try:
-            self._logger.info(
-                "Encrypt files in the path {}".format(input_path))
-            dataset_uuid = str(uuid.uuid4())
-            dataset_key_manager = DatasetKeyManager(self._vault_client)
-            person_key_manager = PersonKeyManager(self._vault_client)
-            encryptor = EncryptionClient(
-                dataset_key_manager, person_key_manager, input_path, output_path)
-            bag_path = encryptor.encrypt(dataset_uuid)
-            return (True, bag_path)
-        except Exception as e:
-            self._logger.info(str(e))
-            return (False, str(e))
+        manager = Manager()
+        message = manager.Value(c_char_p, "Terminated")
+        successful = manager.Value(c_bool, False)
+        p = Process(target=encrypt_in_process, args=(input_path, output_path, self._vault_client.token, self._vault_client.entity_id, self._vault_client.url, message, successful))
+        p.start()
+        p.join()
+        return (successful.value, message.value)
+    
+    def cleanup(self):
+        self._logger.info("Encryption has been terminated by the user. Now clean up...")
+        
 
     def decrypt(self, input_path, output_path, url):
         try:
@@ -151,6 +176,8 @@ class EncryptionClientGui(object):
             return (True, entity_id)
         except Exception as e:
             return (False, str(e))
+
+
 
 
 if __name__ == "__main__":

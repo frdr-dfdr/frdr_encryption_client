@@ -8,11 +8,22 @@ from hvac.exceptions import InvalidRequest
 
 
 class VaultClient(object):
-    def __init__(self):
+    def __init__(self, token=None, url=None, entity_id=None):
+        """Init function of VaultClient. 
+           In normal case, no parameter is required for initilization. 
+           If token, url and entity_id are given, it means the VaultClient
+           has already been authenticated for usage. This is added to support 
+           calling the encrypt function in EncryptionClientGui in a separate 
+           process.
+
+        Args:
+            token (string, optional): Authentication token to include in requests sent to Vault. Defaults to None.
+            url (string, optional): Base URL for the Vault instance being addressed. Defaults to None.
+            entity_id (string, optional): The authenticated user's id on Vault. Defaults to None.
+        """
         self._logger = logging.getLogger("frdr-encryption-client.vault-client")
-        self._entity_id = None
-        self.hvac_client = hvac.Client()
-        self._vault_token = None
+        self.hvac_client = hvac.Client(token=token, url=url)
+        self._entity_id = entity_id
 
     def login(self, vault_addr, auth_method, username=None, password=None, oauth_type=None):
         """Log into the key server (HashiCorp Vault) with different auth methods. 
@@ -41,7 +52,7 @@ class VaultClient(object):
             try:
                 response = self.hvac_client.auth.userpass.login(
                     username, password)
-                self._vault_token = response["auth"]["client_token"]
+                vault_token = response["auth"]["client_token"]
             except Exception:
                 self._logger.error("Failed to auth with userpass method.")
                 raise Exception
@@ -74,7 +85,7 @@ class VaultClient(object):
                 auth_result = self.hvac_client.auth.oidc.oidc_callback(
                     code=token, path=path, nonce=auth_url_nonce, state=auth_url_state
                 )
-                self._vault_token = auth_result['auth']['client_token']
+                vault_token = auth_result['auth']['client_token']
                 self._entity_id = auth_result['auth']['entity_id']
             except InvalidRequest as ir:
                 self._logger.error(
@@ -87,7 +98,7 @@ class VaultClient(object):
                     "Failed to auth with {} account using oidc method. {}".format(oauth_type, e))
                 raise Exception(e)
 
-        self.hvac_client.token = self._vault_token
+        self.hvac_client.token = vault_token
         try:
             assert self.hvac_client.is_authenticated(), "Failed to authenticate with Vault."
         except AssertionError as error:
@@ -274,7 +285,18 @@ class VaultClient(object):
         httpd.timeout = config.VAULT_LOGIN_TIMEOUT
         httpd.handle_request()
         return httpd.token
+    
+    def get_hvac_client(self):
+        return self.hvac_client
 
     @property
     def entity_id(self):
         return self._entity_id
+
+    @property
+    def token(self):
+        return self.hvac_client.token
+
+    @property
+    def url(self):
+        return self.hvac_client.url

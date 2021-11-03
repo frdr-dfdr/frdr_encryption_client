@@ -3,6 +3,7 @@
 
 from collections import defaultdict
 import datetime
+import signal
 import hvac
 import nacl.utils
 import nacl.secret
@@ -51,6 +52,14 @@ class EncryptionClient(object):
         """
         logger = logging.getLogger('frdr-encryption-client.encrypt')
 
+        def cleanup(*args):
+            logger.info("In CLEAN UP FUNCTION")
+            logger.info("bag dir parent: " + bag_dir_parent)
+            exit(0)
+
+        signal.signal(signal.SIGINT, cleanup)
+        signal.signal(signal.SIGTERM, cleanup)
+        
         # generate key
         self._dataset_key_manager.generate_key()
         self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
