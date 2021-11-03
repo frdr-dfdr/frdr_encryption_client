@@ -1,6 +1,6 @@
 const {dialog, ipcMain} = require('electron');
  
-ipcMain.on('grant-access', (event, requester, dataset, expiryDate, dialogOptions, dialogOptions2) => {
+ipcMain.on('grant-access', (event, requester, dataset, expiryDate, dialogOptions, dialogOptions2, loginSuccessMsg) => {
   client.invoke("get_entity_name", requester, function(_error, res) {
     var success = res[0];
     var result = res[1];
@@ -10,7 +10,7 @@ ipcMain.on('grant-access', (event, requester, dataset, expiryDate, dialogOptions
       if (response == 0) {
         const response2 = dialog.showMessageBoxSync(dialogOptions2);
         if (response2 == 0) {
-          client.invoke("login_frdr_api_globus", function(_error, res) {
+          client.invoke("login_frdr_api_globus", loginSuccessMsg, function(_error, res) {
             var successLogin = res[0];
             var errMessageLogin = res[1];
             if (successLogin) {

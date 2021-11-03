@@ -31,17 +31,20 @@ class FRDRAPIClient():
             "frdr-encryption-client.FRDR-API-client")
         self._pub_client = None
 
-    def login(self, base_url):
+    def login(self, base_url, success_msg=None):
         """Log into FRDR for API usage.
 
         Args:
             base_url (string): FRDR API base url
+            success_msg (string, optional): The message shown in the browser once when the user logs in successfully. Defaults to None.
 
         Raises:
             Exception: If there is any error when logging into FRDR
         """
+        if success_msg is None:
+            success_msg = "Authentication to FRDR successful, you can close the browser now."
         try:
-            tokens = self._interactive_login()
+            tokens = self._interactive_login(success_msg)
 
             pub_tokens = tokens['publish.api.frdr.ca']
 
@@ -91,7 +94,7 @@ class FRDRAPIClient():
 
         return ret_toks
 
-    def _interactive_login(self):
+    def _interactive_login(self, success_msg):
         native_client = self._load_auth_client()
 
         port = Util.find_free_port()
@@ -102,7 +105,7 @@ class FRDRAPIClient():
             redirect_uri='http://localhost:{}'.format(port))
         auth_url = native_client.oauth2_get_authorize_url()
         webbrowser.open(auth_url)
-        auth_code = self._login_get_token(port)
+        auth_code = self._login_get_token(port ,success_msg)
 
         if auth_code is None:
             raise TimeoutError(
@@ -111,7 +114,7 @@ class FRDRAPIClient():
         tkns = native_client.oauth2_exchange_code_for_tokens(auth_code)
         return self._token_response_to_dict(tkns)
 
-    def _login_get_token(self, port):
+    def _login_get_token(self, port, success_msg):
 
         class HttpServ(HTTPServer):
             def __init__(self, *args, **kwargs):
@@ -127,7 +130,7 @@ class FRDRAPIClient():
                 self.send_response(200)
                 self.end_headers()
                 self.wfile.write(str.encode(
-                    '<div>Authentication successful, you can close the browser now.</div>'))
+                    "<div>{}</div>".format(success_msg)))
 
         server_address = ('', port)
         httpd = HttpServ(server_address, AuthHandler)

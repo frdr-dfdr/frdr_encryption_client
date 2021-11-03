@@ -14,6 +14,7 @@
   "app-login-url-tooltip": "If running for development, probably http://127.0.0.1:8200.",
   "app-login-btn": "Login with Globus",
   "app-login-error": "Error logging in with Globus OAuth. \n$1",
+  "app-login-success-message": "Authentication to HashiCorp Valut successful, you can close the browser now.", 
 
   "app-home-dep-btn": "Use as Depositor",
   "app-home-req-btn": "Use as Requester",
@@ -79,6 +80,7 @@
   "app-depositor-grant-access-login-api": "You need to log into FRDR for access granting.",
   "app-depositor-grant-access-login-api-btn1": "Login with Globus",
   "app-depositor-grant-access-login-api-btn2": "Cancel",
+  "app-depositor-grant-access-login-success-message": "Authentication to FRDR successful, you can close the browser now.", 
 
   "app-depositor-grant-access-done": "Access Granted",
   "app-depositor-grant-access-error": "Error granting access. $1",

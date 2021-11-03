@@ -25,15 +25,16 @@ function grantAccess() {
     defaultId: 1,
     title: "Confirmation",
     message: $.i18n("app-depositor-grant-access-confirm")
-  }
+  };
   var dialogOptions2 = {
     type: "question",
     buttons: [$.i18n("app-depositor-grant-access-login-api-btn1"), $.i18n("app-depositor-grant-access-login-api-btn2")],
     defaultId: 1,
     title: "Confirmation",
     message: $.i18n("app-depositor-grant-access-login-api")
-  }
-  ipcRenderer.send("grant-access", requester, dataset, expiryDate, dialogOptions, dialogOptions2);
+  };
+  var loginSuccessMsg = $.i18n("app-depositor-grant-access-login-success-message");
+  ipcRenderer.send("grant-access", requester, dataset, expiryDate, dialogOptions, dialogOptions2, loginSuccessMsg);
 }
 
 ipcRenderer.on('notify-get-entity-name-error', function (_event, result) {

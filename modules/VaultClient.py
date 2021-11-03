@@ -14,7 +14,8 @@ class VaultClient(object):
         self.hvac_client = hvac.Client()
         self._vault_token = None
 
-    def login(self, vault_addr, auth_method, username=None, password=None, oauth_type=None):
+    def login(self, vault_addr, auth_method, username=None, password=None, oauth_type=None, success_msg=None):
+        
         """Log into the key server (HashiCorp Vault) with different auth methods. 
            It currently supports OIDC auth method which is configured to allow 
            users to use their Globus Credentials, and userpass auth method. 
@@ -25,6 +26,7 @@ class VaultClient(object):
             username (string, optional): Username is using userpass as the auth method. Defaults to None.
             password (string, optional): Password is using userpass as the auth method. Defaults to None.
             oauth_type (string, optional): The oidc provider if multiple oidc providers are needed. Defaults to None.
+            success_msg (string, optional): The message shown in the browser once when the user logs in successfully. Defaults to None.
 
         Raises:
             Exception: If there is any error when logging in with userpass auth method
@@ -49,6 +51,8 @@ class VaultClient(object):
         elif auth_method == "ldap":
             pass
         elif auth_method == "oidc":
+            if success_msg is None:
+                success_msg = "Authentication to HashiCorp Vault successful, you can close the browser now."
             try:
                 if oauth_type is None:
                     path = "oidc"
@@ -69,7 +73,7 @@ class VaultClient(object):
                 auth_url_state = params['state'][0]
 
                 webbrowser.open(auth_url)
-                token = self._login_odic_get_token(port)
+                token = self._login_odic_get_token(port, success_msg)
 
                 auth_result = self.hvac_client.auth.oidc.oidc_callback(
                     code=token, path=path, nonce=auth_url_nonce, state=auth_url_state
@@ -249,7 +253,7 @@ class VaultClient(object):
                 self._logger.error("error {}".format(e))
 
     # handles the callback
-    def _login_odic_get_token(self, port):
+    def _login_odic_get_token(self, port, success_msg):
         from http.server import BaseHTTPRequestHandler, HTTPServer
 
         class HttpServ(HTTPServer):
@@ -267,7 +271,7 @@ class VaultClient(object):
                 self.send_response(200)
                 self.end_headers()
                 self.wfile.write(str.encode(
-                    '<div>Authentication successful, you can close the browser now.</div>'))
+                    "<div>{}</div>".format(success_msg)))
 
         server_address = ('', port)
         httpd = HttpServ(server_address, AuthHandler)

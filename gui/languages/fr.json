@@ -13,6 +13,7 @@
   "app-login-url-title": "FR Key Server URL",
   "app-login-url-tooltip": "FR If running for development, probably http://127.0.0.1:8200.",
   "app-login-btn": "FR Login with Globus",
+  "app-login-success-message": "FR Authentication to HashiCorp Valut successful, you can close the browser now.", 
 
   "app-home-dep-btn": "Utiliser en tant que déposant",
   "app-home-req-btn": "Utiliser en tant que demandeur",
