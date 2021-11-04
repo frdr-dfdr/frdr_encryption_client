@@ -13,6 +13,7 @@
   "app-login-url-title": "FR Key Server URL",
   "app-login-url-tooltip": "FR If running for development, probably http://127.0.0.1:8200.",
   "app-login-btn": "FR Login with Globus",
+  "app-login-success-message": "FR Authentication to HashiCorp Valut successful, you can close the browser now.", 
 
   "app-home-dep-btn": "Utiliser en tant que déposant",
   "app-home-req-btn": "Utiliser en tant que demandeur",
@@ -57,7 +58,6 @@
   "app-depositor-grant-access-expire-tooltip": "The date that this access is going to expire111111",
   "app-depositor-grant-access-button": "Grant Access111111",
   "app-depositor-grant-access-confirm": "!!!!! $1 22222 $2. \n\nDo you want to continue?",
-  "app-footer": "© 2021 DFDR Chiffrement Application 0.0.3",
   "app-profile-title": "FR User Profile",
   "app-profile-email": "FR Email",
   "app-profile-user-id": "FR Vault User ID",

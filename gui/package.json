@@ -4,7 +4,7 @@
   "homepage": "https://github.com/frdr-dfdr/frdr_encryption_client",
   "main": "main.js",
   "description": "A local application to encrypt and decrypt data.",
-  "license": "MIT",
+  "license": "CUSTOM",
   "repository": {
     "type": "git",
     "url": "https://github.com/frdr-dfdr/frdr_encryption_client"

@@ -52,7 +52,8 @@ function oidcGlobusLogin() {
   else {
     var hostnamePKI = hostname;
   }
-  ipcRenderer.send("login-vault-oidc-globus", hostname, hostnamePKI);
+  var loginSuccessMsg = $.i18n("app-login-success-message");
+  ipcRenderer.send("login-vault-oidc-globus", hostname, hostnamePKI, loginSuccessMsg);
 }
 
 document.getElementById("globus_submit").addEventListener("click", oidcGlobusLogin);

@@ -1,6 +1,6 @@
 from util.util import Util
 from globus_sdk import RefreshTokenAuthorizer, NativeAppAuthClient
-from globus_sdk.base import BaseClient
+from globus_sdk import BaseClient
 import logging
 from util.config_loader import config
 import webbrowser
@@ -10,18 +10,18 @@ from urllib import parse
 
 class DataPublicationClient(BaseClient):
     allowed_authorizer_types = [RefreshTokenAuthorizer]
-
+    service_name = "datapublication"
     def __init__(self, base_url, **kwargs):
         self._logger = logging.getLogger(
             "frdr-encryption-client.DataPublicationClient")
         app_name = kwargs.pop(
             'app_name', config.GLOBUS_DATA_PUBLICATION_CLIENT_NAME)
-        BaseClient.__init__(self, "datapublication", base_url=base_url,
+        BaseClient.__init__(self, base_url=base_url,
                             app_name=app_name, **kwargs)
-        self._headers['Content-Type'] = 'application/json'
+        self._headers = {'Content-Type': 'application/json'}
 
     def update_requestitem(self, data):
-        return self.put('requestitem', json_body=data)
+        return self.put('requestitem', data=data, headers=self._headers)
 
 
 class FRDRAPIClient():
@@ -31,23 +31,28 @@ class FRDRAPIClient():
             "frdr-encryption-client.FRDR-API-client")
         self._pub_client = None
 
-    def login(self, base_url):
+    def login(self, base_url, success_msg=None):
         """Log into FRDR for API usage.
 
         Args:
             base_url (string): FRDR API base url
+            success_msg (string, optional): The message shown in the browser once when the user logs in successfully. Defaults to None.
 
         Raises:
             Exception: If there is any error when logging into FRDR
         """
+        if success_msg is None:
+            success_msg = "Authentication to FRDR successful, you can close the browser now."
         try:
-            tokens = self._interactive_login()
+            tokens = self._interactive_login(success_msg)
 
             pub_tokens = tokens['publish.api.frdr.ca']
 
             pub_authorizer = RefreshTokenAuthorizer(
-                pub_tokens['refresh_token'], self._load_auth_client(),
-                pub_tokens['access_token'], pub_tokens['expires_at_seconds'])
+                refresh_token=pub_tokens['refresh_token'], 
+                auth_client=self._load_auth_client(),
+                access_token=pub_tokens['access_token'], 
+                expires_at=pub_tokens['expires_at_seconds'])
 
             pub_client = DataPublicationClient(
                 base_url, authorizer=pub_authorizer)
@@ -89,7 +94,7 @@ class FRDRAPIClient():
 
         return ret_toks
 
-    def _interactive_login(self):
+    def _interactive_login(self, success_msg):
         native_client = self._load_auth_client()
 
         port = Util.find_free_port()
@@ -100,7 +105,7 @@ class FRDRAPIClient():
             redirect_uri='http://localhost:{}'.format(port))
         auth_url = native_client.oauth2_get_authorize_url()
         webbrowser.open(auth_url)
-        auth_code = self._login_get_token(port)
+        auth_code = self._login_get_token(port ,success_msg)
 
         if auth_code is None:
             raise TimeoutError(
@@ -109,7 +114,7 @@ class FRDRAPIClient():
         tkns = native_client.oauth2_exchange_code_for_tokens(auth_code)
         return self._token_response_to_dict(tkns)
 
-    def _login_get_token(self, port):
+    def _login_get_token(self, port, success_msg):
 
         class HttpServ(HTTPServer):
             def __init__(self, *args, **kwargs):
@@ -125,7 +130,7 @@ class FRDRAPIClient():
                 self.send_response(200)
                 self.end_headers()
                 self.wfile.write(str.encode(
-                    '<div>Authentication successful, you can close the browser now.</div>'))
+                    "<div>{}</div>".format(success_msg)))
 
         server_address = ('', port)
         httpd = HttpServ(server_address, AuthHandler)
