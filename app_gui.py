@@ -38,32 +38,33 @@ class EncryptionClientGui(object):
                                      oauth_type="google")
             return (True, None)
         except Exception as e:
-            self._logger.info(str(e))
+            self._logger.error(str(e), exc_info=True)
             return (False, str(e))
 
-    def login_oidc_globus(self, hostname, hostname_pki):
+    def login_oidc_globus(self, hostname, hostname_pki, success_msg):
         try:
             self._logger.info(
                 "Log into Vault using oidc method with globus acccount")
             self._vault_client.login(vault_addr=hostname,
-                                     auth_method="oidc")
+                                     auth_method="oidc",
+                                     success_msg=success_msg)
             # self._vault_client_pki.login(vault_addr=hostname_pki,
             #                          auth_method="oidc")
             return (True, None)
         except Exception as e:
-            self._logger.info(str(e))
+            self._logger.error(str(e), exc_info=True)
             return (False, str(e))
 
-    def login_frdr_api_globus(self, base_url=None):
+    def login_frdr_api_globus(self, success_msg, base_url=None):
         try:
             self._logger.info(
                 "Login with globus acccount for FRDR REST API usage")
             if base_url is None:
                 base_url = config.FRDR_API_BASE_URL
-            self._frdr_api_client.login(base_url=base_url)
+            self._frdr_api_client.login(base_url=base_url, success_msg=success_msg)
             return (True, None)
         except Exception as e:
-            self._logger.info(str(e))
+            self._logger.error(str(e), exc_info=True)
             return (False, str(e))
 
     def logout(self):
