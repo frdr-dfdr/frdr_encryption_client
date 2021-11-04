@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>FRDR Encryption Application</title>
+  <script>window.jQuery = window.$ = require('jquery');</script>
+  <script src="../assests/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
+  <script src="../assests/js/jquery_i18n/CLDRPluralRuleParser.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.messagestore.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.fallbacks.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.language.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.parser.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.bidi.js"></script>
+  <style>
+    @import url("../theme/colors.css");  
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      margin: 15px 0;
+      opacity: 0.85;
+      display: inline-block;
+      font-size: 17px;
+      line-height: 20px;
+      text-decoration: none; /* remove underline from anchors */
+      text-align: center;
+    }
+
+    .btn-login:disabled,
+    .btn-login:disabled:hover
+    {
+      background-color: rgb(214, 214, 214);
+    }
+
+    .login-block{
+      background: var(--login-background-gradient-start);  /* fallback for old browsers */
+      background: -webkit-linear-gradient(to bottom, var(--login-background-gradient-start), var(--login-background-gradient-end));  /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(to bottom, var(--login-background-gradient-start), var(--login-background-gradient-end)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+      float:left;
+      width:100%;
+      padding : 50px 0;
+    }
+    
+    .banner-sec{
+      background: var(--login-banner-background); 
+      background-size: cover; 
+      min-height: 500px; 
+      border-radius:  10px 0 0 10px; 
+      padding: 50px;}
+      
+    .container{
+      background: var(--login-login-sec-background); 
+      border-radius:  10px;
+    
+    }
+    
+    .login-sec{
+      padding: 50px; 
+      position: relative;
+    }
+
+    .login-sec h2{
+      margin-bottom: 30px; 
+      font-weight: 800; 
+      font-size: 30px; 
+      color:  var(--login-heading);
+    }
+
+    .login-sec h2:after{
+      content: " "; 
+      width: 100px; 
+      height: 5px; 
+      background: var(--login-dividing-line); 
+      display: block; 
+      margin-top: 20px; 
+      border-radius: 3px; 
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .banner-text{
+      width: 70%; 
+      position: absolute; 
+      padding-left: 20px;
+    }
+
+    .banner-text h2{
+      color: var(--login-banner-text); 
+      font-weight: 600;
+    }
+
+    .banner-text h2:after{
+      content: " "; 
+      width: 100px; 
+      height: 5px; 
+      background: var(--login-banner-text); 
+      display: block; 
+      margin-top: 20px; 
+      border-radius: 3px;
+    }
+
+    .banner-text p{
+      color: var(--login-banner-text);
+    }
+
+    .dropdown-menu {
+      min-width: 50px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <section class="login-block">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-xs-6 banner-sec">
+          <div class="banner-text">
+              <h2 data-i18n="app-name"></h2>
+              <p data-i18n="app-desc"></p>
+          </div>	
+        </div>	 
+
+        <div class="col-md-6 col-xs-6 login-sec">
+          <div class="row">
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="#" id="locale-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></a>
+                <ul class="dropdown-menu" id="locale-menu" role="menu">
+                  <li><a role="menuitem" class="lang-switch" href="#" data-locale="en" data-i18n="app-navbar-locale-english"></a></li>
+                  <li><a role="menuitem" class="lang-switch" href="#" data-locale="fr" data-i18n="app-navbar-locale-french"></a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <h2 class="text-center" data-i18n="app-login-title"></h2>  
+
+          <div>
+            <label for="hostname" data-i18n="app-login-url-title"></label>
+            <input id="hostname" type="text" style='width:90%;display:inline'/>
+            <a data-placement="top" data-toggle="tooltip" id="login-url-tooltip">
+              <span class="glyphicon glyphicon-question-sign" ></span>
+            </a>
+          </div>
+
+          <div class="text-center">
+            <button id="globus_submit" class="btn-primary btn-login" data-i18n="app-login-btn"></button>
+          </div>
+  
+    </div>
+  </div>
+  </div>
+  </section>  
+
+  <script src="../renderer_process/login.js" charset="utf-8"></script> 
+  <script src="../assests/js/jquery_i18n/app.js"></script>
+
+</body>
+
+</html>

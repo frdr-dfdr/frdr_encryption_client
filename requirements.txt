@@ -1,8 +1,10 @@
 appdirs==1.4.4
 astroid==2.3.3
+bagit==1.8.1
 cffi==1.14.0
+cryptography==3.1.1
 docopt==0.6.2
-hvac==0.10.3
+hvac==0.10.14
 isort==4.3.21
 lazy-object-proxy==1.4.3
 mccabe==0.6.1
@@ -15,3 +17,6 @@ wrapt==1.11.2
 click==7.1.2
 python-dateutil==2.8.1
 pytz==2020.4
+zerorpc==0.6.3
+globus_sdk==3.1.0
+PyYAML==5.4.1

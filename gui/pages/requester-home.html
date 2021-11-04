@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>FRDR Encryption Application</title>
+  <script>window.jQuery = window.$ = require('jquery'); </script>
+  <script src="../assests/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/css/bootstrap-theme.min.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/css/frdr-theme.css" type="text/css" />
+  <script src="../assests/js/jquery_i18n/CLDRPluralRuleParser.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.messagestore.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.fallbacks.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.language.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.parser.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.bidi.js"></script>
+</head>
+
+<body>
+  <!--Navigation bar-->
+  <div id="nav-placeholder">
+  </div>
+
+  <script>
+  $(function(){
+    $("#nav-placeholder").load("../components/navbar.html");
+  });
+  </script>
+  <!--end of Navigation bar-->
+  <div class="container">
+    <h2 data-i18n="app-requester-home-title"></h2>
+    <p data-i18n="app-requester-home-info"></p>
+    <div class="row">
+      <div class="col-sm-12 text-center">
+        <button id="btn-request-access" class="btn btn-primary btn-md center-block" onclick="window.location='requester-request-access.html';" data-i18n="app-request-access-titile"></button>
+        <button id="btn-decrypt" class="btn btn-primary btn-md center-block" onclick="window.location='requester-decrypt.html';" data-i18n="app-decrypt-title"></button>
+      </div>
+    </div>
+  </div>
+
+  <!--Footer-->
+  <div id="footer-placeholder"></div>
+  <script>
+  $(function(){
+    $("#footer-placeholder").load("../components/footer.html");
+  });
+  </script>
+  <!--end of Footer--> 
+  
+</body>
+
+</html>

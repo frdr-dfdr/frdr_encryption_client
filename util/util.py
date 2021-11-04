@@ -3,30 +3,31 @@ import sys
 import logging
 from base64 import b64encode, b64decode
 import textwrap
-import subprocess
-import smtplib
-from email import encoders
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from configparser import ConfigParser
+from pathlib import Path
+from util.config_loader import config
+import socket
 
-logger = logging.getLogger("frdr-crypto.util")
+logger = logging.getLogger("frdr-encryption-client.util")
+
 
 class Util(object):
-    
+
     @classmethod
     def make_dir(cls, dir_name):
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
             logger.info("A new directory {} created.".format(dir_name))
         else:
-            logger.info("Creating a new directory {} failed, already existed.".format(dir_name))
-            pass
-   
+            logger.info(
+                "Creating a new directory {} failed, already existed.".format(dir_name))
+
     @classmethod
     def base64_to_byte(cls, plaintext):
         return b64decode(plaintext.encode())
+
+    @classmethod
+    def byte_to_base64(cls, byte):
+        return b64encode(byte).decode()
 
     @classmethod
     def clean_dir_path(cls, path):
@@ -36,32 +37,48 @@ class Util(object):
             return path
 
     @classmethod
+    def get_key_dir(cls, subdir):
+        home = str(Path.home())
+        key_dir = os.path.join(home, config.LOCAL_KEY_DIR_NAME, subdir)
+        if not os.path.exists(key_dir):
+            Util.make_dir(key_dir)
+        return key_dir
+
+    @classmethod
+    def check_dir_exists(cls, path):
+        return os.path.isdir(path)
+
+    @classmethod
+    def check_file_exists(cls, path):
+        return os.path.isfile(path)
+
+    @classmethod
     def get_logger(cls, name, log_level="INFO", filepath=None):
         logger = logging.getLogger(name)
         # if logger already exists, return it
         if logger.handlers:
             return logger
-        
+
         level = getattr(logging, log_level.upper() if log_level else "INFO")
         try:
             logger.setLevel(level)
-        except: 
+        except:
             logger.setLevel(logging.INFO)
 
         logger.info("Log level: {}".format(log_level))
 
-        clean_logformatter = '%(asctime)s %(name)s [%(levelname)s] %(message)s'
+        clean_logformatter = '%(asctime)s %(name)s [%(levelname)s] %(message)s [%(filename)s:%(lineno)d]'
         clean_formatter = logging.Formatter(clean_logformatter)
         console = logging.StreamHandler(sys.stdout)
         try:
             console.setLevel(level)
-        except: 
+        except:
             console.setLevel(logging.INFO)
 
         # console.addFilter(lambda record: record.levelno <= logging.INFO)
         console.setFormatter(clean_formatter)
         logger.addHandler(console)
-        
+
         # Create handlers
         if filepath:
             logformatter = '%(asctime)s %(name)s [%(levelname)s] %(message)s'
@@ -74,7 +91,6 @@ class Util(object):
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
 
-
         return logger
 
     @classmethod
@@ -84,45 +100,23 @@ class Util(object):
         lines = textwrap.wrap(text, max_line_length)
         wrapped_text = 60 * '*' + '\n'
         for line in lines:
-            wrapped_text += '*{pad}{text:{width}}{pad}*\n'.format(text=line, pad=' '*padding, width=max_line_length)
+            wrapped_text += '*{pad}{text:{width}}{pad}*\n'.format(
+                text=line, pad=' '*padding, width=max_line_length)
         wrapped_text += 60 * '*'
         return wrapped_text
 
     @classmethod
-    def send_email(cls, to_addr, msg_subject, msg_body_html, file_to_attach=None):    
-        parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        config_path = os.path.join(parent_path, "email.ini")
-
-        if os.path.exists(config_path):
-            cfg = ConfigParser()
-            cfg.read(config_path)
-        else:
-            logger.error("Email Server Config not found! Exiting!")
-            sys.exit(1)
-        
-        host = cfg.get("smtp", "server")
-        from_addr = cfg.get("smtp", "from_addr")
-        
-        message = MIMEMultipart("alternative")
-        message["Subject"] = msg_subject
-        message["From"] = from_addr
-        message["To"] = to_addr
-        message.attach(MIMEText(msg_body_html, "html"))
-        
-        if file_to_attach is not None:      
-            with open(file_to_attach, 'rb') as f:
-                # set attachment mime and file name, the image type is png
-                mime = MIMEBase('image', 'png', filename='decrypt.png')
-                # add required header data:
-                mime.add_header('Content-Disposition', 'attachment', filename='decrypt.png')
-                mime.add_header('X-Attachment-Id', '0')
-                mime.add_header('Content-ID', '<0>')
-                # read attachment file content into the MIMEBase object
-                mime.set_payload(f.read())
-                # encode with base64
-                encoders.encode_base64(mime)
-                # add MIMEBase object to MIMEMultipart object
-                message.attach(mime)
-    
-        with smtplib.SMTP(host) as server:
-            server.sendmail(from_addr, to_addr, message.as_string())
+    def find_free_port(cls,
+                       port=config.VAULT_CLIENT_LOGIN_REDIRECT_PORT_MIN,
+                       max_port=config.VAULT_CLIENT_LOGIN_REDIRECT_PORT_MAX):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        while port <= max_port:
+            try:
+                sock.bind(('127.0.0.1', port))
+                sock.close()
+                return port
+            except OSError:
+                port += 1
+        raise IOError("The app needs to use a port between {} and {} for login process. \
+                        Please free a port."
+                      .format(config.VAULT_CLIENT_LOGIN_REDIRECT_PORT_MIN, config.VAULT_CLIENT_LOGIN_REDIRECT_PORT_MAX))
