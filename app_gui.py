@@ -114,8 +114,7 @@ class EncryptionClientGui(object):
         return (successful.value, message.value)
     
     def cleanup(self):
-        self._logger.info("Encryption has been terminated by the user. Now clean up...")
-        
+        self._logger.info("Encryption has been terminated by the user.")
 
     def decrypt(self, input_path, output_path, url):
         try:

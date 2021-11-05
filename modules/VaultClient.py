@@ -171,9 +171,11 @@ class VaultClient(object):
             path (string): The path the key is saved at.
             key (string): The key to save on HashiCorp Vault.
         """
-        self._logger.info("Path is: " + path)
         self.hvac_client.secrets.kv.v2.create_or_update_secret(
             path=path, secret=dict(ciphertext=key))
+
+    def delete_key_on_vault(self, path):
+        self.hvac_client.secrets.kv.v2.delete_metadata_and_all_versions(path)
 
     def retrive_key_from_vault(self, path):
         """Retrieve the key at the specified location.
@@ -184,10 +186,13 @@ class VaultClient(object):
         Returns:
             string: The key saved on HashiCorp Vault.
         """
-        read_secret_response = self.hvac_client.secrets.kv.v2.read_secret_version(
-            path=path)
-        key_ciphertext = read_secret_response["data"]["data"]["ciphertext"]
-        return key_ciphertext
+        try:
+            read_secret_response = self.hvac_client.secrets.kv.v2.read_secret_version(path=path)
+            key_ciphertext = read_secret_response["data"]["data"]["ciphertext"]
+            return key_ciphertext
+        except Exception as e:
+            self._logger.error("error {}".format(e))
+            return None
 
     def read_entity_by_id(self, entity_id):
         """Query an entity's name by its identifier.

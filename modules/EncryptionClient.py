@@ -53,8 +53,17 @@ class EncryptionClient(object):
         logger = logging.getLogger('frdr-encryption-client.encrypt')
 
         def cleanup(*args):
-            logger.info("In CLEAN UP FUNCTION")
-            logger.info("bag dir parent: " + bag_dir_parent)
+            logger.info("Encryption has been terminated by the user. Now clean up...")
+            # delete temp dir
+            if os.path.exists(bag_dir_parent) and os.path.isdir(bag_dir_parent):
+                logger.info("Deleting temp dir")
+                shutil.rmtree(bag_dir_parent)
+            # delete output dir
+            if os.path.exists(bag_output_path):
+                logger.info("Deleting output package")
+                os.remove(bag_output_path)
+            # remove dataset key saved on Vault
+            self._dataset_key_manager.delete_key(key_path_on_vault)
             exit(0)
 
         signal.signal(signal.SIGINT, cleanup)
@@ -91,15 +100,16 @@ class EncryptionClient(object):
         bag_destination = os.path.join(
             str(bag_dir_parent), (os.path.basename(self._input)+"_bag"))
         zipname = shutil.make_archive(bag_destination, 'zip', bag_dir)
-        shutil.rmtree(bag_dir)
         bag_output_path = os.path.join(self._output, os.path.basename(zipname))
+        logger.info("bag output path is " + bag_output_path)
         shutil.move(zipname, bag_output_path)
+        shutil.rmtree(bag_dir_parent)
 
         # save key
         self._dataset_key_manager.encrypt_key(
             self._person_key_manager.my_public_key)
-        self._dataset_key_manager.save_key(
-            "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid]))
+        key_path_on_vault =  "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid])
+        self._dataset_key_manager.save_key(key_path_on_vault)
 
         return bag_output_path
 

@@ -67,7 +67,17 @@ class DatasetKeyManager(object):
             path (string): The path the dataset key saved on the key server
         """
         self._vault_client.save_key_to_vault(path, self._key_encrypted)
-        self._logger.info("Key is saved to vault")
+        self._logger.info("Key is saved to vault at path {}.".format(path))
+    
+    def delete_key(self, path):
+        """Delete the encrypted dataset key saved on the key server.
+
+        Args:
+            path (string): The path to the key.
+        """     
+        if self._vault_client.retrive_key_from_vault(path) is not None:
+            self._logger.info("Found key on path {}. Deleting it.".format(path))
+            self._vault_client.delete_key_on_vault(path)
 
     def read_key(self, path):
         """Read the key saved at the path from the key server.
