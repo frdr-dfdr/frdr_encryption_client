@@ -51,19 +51,24 @@ class EncryptionClient(object):
             string: The output path of the generated bag including the encrypted package
         """
         logger = logging.getLogger('frdr-encryption-client.encrypt')
+        # initialize these variables to avoid free variable 'bag_output_path' referenced before assignment error in cleanup
+        bag_dir_parent = None
+        bag_output_path = None
+        key_path_on_vault = None
 
         def cleanup(*args):
             logger.info("Encryption has been terminated by the user. Now clean up...")
             # delete temp dir
-            if os.path.exists(bag_dir_parent) and os.path.isdir(bag_dir_parent):
+            if bag_dir_parent is not None and os.path.exists(bag_dir_parent) and os.path.isdir(bag_dir_parent):
                 logger.info("Deleting temp dir")
                 shutil.rmtree(bag_dir_parent)
             # delete output dir
-            if os.path.exists(bag_output_path):
+            if bag_output_path is not None and os.path.exists(bag_output_path):
                 logger.info("Deleting output package")
                 os.remove(bag_output_path)
             # remove dataset key saved on Vault
-            self._dataset_key_manager.delete_key(key_path_on_vault)
+            if key_path_on_vault is not None:
+                self._dataset_key_manager.delete_key(key_path_on_vault)
             exit(0)
 
         signal.signal(signal.SIGINT, cleanup)
@@ -110,6 +115,8 @@ class EncryptionClient(object):
             self._person_key_manager.my_public_key)
         key_path_on_vault =  "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid])
         self._dataset_key_manager.save_key(key_path_on_vault)
+        import time
+        time.sleep(10)
 
         return bag_output_path
 
