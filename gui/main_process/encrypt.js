@@ -1,7 +1,9 @@
-const {BrowserWindow, dialog, ipcMain, shell} = require('electron');
+const {BrowserWindow, dialog, ipcMain, shell, app} = require('electron');
 const path = require('path');
 const fs = require('fs');
- 
+
+var basepath = app.getPath("userData");
+
 // Main process to open a folder selector dialog
 ipcMain.on('encrypt-open-input-dir-dialog', function (event) {
   var selected_path = dialog.showOpenDialogSync({properties: ['openDirectory']});
@@ -63,12 +65,12 @@ ipcMain.on('encrypt', (event, input_path, output_path) => {
 
 ipcMain.on('encrypt-cancel', (_event) => {
   try {
-    const pid = fs.readFileSync('/Users/jza201/Library/Application Support/frdr-encryption-client/pid', 'utf8');
+    const pid = fs.readFileSync(path.join(basepath, 'pid'), 'utf8');
     process.kill(pid);
     var currentWindow = BrowserWindow.getFocusedWindow();
     currentWindow.close();
-    client.invoke("cleanup", function(_error, res) {
-      
+    client.invoke("cleanup", function(_error, _res) {
+    
     });
   } catch (err) {
     console.error(err)

@@ -14,8 +14,6 @@ from util.util import Util
 import uuid
 from modules.DatasetKeyManager import DatasetKeyManager
 from modules.FRDRAPIClient import FRDRAPIClient
-import traceback
-
 
 __version__ = config.VERSION
 dirs = AppDirs(config.APP_NAME, config.APP_AUTHOR)
@@ -27,7 +25,7 @@ def encrypt_in_process(input_path, output_path, vault_client_token,
     try:
         Util.get_logger("frdr-encryption-client",
                         log_level="info",
-                        filepath=os.path.join(dirs.user_data_dir, "frdr-encryption-client_log.txt"))
+                        filepath=os.path.join(dirs.user_data_dir, config.APP_LOG_FILENAME))
         logger = logging.getLogger("frdr-encryption-client.gui.encrypt")
         logger.info("Encrypt files in the path {}".format(input_path))
         with open(os.path.join(dirs.user_data_dir, "pid"), 'w') as f:
