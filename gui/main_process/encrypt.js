@@ -63,7 +63,7 @@ ipcMain.on('encrypt', (event, input_path, output_path) => {
   });
 });
 
-ipcMain.on('encrypt-cancel', (_event) => {
+ipcMain.on('encrypt-cancel', (event) => {
   try {
     const pid = fs.readFileSync(path.join(basepath, 'pid'), 'utf8');
     process.kill(pid);
@@ -73,6 +73,6 @@ ipcMain.on('encrypt-cancel', (_event) => {
     
     });
   } catch (err) {
-    console.error(err)
+    event.reply('notify-encrypt-cancel-error', err);
   }
 });
