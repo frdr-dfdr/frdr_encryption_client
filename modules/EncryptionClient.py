@@ -115,8 +115,6 @@ class EncryptionClient(object):
             self._person_key_manager.my_public_key)
         key_path_on_vault =  "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid])
         self._dataset_key_manager.save_key(key_path_on_vault)
-        import time
-        time.sleep(10)
 
         return bag_output_path
 
