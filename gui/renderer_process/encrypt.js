@@ -46,3 +46,11 @@ $('#encrypt').on("click", function(){
     ipcRenderer.send("encrypt", input_path[0], output_path[0]);
   }
 });
+
+$('#encrypt-cancel').on("click", function(){
+    ipcRenderer.send("encrypt-cancel");
+});
+
+ipcRenderer.on('notify-encrypt-cancel-error', function (_event, result) {
+  alert($.i18n('app-depositor-encrypt-cancel-error', result), "");
+});

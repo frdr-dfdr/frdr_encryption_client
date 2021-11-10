@@ -8,11 +8,22 @@ from hvac.exceptions import InvalidRequest
 
 
 class VaultClient(object):
-    def __init__(self):
+    def __init__(self, token=None, url=None, entity_id=None):
+        """Init function of VaultClient. 
+           In normal case, no parameter is required for initilization. 
+           If token, url and entity_id are given, it means the VaultClient
+           has already been authenticated for usage. This is added to support 
+           calling the encrypt function in EncryptionClientGui in a separate 
+           process.
+
+        Args:
+            token (string, optional): Authentication token to include in requests sent to Vault. Defaults to None.
+            url (string, optional): Base URL for the Vault instance being addressed. Defaults to None.
+            entity_id (string, optional): The authenticated user's id on Vault. Defaults to None.
+        """
         self._logger = logging.getLogger("frdr-encryption-client.vault-client")
-        self._entity_id = None
-        self.hvac_client = hvac.Client()
-        self._vault_token = None
+        self.hvac_client = hvac.Client(token=token, url=url)
+        self._entity_id = entity_id
 
     def login(self, vault_addr, auth_method, username=None, password=None, oauth_type=None, success_msg=None):
         
@@ -43,7 +54,7 @@ class VaultClient(object):
             try:
                 response = self.hvac_client.auth.userpass.login(
                     username, password)
-                self._vault_token = response["auth"]["client_token"]
+                vault_token = response["auth"]["client_token"]
             except Exception:
                 self._logger.error("Failed to auth with userpass method.")
                 raise Exception
@@ -78,7 +89,7 @@ class VaultClient(object):
                 auth_result = self.hvac_client.auth.oidc.oidc_callback(
                     code=token, path=path, nonce=auth_url_nonce, state=auth_url_state
                 )
-                self._vault_token = auth_result['auth']['client_token']
+                vault_token = auth_result['auth']['client_token']
                 self._entity_id = auth_result['auth']['entity_id']
             except InvalidRequest as ir:
                 self._logger.error(
@@ -91,7 +102,7 @@ class VaultClient(object):
                     "Failed to auth with {} account using oidc method. {}".format(oauth_type, e))
                 raise Exception(e)
 
-        self.hvac_client.token = self._vault_token
+        self.hvac_client.token = vault_token
         try:
             assert self.hvac_client.is_authenticated(), "Failed to authenticate with Vault."
         except AssertionError as error:
@@ -160,9 +171,11 @@ class VaultClient(object):
             path (string): The path the key is saved at.
             key (string): The key to save on HashiCorp Vault.
         """
-        self._logger.info("Path is: " + path)
         self.hvac_client.secrets.kv.v2.create_or_update_secret(
             path=path, secret=dict(ciphertext=key))
+
+    def delete_key_on_vault(self, path):
+        self.hvac_client.secrets.kv.v2.delete_metadata_and_all_versions(path)
 
     def retrive_key_from_vault(self, path):
         """Retrieve the key at the specified location.
@@ -173,10 +186,13 @@ class VaultClient(object):
         Returns:
             string: The key saved on HashiCorp Vault.
         """
-        read_secret_response = self.hvac_client.secrets.kv.v2.read_secret_version(
-            path=path)
-        key_ciphertext = read_secret_response["data"]["data"]["ciphertext"]
-        return key_ciphertext
+        try:
+            read_secret_response = self.hvac_client.secrets.kv.v2.read_secret_version(path=path)
+            key_ciphertext = read_secret_response["data"]["data"]["ciphertext"]
+            return key_ciphertext
+        except Exception as e:
+            self._logger.error("error {}".format(e))
+            return None
 
     def read_entity_by_id(self, entity_id):
         """Query an entity's name by its identifier.
@@ -278,7 +294,18 @@ class VaultClient(object):
         httpd.timeout = config.VAULT_LOGIN_TIMEOUT
         httpd.handle_request()
         return httpd.token
+    
+    def get_hvac_client(self):
+        return self.hvac_client
 
     @property
     def entity_id(self):
         return self._entity_id
+
+    @property
+    def token(self):
+        return self.hvac_client.token
+
+    @property
+    def url(self):
+        return self.hvac_client.url

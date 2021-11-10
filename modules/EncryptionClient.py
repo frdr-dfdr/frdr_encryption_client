@@ -3,6 +3,7 @@
 
 from collections import defaultdict
 import datetime
+import signal
 import hvac
 import nacl.utils
 import nacl.secret
@@ -50,7 +51,29 @@ class EncryptionClient(object):
             string: The output path of the generated bag including the encrypted package
         """
         logger = logging.getLogger('frdr-encryption-client.encrypt')
+        # initialize these variables to avoid free variable 'bag_output_path' referenced before assignment error in cleanup
+        bag_dir_parent = None
+        bag_output_path = None
+        key_path_on_vault = None
 
+        def cleanup(*args):
+            logger.info("Encryption has been terminated by the user. Now clean up...")
+            # delete temp dir
+            if bag_dir_parent is not None and os.path.exists(bag_dir_parent) and os.path.isdir(bag_dir_parent):
+                logger.info("Deleting temp dir")
+                shutil.rmtree(bag_dir_parent)
+            # delete output dir
+            if bag_output_path is not None and os.path.exists(bag_output_path):
+                logger.info("Deleting output package")
+                os.remove(bag_output_path)
+            # remove dataset key saved on Vault
+            if key_path_on_vault is not None:
+                self._dataset_key_manager.delete_key(key_path_on_vault)
+            exit(0)
+
+        signal.signal(signal.SIGINT, cleanup)
+        signal.signal(signal.SIGTERM, cleanup)
+        
         # generate key
         self._dataset_key_manager.generate_key()
         self.box = nacl.secret.SecretBox(self._dataset_key_manager.key)
@@ -82,15 +105,16 @@ class EncryptionClient(object):
         bag_destination = os.path.join(
             str(bag_dir_parent), (os.path.basename(self._input)+"_bag"))
         zipname = shutil.make_archive(bag_destination, 'zip', bag_dir)
-        shutil.rmtree(bag_dir)
         bag_output_path = os.path.join(self._output, os.path.basename(zipname))
+        logger.info("bag output path is " + bag_output_path)
         shutil.move(zipname, bag_output_path)
+        shutil.rmtree(bag_dir_parent)
 
         # save key
         self._dataset_key_manager.encrypt_key(
             self._person_key_manager.my_public_key)
-        self._dataset_key_manager.save_key(
-            "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid]))
+        key_path_on_vault =  "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid])
+        self._dataset_key_manager.save_key(key_path_on_vault)
 
         return bag_output_path
 
