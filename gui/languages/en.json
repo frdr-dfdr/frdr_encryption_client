@@ -70,7 +70,8 @@
   "app-depositor-grant-access-requester-tooltip": "The user ID of the requester you're granting access to",
   "app-depositor-grant-access-requester-missing": "Please input the user ID of the requester you're granting access to",
   
-  "app-depositor-grant-access-expire": "Access Expiry Date",
+  "app-depositor-grant-access-expire": "Download Expiry Date",
+  "app-depositor-grant-access-expire-info": "More info to explain this field",
   "app-depositor-grant-access-expire-tooltip": "The date that this access is going to expire",
   "app-depositor-grant-access-button": "Grant Access",
   "app-depositor-grant-access-confirm": "You are trying to grant requester $1 access to dataset $2. \n\nDo you want to continue?",
