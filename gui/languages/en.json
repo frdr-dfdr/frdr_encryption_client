@@ -55,11 +55,13 @@
   "app-depositor-encrypt-selected": "You selected: $1",
   "app-depositor-encrypt-button": "Encrypt Data",
   "app-depositor-encrypt-in-progress": "Encrypting dataset...",
+  "app-depositor-encrypt-cancel-button": "Stop Encryption",
   "app-depositor-encrypt-done": "Dataset has been encrypted and transfer package has been created on $1",
   "app-depositor-encrypt-done-title": "Dataset has been encrypted",
   "app-depositor-encrypt-done-text": "You can now deposit this encrypted package to FRDR...",
-  
+
   "app-depositor-encrypt-error": "Error encrypting. $1",
+  "app-depositor-encrypt-cancel-error": "Stopping encryption failed. $1",
   
   "app-depositor-grant-access-title": "Grant Access",
   "app-depositor-grant-access-dataset": "Dataset ID",

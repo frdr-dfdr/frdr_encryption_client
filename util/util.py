@@ -66,8 +66,7 @@ class Util(object):
             logger.setLevel(logging.INFO)
 
         logger.info("Log level: {}".format(log_level))
-
-        clean_logformatter = '%(asctime)s %(name)s [%(levelname)s] %(message)s [%(filename)s:%(lineno)d]'
+        clean_logformatter = '%(asctime)s %(name)s [%(levelname)s] %(message)s [%(filename)s:%(lineno)d][Process ID: %(process)s]'
         clean_formatter = logging.Formatter(clean_logformatter)
         console = logging.StreamHandler(sys.stdout)
         try:
