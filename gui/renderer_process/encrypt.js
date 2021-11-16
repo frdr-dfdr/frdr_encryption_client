@@ -29,6 +29,7 @@ ipcRenderer.on('encrypt-selected-output-dir', function (_event, path) {
 
 ipcRenderer.on('notify-encrypt-done', function (_event, result) {
   alert($.i18n('app-depositor-encrypt-done', result), "");
+  ipcRenderer.send('encrypt-done-show-next-step');
 });
 
 ipcRenderer.on('notify-encrypt-error', function (_event, result) {
