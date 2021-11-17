@@ -51,7 +51,7 @@ class EncryptionClientGui(object):
                         filepath=os.path.join(dirs.user_data_dir, config.APP_LOG_FILENAME))
         self._logger = logging.getLogger("frdr-encryption-client.gui")
         self._vault_client = VaultClient()
-        self._frdr_api_client = FRDRAPIClient()
+        self._frdr_api_client = FRDRAPIClient(base_url = config.FRDR_API_BASE_URL)
         # self._vault_client_pki = VaultClient()
 
     def login_oidc_google(self, hostname):
@@ -80,13 +80,11 @@ class EncryptionClientGui(object):
             self._logger.error(str(e), exc_info=True)
             return (False, str(e))
 
-    def login_frdr_api_globus(self, success_msg, base_url=None):
+    def login_frdr_api_globus(self, success_msg):
         try:
             self._logger.info(
                 "Login with globus acccount for FRDR REST API usage")
-            if base_url is None:
-                base_url = config.FRDR_API_BASE_URL
-            self._frdr_api_client.login(base_url=base_url, success_msg=success_msg)
+            self._frdr_api_client.login(success_msg=success_msg)
             return (True, None)
         except Exception as e:
             self._logger.error(str(e), exc_info=True)
@@ -159,12 +157,6 @@ class EncryptionClientGui(object):
         self._access_granter.revoke_access(requester_id, dataset_name)
         return True
 
-    def get_entity_name(self, entity_id):
-        try:
-            return (True, self._vault_client.read_entity_by_id(entity_id))
-        except Exception as e:
-            return (False, str(e))
-
     def get_entity_id(self):
         try:
             entity_id = self._vault_client.entity_id
@@ -174,7 +166,24 @@ class EncryptionClientGui(object):
             return (True, entity_id)
         except Exception as e:
             return (False, str(e))
+    
+    def get_request_info(self, requester_uuid, dataset_uuid):
+        entity_success, entity_result = self.get_entity_name(requester_uuid)
+        dataset_success, dataset_result = self._get_dataset_title(dataset_uuid)
+        return (entity_success, entity_result, dataset_success, dataset_result)
 
+
+    def get_entity_name(self, entity_id):
+        try:
+            return (True, self._vault_client.read_entity_by_id(entity_id))
+        except Exception as e:
+            return (False, str(e))
+    
+    def _get_dataset_title(self, dataset_uuid):
+        try:
+            return (True, self._frdr_api_client.get_dataset_title(dataset_uuid))
+        except Exception as e:
+            return (False, str(e))
 
 
 

@@ -1,11 +1,13 @@
 const {dialog, ipcMain} = require('electron');
  
 ipcMain.on('grant-access', (event, requester, dataset, expiryDate, dialogOptions, dialogOptions2, loginSuccessMsg) => {
-  client.invoke("get_entity_name", requester, function(_error, res) {
-    var success = res[0];
-    var result = res[1];
-    if (success && result != null) {
-      dialogOptions['message'] = dialogOptions['message'].replace("$1", result).replace("$2", dataset);
+  client.invoke("get_request_info", requester, dataset, function(_error, res) {
+    var entity_success = res[0];
+    var entity_result = res[1];
+    var dataset_success = res[2];
+    var dataset_result = res[3];
+    if (entity_success && entity_result != null && dataset_success) {
+      dialogOptions['message'] = dialogOptions['message'].replace("$1", entity_result).replace("$2", dataset_result);
       const response = dialog.showMessageBoxSync(dialogOptions);
       if (response == 0) {
         const response2 = dialog.showMessageBoxSync(dialogOptions2);
@@ -31,8 +33,11 @@ ipcMain.on('grant-access', (event, requester, dataset, expiryDate, dialogOptions
         }
       }
     }
-    else {
-      event.reply('notify-get-entity-name-error', result);
+    else if (!entity_success || entity_result == null){
+      event.reply('notify-get-entity-name-error', entity_result);
+    }
+    else if (!dataset_success){
+      event.reply('notify-get-dataset-title-error', dataset_result);
     }
   });
 });

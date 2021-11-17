@@ -41,6 +41,10 @@ ipcRenderer.on('notify-get-entity-name-error', function (_event, result) {
   alert($.i18n('app-depositor-grant-access-find-user-error', result), "");
 });
 
+ipcRenderer.on('notify-get-dataset-title-error', function (_event, result) {
+  alert($.i18n('app-depositor-grant-access-find-dataset-error', result), "");
+});
+
 ipcRenderer.on('notify-grant-access-done', function (_event) {
   alert($.i18n('app-depositor-grant-access-done'), "");
 });

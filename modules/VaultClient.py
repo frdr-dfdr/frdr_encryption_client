@@ -202,6 +202,9 @@ class VaultClient(object):
 
         Returns:
             string: Entity's name saved on HashiCorp Vault.
+        
+        Raises:
+            Exception: If there is any error when reading entity of user on HashiCorp Vault.
         """
         try:
             response = self.hvac_client.secrets.identity.read_entity(
@@ -211,7 +214,8 @@ class VaultClient(object):
             else:
                 return response["data"]["name"]
         except Exception as e:
-            self._logger.error("error {}".format(e))
+            self._logger.error("Error reading entity of user from Vault {}".format(e))
+            raise Exception(e)
 
     def list_secrets(self, path):
         """Return a list of key names at the specified location.

@@ -4,7 +4,7 @@
 Usage:
   app_cli.py encrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> [--output=<op>] [--loglevel=<l>]
   app_cli.py decrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> --url=<key_addr> [--output=<op>] [--loglevel=<l>]
-  app_cli.py grant_access --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --dataset=<id> --requester=<id> --expire=<date> --frdr_api_url=<url> [--loglevel=<l>]
+  app_cli.py grant_access --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --dataset=<id> --requester=<id> --expire=<date> [--frdr_api_url=<url>] [--loglevel=<l>]
   app_cli.py show_vault_id --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>)
   app_cli.py -h | --help
 
@@ -89,9 +89,18 @@ def main():
                 encryptor.decrypt(url)
 
             elif arguments["grant_access"]:
-                if click.confirm("Do you want to continue?", default=False):
-                    requester_uuid = arguments["--requester"]
-                    dataset_uuid = arguments["--dataset"]
+                requester_uuid = arguments["--requester"]
+                requester_name = vault_client.read_entity_by_id(requester_uuid)
+                    
+                frdr_api_url = arguments["--frdr_api_url"]
+                if frdr_api_url is None:
+                    frdr_api_url = config.FRDR_API_BASE_URL
+                frdr_api_client = FRDRAPIClient(base_url=frdr_api_url)
+
+                dataset_uuid = arguments["--dataset"]
+                dataset_title = frdr_api_client.get_dataset_title(dataset_uuid)
+                
+                if click.confirm("You are trying to grant requester {} access to dataset {}. Do you want to continue?".format(requester_name, dataset_title), default=False):
                     expire_date = arguments["--expire"]
                     dataset_key_manager = DatasetKeyManager(vault_client)
                     person_key_manager = PersonKeyManager(vault_client)
@@ -101,11 +110,7 @@ def main():
                         requester_uuid, dataset_uuid, expire_date)
 
                     # make api call to FRDR to put grant access info in db
-                    frdr_api_url = arguments["--frdr_api_url"]
-                    if frdr_api_url is None:
-                        frdr_api_url = config.FRDR_API_BASE_URL
-                    frdr_api_client = FRDRAPIClient()
-                    frdr_api_client.login(base_url=frdr_api_url)
+                    frdr_api_client.login()
                     data = {"expires": expire_date, "vault_dataset_id": dataset_uuid,
                             "vault_requester_id": requester_uuid}
                     print(frdr_api_client.update_requestitem(data))

@@ -22,20 +22,28 @@ class DataPublicationClient(BaseClient):
 
     def update_requestitem(self, data):
         return self.put('requestitem', data=data, headers=self._headers)
+    
+    def lookup_dataset_title(self, dataset_id):
+        return self.get('dataset-title/{}'.format(dataset_id))
 
 
 class FRDRAPIClient():
 
-    def __init__(self):
-        self._logger = logging.getLogger(
-            "frdr-encryption-client.FRDR-API-client")
-        self._pub_client = None
-
-    def login(self, base_url, success_msg=None):
-        """Log into FRDR for API usage.
+    def __init__(self, base_url):
+        """Class init function 
 
         Args:
             base_url (string): FRDR API base url
+        """
+        self._logger = logging.getLogger(
+            "frdr-encryption-client.FRDR-API-client")
+        self._base_url = base_url
+        self._pub_client = DataPublicationClient(base_url=self._base_url)
+
+    def login(self, success_msg=None):
+        """Log into FRDR for API usage.
+
+        Args:
             success_msg (string, optional): The message shown in the browser once when the user logs in successfully. Defaults to None.
 
         Raises:
@@ -55,7 +63,7 @@ class FRDRAPIClient():
                 expires_at=pub_tokens['expires_at_seconds'])
 
             pub_client = DataPublicationClient(
-                base_url, authorizer=pub_authorizer)
+                self._base_url, authorizer=pub_authorizer)
             self._pub_client = pub_client
         except Exception as e:
             self._logger.error(
@@ -75,6 +83,25 @@ class FRDRAPIClient():
             [string]: REST API call response 
         """
         return self._pub_client.update_requestitem(data)
+
+    def get_dataset_title(self, dataset_id):
+        """Look up the dataset title from FRDR using the dataset's vault id
+
+        Args:
+            dataset_id (string): The id for the dataset on Vault
+
+        Raises:
+            Exception: If there is an error when getting the information from FRDR
+
+        Returns:
+            string: The dataset title on FRDR
+        """
+        try:
+            resp = self._pub_client.lookup_dataset_title(dataset_id)
+            return resp['dataset_title']
+        except Exception as e:
+            self._logger.error("Error getting dataset title from FRDR {}".format(e))
+            raise Exception(e)
 
     def _load_auth_client(self):
         return NativeAppAuthClient(
