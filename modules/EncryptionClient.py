@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from collections import defaultdict
-import datetime
 import signal
 import hvac
 import nacl.utils
@@ -166,7 +165,7 @@ class EncryptionClient(object):
                 self._output, os.path.basename(decrypted_filename)))
             shutil.rmtree(bag_dir_parent)
 
-    def grant_access(self, requester_entity_id, dataset_uuid, expiry_date=None):
+    def grant_access(self, requester_entity_id, dataset_uuid, expiry_date):
         """Share the dataset key to another user by decrypting the key with the 
            owner's private key first then encrypting it with the requester's public key 
 
@@ -174,11 +173,8 @@ class EncryptionClient(object):
         Args:
             requester_entity_id (string): The requester's vault user ID
             dataset_uuid (string): The unique id for the dataset 
-            expiry_date (string, optional): The expiry date of the access to the dataset key. Defaults to None.
+            expiry_date (string): The expiry date of the access to the dataset key
         """
-        if expiry_date is None:
-            expiry_date = (datetime.date.today() +
-                           datetime.timedelta(days=14)).strftime("%Y-%m-%d")
 
         # read encrypted data key from Vault
         encrypted_data_key_path = "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid])

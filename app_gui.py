@@ -1,4 +1,5 @@
 from ctypes import c_char_p, c_bool
+import datetime
 from multiprocessing import Process, Manager
 import webbrowser
 from modules.PersonKeyManager import PersonKeyManager
@@ -126,8 +127,11 @@ class EncryptionClientGui(object):
             self._logger.info(str(e))
             return (False, str(e))
 
-    def grant_access(self, dataset_uuid, requester_uuid, expire_date):
+    def grant_access(self, dataset_uuid, requester_uuid, expire_date=None):
         try:
+            if expire_date is None:
+                expire_date = (datetime.date.today() + datetime.timedelta(days=30*6)).strftime("%Y-%m-%d")
+            
             dataset_key_manager = DatasetKeyManager(self._vault_client)
             person_key_manager = PersonKeyManager(self._vault_client)
             encryptor = EncryptionClient(

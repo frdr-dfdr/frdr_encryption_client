@@ -1,6 +1,6 @@
 const {dialog, ipcMain} = require('electron');
  
-ipcMain.on('grant-access', (event, requester, dataset, expiryDate, dialogOptions, dialogOptions2, loginSuccessMsg) => {
+ipcMain.on('grant-access', (event, requester, dataset, dialogOptions, dialogOptions2, loginSuccessMsg) => {
   client.invoke("get_request_info", requester, dataset, function(_error, res) {
     var entity_success = res[0];
     var entity_result = res[1];
@@ -16,7 +16,7 @@ ipcMain.on('grant-access', (event, requester, dataset, expiryDate, dialogOptions
             var successLogin = res[0];
             var errMessageLogin = res[1];
             if (successLogin) {
-              client.invoke("grant_access", dataset, requester, expiryDate, function(_error, res) {
+              client.invoke("grant_access", dataset, requester, function(_error, res) {
                 var successGrantAccess = res[0];
                 var errMessageGrantAccess = res[1];
                 if (successGrantAccess){

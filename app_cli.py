@@ -4,7 +4,7 @@
 Usage:
   app_cli.py encrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> [--output=<op>] [--loglevel=<l>]
   app_cli.py decrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> --url=<key_addr> [--output=<op>] [--loglevel=<l>]
-  app_cli.py grant_access --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --dataset=<id> --requester=<id> --expire=<date> [--frdr_api_url=<url>] [--loglevel=<l>]
+  app_cli.py grant_access --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --dataset=<id> --requester=<id> [--frdr_api_url=<url>] [--loglevel=<l>]
   app_cli.py show_vault_id --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>)
   app_cli.py -h | --help
 
@@ -18,11 +18,11 @@ Options:
   --url=<key_addr>
   --dataset=<id>
   --requester=<id>
-  --expire=<date>  the permission expiry date in format YYYY-mm-dd
   --frdr_api_url=<url>
   --loglevel=<l>  loglevel [default: info].
 """
 
+import datetime
 from modules.FRDRAPIClient import FRDRAPIClient
 from modules.PersonKeyManager import PersonKeyManager
 from modules.EncryptionClient import EncryptionClient
@@ -101,7 +101,7 @@ def main():
                 dataset_title = frdr_api_client.get_dataset_title(dataset_uuid)
                 
                 if click.confirm("You are trying to grant requester {} access to dataset {}. Do you want to continue?".format(requester_name, dataset_title), default=False):
-                    expire_date = arguments["--expire"]
+                    expire_date = (datetime.date.today() + datetime.timedelta(days=30*6)).strftime("%Y-%m-%d")
                     dataset_key_manager = DatasetKeyManager(vault_client)
                     person_key_manager = PersonKeyManager(vault_client)
                     encryptor = EncryptionClient(

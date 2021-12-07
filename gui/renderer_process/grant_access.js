@@ -1,20 +1,4 @@
-const flatpickr = require('flatpickr');
 const {ipcRenderer} = require('electron');
-
-var expiryDate = null;
-var defaultDate = new Date().fp_incr(14);
-var defaultDateStr = defaultDate.toISOString().substring(0, 10);
-document.getElementById("expiry_date").value = defaultDateStr;
-expiryDate = defaultDateStr;
-flatpickr('#expiry_date', {
-  minDate: new Date().fp_incr(7),
-  maxDate: new Date().fp_incr(30),
-  defaultDate: defaultDate,
-  allowInput: true,
-  onChange: function(_selectedDates, dateStr) {
-    expiryDate = dateStr;
-  }
-});
 
 function grantAccess() {
   var dataset = document.getElementById("dataset").value.trim();
@@ -34,7 +18,7 @@ function grantAccess() {
     message: $.i18n("app-depositor-grant-access-login-api")
   };
   var loginSuccessMsg = $.i18n("app-depositor-grant-access-login-success-message");
-  ipcRenderer.send("grant-access", requester, dataset, expiryDate, dialogOptions, dialogOptions2, loginSuccessMsg);
+  ipcRenderer.send("grant-access", requester, dataset, dialogOptions, dialogOptions2, loginSuccessMsg);
 }
 
 ipcRenderer.on('notify-get-entity-name-error', function (_event, result) {
