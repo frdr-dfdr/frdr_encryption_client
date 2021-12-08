@@ -35,9 +35,9 @@ function decrypt() {
     buttons: [$.i18n("app-requester-decrypt-confirm-btn1"), $.i18n("app-requester-decrypt-confirm-btn2")],
     defaultId: 1,
     title: "Confirmation",
-    message: $.i18n("app-requester-decrypt-confirm", dataset)
+    message: $.i18n("app-requester-decrypt-confirm")
   }
-  ipcRenderer.send("decrypt", options, input_path[0], output_path[0], url);
+  ipcRenderer.send("decrypt", dataset, options, input_path[0], output_path[0], url);
 }
 
 ipcRenderer.on('notify-decrypt-done', function (_event) {

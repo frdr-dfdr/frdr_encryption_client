@@ -173,7 +173,7 @@ class EncryptionClientGui(object):
     
     def get_request_info(self, requester_uuid, dataset_uuid):
         entity_success, entity_result = self.get_entity_name(requester_uuid)
-        dataset_success, dataset_result = self._get_dataset_title(dataset_uuid)
+        dataset_success, dataset_result = self.get_dataset_title(dataset_uuid)
         return (entity_success, entity_result, dataset_success, dataset_result)
 
 
@@ -183,7 +183,7 @@ class EncryptionClientGui(object):
         except Exception as e:
             return (False, str(e))
     
-    def _get_dataset_title(self, dataset_uuid):
+    def get_dataset_title(self, dataset_uuid):
         try:
             return (True, self._frdr_api_client.get_dataset_title(dataset_uuid))
         except Exception as e:
