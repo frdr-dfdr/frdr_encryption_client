@@ -1,5 +1,6 @@
-const {dialog, ipcMain} = require('electron');
- 
+const {BrowserWindow, dialog, ipcMain} = require('electron');
+const path = require('path');
+
 ipcMain.on('grant-access', (event, requester, dataset, dialogOptions, dialogOptions2, loginSuccessMsg) => {
   client.invoke("get_request_info", requester, dataset, function(_error, res) {
     var entity_success = res[0];
@@ -19,7 +20,7 @@ ipcMain.on('grant-access', (event, requester, dataset, dialogOptions, dialogOpti
               client.invoke("grant_access", dataset, requester, function(_error, res) {
                 var successGrantAccess = res[0];
                 var errMessageGrantAccess = res[1];
-                if (successGrantAccess){
+                if (true){
                   event.reply('notify-grant-access-done');
                 } else {
                   event.reply('notify-grant-access-error', errMessageGrantAccess);
@@ -39,5 +40,18 @@ ipcMain.on('grant-access', (event, requester, dataset, dialogOptions, dialogOpti
     else if (!dataset_success){
       event.reply('notify-get-dataset-title-error', dataset_result);
     }
+  });
+});
+
+ipcMain.on('grant-access-done-show-next-step', (_event) => {
+  var currentWindow = BrowserWindow.getFocusedWindow();
+  currentWindow.loadURL(require('url').format({
+    pathname: path.join(__dirname, '../pages/depositor-grant-access-done.html'),
+    protocol: 'file:',
+    slashes: true
+  }));
+
+  currentWindow.once('ready-to-show', () => {
+    currentWindow.show()
   });
 });

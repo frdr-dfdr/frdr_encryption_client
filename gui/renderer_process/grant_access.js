@@ -31,6 +31,7 @@ ipcRenderer.on('notify-get-dataset-title-error', function (_event, result) {
 
 ipcRenderer.on('notify-grant-access-done', function (_event) {
   alert($.i18n('app-depositor-grant-access-done'), "");
+  ipcRenderer.send('grant-access-done-show-next-step');
 });
 
 ipcRenderer.on('notify-grant-access-error', function (_event, errMessage) {

@@ -89,6 +89,8 @@
   "app-depositor-grant-access-error": "Error granting access. $1",
   "app-depositor-grant-access-find-user-error": "Error finding the user in Vault. \n$1.",
   "app-depositor-grant-access-find-dataset-error": "Error finding the dataset in FRDR. \n$1.",
+  "app-depositor-grant-access-done-title": "You have successfully granted access to the key.",
+  "app-depositor-grant-access-done-text": "You can now go to FRDR and grant access to the dataset...",
 
   "app-requester-request-access-title": "Show Vault ID",
   "app-requester-request-access-intro1": "You can either copy this ID to the Vault ID field when you create a new access request on FRDR, or save this ID on ",
