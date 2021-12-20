@@ -35,7 +35,8 @@ The Electron GUI in /gui should work for development after runing  `cd gui` and 
 ## Building
 The Python code needs to be built on its target platform using `pyinstaller`:
 
-`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml;./config'`
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml;./config'` (Windows)
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config'` (Mac)
 
 We need to include the config file when generating the bundle.
 
@@ -52,6 +53,9 @@ On Mac, you can sign for distribution with `electron-osx-sign` and `electron-not
 `IFS=$'\n' && electron-osx-sign frdr-encryption-client-darwin-x64/frdr-encryption-client.app/ $(find frdr-encryption-client-darwin-x64/frdr-encryption-client.app/Contents/ -type f -perm -u+x) --identity [hash] --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
 
 `electron-notarize --bundle-id ca.frdr-dfdr.secure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-encryption-client-darwin-x64/frdr-encryption-client.app/`
+
+To build for development on Mac, don't need to create a new key and can ad-hoc code sign 
+`cd frdr-encryption-client-darwin-x64/ && codesign --deep --force --verbose --sign - frdr-encryption-client.app/`
 
 Finally, to package for install:
 

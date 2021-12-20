@@ -31,6 +31,6 @@
   ],
   "author": "Compute Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)",
   "devDependencies": {
-    "electron-rebuild": "^1.11.0"
+    "electron-rebuild": "^3.2.5"
   }
 }
