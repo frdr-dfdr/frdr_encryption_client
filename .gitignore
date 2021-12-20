@@ -148,3 +148,4 @@ gui/install/
 gui/node_modules
 gui/package-lock.json
 *.ipynb
+gui/app_gui.app
