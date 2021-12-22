@@ -37,7 +37,7 @@ ipcMain.on('decrypt', function (event, dataset_id, options, input_path, output_p
       });
     
       childWindow.loadURL(require('url').format({
-        pathname: path.join(__dirname, '../pages/requester-decrypt-in-progress.html'),
+        pathname: path.join(__dirname, '../pages/decrypt-in-progress.html'),
         protocol: 'file:',
         slashes: true
       }));

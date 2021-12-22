@@ -30,14 +30,35 @@
   });
   </script>
   <!--end of Navigation bar-->
+  
   <div class="container">
-    <h2 data-i18n="app-requester-home-title"></h2>
-    <p data-i18n="app-requester-home-info"></p>
+    <h2 data-i18n="app-encrypt-title"></h2> 
     <div class="row">
-      <div class="col-sm-12 text-center">
-        <button id="btn-request-access" class="btn btn-primary btn-md center-block" onclick="window.location='requester-request-access.html';" data-i18n="app-request-access-titile"></button>
-        <button id="btn-decrypt" class="btn btn-primary btn-md center-block" onclick="window.location='requester-decrypt.html';" data-i18n="app-decrypt-title"></button>
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+        <h3 data-i18n="app-encrypt-input"></h3>
+        <button class="btn btn-secondary" id="input_path_dir" data-i18n="app-encrypt-input-select"></button>
+        <a data-placement="right" data-toggle="tooltip" id="encrypt-input-tooltip">
+          <span class="glyphicon glyphicon-question-sign" ></span>
+        </a>
+        <p id="selected-input-dir" data-i18n="app-encrypt-no-selection"></p>
       </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+        <h3 data-i18n="app-encrypt-output"></h3>
+        <button class="btn btn-secondary" id="output_path_dir" data-i18n="app-encrypt-output-select"></button>
+        <a data-placement="right" data-toggle="tooltip" id="encrypt-output-tooltip">
+          <span class="glyphicon glyphicon-question-sign" ></span>
+        </a>
+        <p id="selected-output-dir" data-i18n="app-encrypt-no-selection"></p>
+      </div>
+    </div>
+
+    <br/><br/>
+
+    <div class="button">
+      <button class="btn btn-primary" type="submit" id="encrypt" data-i18n="app-encrypt-button"></button>
     </div>
   </div>
 
@@ -48,8 +69,10 @@
     $("#footer-placeholder").load("../components/footer.html");
   });
   </script>
-  <!--end of Footer--> 
-  
+  <!--end of Footer-->  
+
+  <script src="../renderer_process/encrypt.js" charset="utf-8"></script> 
+
 </body>
 
 </html>

@@ -46,7 +46,7 @@ ipcMain.on('grant-access', (event, requester, dataset, dialogOptions, dialogOpti
 ipcMain.on('grant-access-done-show-next-step', (_event) => {
   var currentWindow = BrowserWindow.getFocusedWindow();
   currentWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, '../pages/depositor-grant-access-done.html'),
+    pathname: path.join(__dirname, '../pages/grant-access-done.html'),
     protocol: 'file:',
     slashes: true
   }));

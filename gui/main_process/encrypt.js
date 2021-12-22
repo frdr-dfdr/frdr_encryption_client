@@ -31,7 +31,7 @@ ipcMain.on('encrypt', (event, input_path, output_path) => {
     }
   });
   childWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, '../pages/depositor-encrypt-in-progress.html'),
+    pathname: path.join(__dirname, '../pages/encrypt-in-progress.html'),
     protocol: 'file:',
     slashes: true
   }));
@@ -70,7 +70,7 @@ ipcMain.on('encrypt-cancel', (event) => {
 ipcMain.on('encrypt-done-show-next-step', (_event) => {
   var currentWindow = BrowserWindow.getFocusedWindow();
   currentWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, '../pages/depositor-encrypt-done.html'),
+    pathname: path.join(__dirname, '../pages/encrypt-done.html'),
     protocol: 'file:',
     slashes: true
   }));

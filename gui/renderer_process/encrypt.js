@@ -12,7 +12,7 @@ $('#input_path_dir').on("click", function(){
 ipcRenderer.on('encrypt-selected-input-dir', function (_event, path) {
   //print the path selected
   input_path = path;
-  document.getElementById('selected-input-dir').innerHTML = $.i18n('app-depositor-encrypt-selected', path);
+  document.getElementById('selected-input-dir').innerHTML = $.i18n('app-encrypt-selected', path);
 });
 
 // Send a open directory selector dialog message from a renderer process to main process 
@@ -24,24 +24,24 @@ $('#output_path_dir').on("click", function(){
 ipcRenderer.on('encrypt-selected-output-dir', function (_event, path) {
   //print the path selected
   output_path = path;
-  document.getElementById('selected-output-dir').innerHTML = $.i18n('app-depositor-encrypt-selected', path);
+  document.getElementById('selected-output-dir').innerHTML = $.i18n('app-encrypt-selected', path);
 });
 
 ipcRenderer.on('notify-encrypt-done', function (_event, result) {
-  alert($.i18n('app-depositor-encrypt-done', result), "");
+  alert($.i18n('app-encrypt-done', result), "");
   ipcRenderer.send('encrypt-done-show-next-step');
 });
 
 ipcRenderer.on('notify-encrypt-error', function (_event, result) {
-  alert($.i18n('app-depositor-encrypt-error', result), "");
+  alert($.i18n('app-encrypt-error', result), "");
 });
 
 $('#encrypt').on("click", function(){
   if (input_path == null){
-      alert($.i18n('app-depositor-encrypt-input-missing'));
+      alert($.i18n('app-encrypt-input-missing'));
   }
   else if (output_path == null) {
-    alert($.i18n('app-depositor-encrypt-output-missing'));
+    alert($.i18n('app-encrypt-output-missing'));
   }
   else {
     ipcRenderer.send("encrypt", input_path[0], output_path[0]);
@@ -53,5 +53,5 @@ $('#encrypt-cancel').on("click", function(){
 });
 
 ipcRenderer.on('notify-encrypt-cancel-error', function (_event, result) {
-  alert($.i18n('app-depositor-encrypt-cancel-error', result), "");
+  alert($.i18n('app-encrypt-cancel-error', result), "");
 });

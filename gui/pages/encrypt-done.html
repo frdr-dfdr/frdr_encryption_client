@@ -5,7 +5,6 @@
   <meta charset="utf-8">
   <title>FRDR Encryption Application</title>
   <script>window.jQuery = window.$ = require('jquery'); </script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="../assests/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
   <link rel="stylesheet" href="../assests/css/bootstrap-theme.min.css" type="text/css" />
@@ -20,7 +19,6 @@
   <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.bidi.js"></script>
 </head>
 
-
 <body>
   <!--Navigation bar-->
   <div id="nav-placeholder">
@@ -32,42 +30,10 @@
   });
   </script>
   <!--end of Navigation bar-->
-
+  
   <div class="container">
-    <h2 data-i18n="app-depositor-grant-access-title"></h2> 
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-        <h3 data-i18n="app-depositor-grant-access-dataset"></h3>
-        <input class="form-control" name="dataset" id="dataset" type="text" style="width:75%;display:inline"/>
-        <a data-placement="right" data-toggle="tooltip" id="dataset-tooltip">
-          <span class="glyphicon glyphicon-question-sign" ></span>
-        </a>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-        <h3 data-i18n="app-depositor-grant-access-requester"></h3>
-        <input class="form-control" name="requester" id="requester" type="text" style="width:75%;display:inline"/>
-        <a data-placement="right" data-toggle="tooltip" id="requester-tooltip">
-          <span class="glyphicon glyphicon-question-sign" ></span>
-        </a>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-        <h3 data-i18n="app-depositor-grant-access-expire"></h3>
-        <p data-i18n="app-depositor-grant-access-expire-info"></p>
-      </div>
-    </div>
-    
-
-    <br/>
-
-    <div class="button">
-      <button class="btn btn-primary" type="submit" id="grant_access" data-i18n="app-depositor-grant-access-button"></button>
-    </div>
+    <h2 data-i18n="app-encrypt-done-title"></h2> 
+    <p data-i18n="app-encrypt-done-text"></p>
   </div>
 
   <!--Footer-->
@@ -79,7 +45,7 @@
   </script>
   <!--end of Footer-->  
 
-  <script src="../renderer_process/grant_access.js" charset="utf-8"></script> 
+  <script src="../renderer_process/encrypt.js" charset="utf-8"></script> 
 
 </body>
 
