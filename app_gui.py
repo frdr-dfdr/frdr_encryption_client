@@ -1,6 +1,7 @@
 from ctypes import c_char_p, c_bool
 import datetime
 from multiprocessing import Process, Manager
+import multiprocessing
 import webbrowser
 from modules.PersonKeyManager import PersonKeyManager
 from modules.EncryptionClient import EncryptionClient
@@ -192,6 +193,7 @@ class EncryptionClientGui(object):
 
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     s = zerorpc.Server(EncryptionClientGui())
     s.bind("tcp://127.0.0.1:" + str(sys.argv[1]))
     s.run()
