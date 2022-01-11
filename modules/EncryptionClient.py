@@ -16,6 +16,7 @@ from zipfile import ZipFile
 import bagit
 import re
 import json
+from sys import exit
 
 
 class EncryptionClient(object):
