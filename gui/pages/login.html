@@ -5,8 +5,9 @@
   <meta charset="utf-8">
   <title>FRDR Encryption Application</title>
   <script>window.jQuery = window.$ = require('jquery');</script>
-  <script src="../assests/js/bootstrap.min.js"></script>
+  <script src="../assests/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/fonts/fontawesome-5.15.4/css/all.min.css" type="text/css" />
   <script src="../assests/js/jquery_i18n/CLDRPluralRuleParser.js"></script>
   <script src="../assests/js/jquery_i18n/jquery.i18n.js"></script>
   <script src="../assests/js/jquery_i18n/jquery.i18n.messagestore.js"></script>
@@ -49,14 +50,13 @@
     .banner-sec{
       background: var(--login-banner-background); 
       background-size: cover; 
-      min-height: 500px; 
+      min-height: 522px; 
       border-radius:  10px 0 0 10px; 
       padding: 50px;}
       
     .container{
       background: var(--login-login-sec-background); 
       border-radius:  10px;
-    
     }
     
     .login-sec{
@@ -120,21 +120,21 @@
   <section class="login-block">
     <div class="container">
       <div class="row">
-        <div class="col-md-6 col-xs-6 banner-sec">
+        <div class="col-lg-6 col-md-6 banner-sec">
           <div class="banner-text">
               <h2 data-i18n="app-name"></h2>
               <p data-i18n="app-desc"></p>
           </div>	
         </div>	 
 
-        <div class="col-md-6 col-xs-6 login-sec">
+        <div class="col-lg-6 col-md-6 login-sec">
           <div class="row">
-            <ul class="nav navbar-nav navbar-right">
-              <li class="dropdown">
+            <ul class="nav navbar-nav ml-auto">
+              <li class="nav-item dropdown">
                 <a href="#" id="locale-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></a>
-                <ul class="dropdown-menu" id="locale-menu" role="menu">
-                  <li><a role="menuitem" class="lang-switch" href="#" data-locale="en" data-i18n="app-navbar-locale-english"></a></li>
-                  <li><a role="menuitem" class="lang-switch" href="#" data-locale="fr" data-i18n="app-navbar-locale-french"></a></li>
+                <ul class="dropdown-menu dropdown-menu-right" id="locale-menu" role="menu">
+                  <li class="dropdown-item"><a role="menuitem" class="lang-switch" href="#" data-locale="en" data-i18n="app-navbar-locale-english"></a></li>
+                  <li class="dropdown-item"><a role="menuitem" class="lang-switch" href="#" data-locale="fr" data-i18n="app-navbar-locale-french"></a></li>
                 </ul>
               </li>
             </ul>
@@ -145,7 +145,7 @@
             <label for="hostname" data-i18n="app-login-url-title"></label>
             <input id="hostname" type="text" style='width:90%;display:inline'/>
             <a data-placement="top" data-toggle="tooltip" id="login-url-tooltip">
-              <span class="glyphicon glyphicon-question-sign" ></span>
+              <span class="fas fa-question-circle" ></span>
             </a>
           </div>
 

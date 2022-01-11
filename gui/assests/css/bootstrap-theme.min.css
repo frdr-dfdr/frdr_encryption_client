@@ -227,10 +227,6 @@ a.btn {
   height: 64px;
 }
 
-.navbar-nav{
-  margin-top: 10px;
-}
-
 .navbar-header > a{
   margin-top: 0px;
   margin-bottom: 0px;
@@ -754,6 +750,10 @@ div.ekko-lightbox.modal > * > .modal-content {
     padding-bottom: 10px;
 }
 
+.metadata-input-numeric {
+    width: 100%;
+}
+
 .missing-required {
     border-color: red;
 }
@@ -1009,7 +1009,32 @@ iframe.policy {
     margin-bottom: 50px;
 }
 
-select.crdc {
+select.crdc, select.geo {
+    padding: 8px 7px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+.geo.readonly {
+    margin-bottom: 20px;
+    display: inline-block;
+    width: 100%;
+}
+
+input[type=text].geo {
+    padding-left: 10px;
+}
+
+input.geo {
+    height: 35px;
+    width: 100%;
     padding: 7px 7px;
     margin-top: 3px;
     margin-bottom: 3px;
@@ -1059,6 +1084,27 @@ div.crdc-label {
     padding-left: 7px;
     padding-right: 7px;
     display: inline;
+}
+
+.metadata-sub-group {
+    margin-bottom: 32px;
+}
+
+.metadata-sub-label {
+}
+
+
+/*** Stop numeric input from having up / down arrows ***/
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 .path {
