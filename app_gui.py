@@ -1,7 +1,8 @@
-from ctypes import c_char_p, c_bool
+from ctypes import c_char_p
 import datetime
-from multiprocessing import Process, Manager
+from multiprocessing import Process, Manager, Queue
 import multiprocessing
+import shutil
 import webbrowser
 from modules.PersonKeyManager import PersonKeyManager
 from modules.EncryptionClient import EncryptionClient
@@ -21,9 +22,9 @@ __version__ = config.VERSION
 dirs = AppDirs(config.APP_NAME, config.APP_AUTHOR)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 
-def encrypt_in_process(input_path, output_path, vault_client_token, 
+def encrypt_in_new_process(input_path, output_path, vault_client_token, 
                        vault_client_entity_id, vault_client_addr, 
-                       return_message, return_successful):
+                       return_message, queue):
     try:
         Util.get_logger("frdr-encryption-client",
                         log_level="info",
@@ -38,13 +39,12 @@ def encrypt_in_process(input_path, output_path, vault_client_token,
         person_key_manager = PersonKeyManager(vault_client)
         encryptor = EncryptionClient(
             dataset_key_manager, person_key_manager, input_path, output_path)
-        bag_path = encryptor.encrypt(dataset_uuid)
+        bag_path = encryptor.encrypt(dataset_uuid, queue)
         return_message.value = bag_path
-        return_successful.value = True
     except Exception as e:
         return_message.value = str(e)
-        return_successful.value = False
-        logger.info(e, exc_info=True)
+        logger.error(e, exc_info=True)
+        sys.exit(-1)
 
 class EncryptionClientGui(object):
     def __init__(self):
@@ -104,15 +104,46 @@ class EncryptionClientGui(object):
 
     def encrypt(self, input_path, output_path):
         manager = Manager()
-        message = manager.Value(c_char_p, "Terminated")
-        successful = manager.Value(c_bool, False)
-        p = Process(target=encrypt_in_process, args=(input_path, output_path, self._vault_client.token, self._vault_client.entity_id, self._vault_client.url, message, successful))
+        message = manager.Value(c_char_p, "")
+        queue = Queue()
+        p = Process(target=encrypt_in_new_process, args=(input_path, output_path, self._vault_client.token, self._vault_client.entity_id, self._vault_client.url, message, queue))
         p.start()
         p.join()
-        return (successful.value, message.value)
+
+        self._logger.debug("Encryption process exitcode {}".format(p.exitcode))
+        
+        if (p.exitcode == 0):
+            successful = True
+        else:
+            successful = False
+            # Get the directories created when encrypting data if any.
+            try: 
+                temp_bag_dir = queue.get(timeout=0)
+            except:
+                temp_bag_dir = None
+            try:
+                bag_output_path = queue.get(timeout=0)
+            except:
+                bag_output_path = None
+                
+            self.cleanup_failed_encryption(temp_bag_dir, bag_output_path)
+            if (p.exitcode == -9):
+                message.value = "Failed. The machine is out of memory."
+            elif (p.exitcode == -15):
+                message.value = "Terminated by user."
+        queue.close()
+        return (successful, message.value)
     
-    def cleanup(self):
-        self._logger.info("Encryption has been terminated by the user.")
+    def cleanup_failed_encryption(self, temp_bag_dir=None, bag_output_path=None):
+        self._logger.info("Clean up after failed encryption.")
+        # delete temp dir
+        if temp_bag_dir is not None and os.path.exists(temp_bag_dir) and os.path.isdir(temp_bag_dir):
+            self._logger.info("Deleting temp dir {}".format(temp_bag_dir))
+            shutil.rmtree(temp_bag_dir)
+        # delete output dir
+        if bag_output_path is not None and os.path.exists(bag_output_path):
+            self._logger.info("Deleting output package {}".format(bag_output_path))
+            os.remove(bag_output_path)
 
     def decrypt(self, input_path, output_path, url):
         try:

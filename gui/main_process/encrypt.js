@@ -41,7 +41,7 @@ ipcMain.on('encrypt', (event, input_path, output_path) => {
   client.invoke("encrypt", input_path, output_path, function(_error, res) {
     var success = res[0];
     var result = res[1];
-    if (result != "Terminated") {
+    if (result != "") {
       childWindow.close();
     }
     if (success){
@@ -57,11 +57,6 @@ ipcMain.on('encrypt-cancel', (event) => {
   try {
     const pid = fs.readFileSync(path.join(basepath, 'pid'), 'utf8');
     process.kill(pid);
-    var currentWindow = BrowserWindow.getFocusedWindow();
-    currentWindow.close();
-    client.invoke("cleanup", function(_error, _res) {
-    
-    });
   } catch (err) {
     event.reply('notify-encrypt-cancel-error', err);
   }
