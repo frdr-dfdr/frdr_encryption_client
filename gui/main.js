@@ -1,5 +1,5 @@
 if (require('electron-squirrel-startup')) return;
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 // Does not allow a second instance
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -84,6 +84,19 @@ function createWindow() {
         }))
     });
 
+    // Load an error page when user is authenticated but local keys verification fails.
+    ipcMain.on("verification-failed", (_event, dialogOptions) => {
+        mainWindow.loadURL(require('url').format({
+            pathname: path.join(__dirname, 'pages/local-keys-error.html'),
+            protocol: 'file:',
+            slashes: true,
+        }))
+        mainWindow.webContents.on('did-finish-load', function() {
+            mainWindow.show();
+        });
+        dialog.showMessageBox(mainWindow, dialogOptions);
+    });
+
     mainWindow.on('close', (_event) => {
         if (mainWindow != null) {
             mainWindow.hide();
@@ -104,7 +117,6 @@ app.on('ready', () => {
 portfinder.basePort = 4242;
 portfinder.getPort(function(_err, port) {
     client.connect("tcp://127.0.0.1:" + String(port));
-    console.log(port);
     const createApp = () => {
         let script = getScriptPath();
         if (guessPackaged()) {

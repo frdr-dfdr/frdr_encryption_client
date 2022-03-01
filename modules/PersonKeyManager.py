@@ -113,7 +113,7 @@ class PersonKeyManager(object):
             return self._vault_client.retrive_key_from_vault(path)
         except Exception as e:
             self._logger.error(
-                "Falied to read public key from Vault. {}".format(e))
+                "Failed to read public key from Vault. {}".format(e))
             return None
 
     def get_vault_entity_id(self):

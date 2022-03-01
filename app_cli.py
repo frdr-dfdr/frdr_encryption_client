@@ -71,6 +71,30 @@ def main():
             elif arguments["--oauth"]:
                 vault_client.login(vault_addr=arguments["--vault"],
                                    auth_method="oidc")
+            
+            # verify public and private key pair saved locally
+            person_key_manager = PersonKeyManager(vault_client)
+            error_msg = None
+            try:
+                person_key_manager.create_or_retrieve_public_key()
+            except ValueError as e:
+                logger.error(e)
+                error_msg = str(e)
+            except FileNotFoundError as e:
+                logger.error(e)
+                error_msg = "No public key is found locally."
+            try:
+                private_key_path = os.path.join(Util.get_key_dir(
+                    person_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
+                person_key_manager.read_private_key(private_key_path)
+            except FileNotFoundError as e:
+                logger.error(e)
+                if error_msg is not None:
+                    error_msg = error_msg + " No private key is found locally." 
+                else:
+                    error_msg = "No private key is found locally."
+            if error_msg is not None:
+                raise Exception("Local public and private key pair verification failed. {}".format(error_msg))
 
             if arguments["encrypt"]:
                 dataset_uuid = str(uuid.uuid4())
@@ -118,8 +142,6 @@ def main():
             elif arguments["show_vault_id"]:
                 entity_id = vault_client.entity_id
                 person_key_manager = PersonKeyManager(vault_client)
-                # make sure there is a public key saved on Vault for the requester
-                person_key_manager.create_or_retrieve_public_key()
                 print(
                     "Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.")
                 print(Util.wrap_text(entity_id))

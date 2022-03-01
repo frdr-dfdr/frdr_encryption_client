@@ -176,6 +176,30 @@ class EncryptionClientGui(object):
         except Exception as e:
             self._logger.error(e, exc_info=True)
             return (False, str(e))
+    
+    def verify_local_keys(self):
+        person_key_manager = PersonKeyManager(self._vault_client)
+        error_msg = None
+        try:
+            person_key_manager.create_or_retrieve_public_key()
+        except ValueError as e:
+            self._logger.error(e, exc_info=True)
+            error_msg = str(e)
+        except FileNotFoundError as e:
+            self._logger.error(e, exc_info=True)
+            error_msg = "No public key is found locally."
+        try:
+            private_key_path = os.path.join(Util.get_key_dir(
+                person_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
+            person_key_manager.read_private_key(private_key_path)
+        except FileNotFoundError as e:
+            self._logger.error(e, exc_info=True)
+            if error_msg is not None:
+                error_msg = error_msg + "\nNo private key is found locally." 
+            else:
+                error_msg = "No private key is found locally."
+
+        return error_msg
 
     # TODO: keep for future feature
     def review_shares(self):
@@ -197,8 +221,6 @@ class EncryptionClientGui(object):
         try:
             entity_id = self._vault_client.entity_id
             person_key_manager = PersonKeyManager(self._vault_client)
-            # make sure there is a public key saved on Vault for the requester
-            person_key_manager.create_or_retrieve_public_key()
             return (True, entity_id)
         except Exception as e:
             return (False, str(e))

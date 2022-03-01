@@ -56,12 +56,24 @@ function oidcGlobusLogin() {
   ipcRenderer.send("login-vault-oidc-globus", hostname, hostnamePKI, loginSuccessMsg);
 }
 
-document.getElementById("globus_submit").addEventListener("click", oidcGlobusLogin);
-
 ipcRenderer.on('notify-login-oidc-done', function (_event) {
-  ipcRenderer.send("authenticated");
+  ipcRenderer.send("verify-local-user-keys");
 });
 
 ipcRenderer.on('notify-login-oidc-error', function (_event, errMessage) {
   alert($.i18n('app-login-error', errMessage), "");
+});
+
+ipcRenderer.on('notify-verify-local-user-keys-error', function (_event, errMessage) {
+  var dialogOptions = {
+    type: "warning",
+    buttons: [$.i18n("app-cancel-btn")],
+    title: "Error",
+    message: errMessage
+  };
+  ipcRenderer.send("verification-failed", dialogOptions);
+});
+
+ipcRenderer.on('notify-verify-local-user-keys-done', function (_event) {
+  ipcRenderer.send("authenticated");
 });

@@ -8,13 +8,17 @@
     },
     "app-name": "FRDR Encryption App",
     "app-desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.",
-
+    
     "app-login-title": "Login Now",
     "app-login-url-title": "Key Server URL",
     "app-login-url-tooltip": "If running for development, probably http://127.0.0.1:8200.",
     "app-login-btn": "Login with Globus",
     "app-login-error": "Error logging in with Globus OAuth. \n$1",
     "app-login-success-message": "Authentication to HashiCorp Vault successful, you can close the browser now.",
+    "app-login-local-keys-error-title": "Error with local public and private key pair",
+    "app-login-local-keys-error-text": "You are not able to use FRDR Encryption App on this device",
+    
+    "app-cancel-btn": "Cancel",
 
     "app-logout": "You have successfully logged out.",
     "app-logout-error": "Error logging out. \n$1",
