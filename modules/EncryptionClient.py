@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from collections import defaultdict
-import signal
 import hvac
 import nacl.utils
 import nacl.secret
@@ -14,10 +13,7 @@ import shutil
 import tempfile
 from zipfile import ZipFile
 import bagit
-import re
 import json
-from sys import exit
-
 
 class EncryptionClient(object):
     def __init__(self, dataset_key_manager, person_key_manager, input_dir=None, output_dir=None):
@@ -121,7 +117,7 @@ class EncryptionClient(object):
         """
         logger = logging.getLogger('frdr-encryption-client.decrypt')
 
-        depositor_uuid, dataset_uuid, requester_uuid = self._parse_url(url)
+        depositor_uuid, dataset_uuid, requester_uuid = Util.parse_url(url)
 
         if requester_uuid == "":
             assert self._dataset_key_manager.get_vault_entity_id(
@@ -312,11 +308,3 @@ class EncryptionClient(object):
                 output_path, os.path.basename(input_path))
             zipfile_name = shutil.make_archive(zipfile_path, 'zip', input_path)
         return zipfile_name
-
-    def _parse_url(self, url):
-        match = re.match(
-            r"^.*secret/data/dataset/([0-9a-f\-]*)/([0-9a-f\-]*)/?(.*)?", url)
-        depositor_uuid = match.group(1)
-        dataset_uuid = match.group(2)
-        requester_uuid = match.group(3)
-        return (depositor_uuid, dataset_uuid, requester_uuid)

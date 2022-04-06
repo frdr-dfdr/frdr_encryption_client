@@ -154,6 +154,9 @@ class EncryptionClientGui(object):
             encryptor = EncryptionClient(
                 dataset_key_manager, person_key_manager, input_path, output_path)
             encryptor.decrypt(url)
+            _, dataset_uuid, requester_uuid = Util.parse_url(url)
+            data = {"vault_dataset_id": dataset_uuid, "vault_requester_id": requester_uuid}
+            self._frdr_api_client.update_requestitem_decrypt(data)
             return (True, None)
         except Exception as e:
             self._logger.info(str(e))
@@ -171,7 +174,7 @@ class EncryptionClientGui(object):
             encryptor.grant_access(requester_uuid, dataset_uuid, expire_date)
             data = {"expires": expire_date, "vault_dataset_id": dataset_uuid,
                     "vault_requester_id": requester_uuid}
-            self._frdr_api_client.update_requestitem(data)
+            self._frdr_api_client.update_requestitem_grant_access(data)
             return (True, None)
         except Exception as e:
             self._logger.error(e, exc_info=True)

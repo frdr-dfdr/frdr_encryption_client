@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import logging
 from base64 import b64encode, b64decode
@@ -119,3 +120,12 @@ class Util(object):
         raise IOError("The app needs to use a port between {} and {} for login process. \
                         Please free a port."
                       .format(config.VAULT_CLIENT_LOGIN_REDIRECT_PORT_MIN, config.VAULT_CLIENT_LOGIN_REDIRECT_PORT_MAX))
+
+    @classmethod
+    def parse_url(cls, url):
+        match = re.match(
+            r"^.*secret/data/dataset/([0-9a-f\-]*)/([0-9a-f\-]*)/?(.*)?", url)
+        depositor_uuid = match.group(1)
+        dataset_uuid = match.group(2)
+        requester_uuid = match.group(3)
+        return (depositor_uuid, dataset_uuid, requester_uuid)
