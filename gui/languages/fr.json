@@ -21,7 +21,6 @@
     "app-depositor-home-title": "Vous utilisez cette application en tant que déposant",
     "app-depositor-home-info": "En tant que déposant, vous pouvez utiliser cette application pour crypter des ensembles de données sensibles et accorder à d'autres utilisateurs l'accès à la clé des ensembles de données sensibles.",
     "app-encrypt-title": "Crypter l'ensemble de données",
-    "app-grant-access-title": "Accorder l'accès",
     "app-decrypt-title": "Décrypter l'ensemble de données",
     "app-request-access-titile": "Demande d'accès",
     "app-navbar-contact-us": "Contactez nous",

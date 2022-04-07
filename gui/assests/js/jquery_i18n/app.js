@@ -21,6 +21,13 @@ var update_texts = function() {
         openFRDRProfile();
       });
 
+      // Add hyperlink to open FRDR Deposit Dashboard
+      $('#frdr-dashboard-link').html('<a id="open-frdr-dashboard">' + $.i18n('app-encrypt-done-text2') +'</a>');
+
+      $('#open-frdr-dashboard').on("click", function(){
+        openFRDRDepositDashboard();
+      });
+
       // tooltip
       $('#login-url-tooltip').attr("data-original-title", $.i18n('app-login-url-tooltip'));
 

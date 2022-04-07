@@ -1,4 +1,25 @@
-const {ipcRenderer} = require('electron');
+const {ipcRenderer, shell} = require('electron');
+const fs = require('fs');
+const yaml = require('js-yaml');
+const path = require('path');
+
+var dashboardURL = null;
+
+try {
+  var configPath = "";
+  if (process.env.NODE_ENV == "development") {
+    configPath = path.join(__dirname, '..', '..','config', 'config.yml');
+  }
+  else {
+    var configPath = path.join(__dirname, '..', 'app_gui','config', 'config.yml');
+  }
+  let fileContents = fs.readFileSync(configPath, 'utf8');
+  let config = yaml.load(fileContents);
+  dashboardURL = config["FRDR_DEPOSIT_DASHBOARD_URL"];
+} catch (e) {
+  // log error, the link to FRDR profile page is not working
+  console.log(e);
+}
 
 let input_path = null;
 let output_path = null;
@@ -55,3 +76,9 @@ $('#encrypt-cancel').on("click", function(){
 ipcRenderer.on('notify-encrypt-cancel-error', function (_event, result) {
   alert($.i18n('app-encrypt-cancel-error', result), "");
 });
+
+function openFRDRDepositDashboard() {
+  shell.openExternal(dashboardURL);
+}
+
+document.getElementById("open-frdr-dashboard").addEventListener("click", openFRDRDepositDashboard);

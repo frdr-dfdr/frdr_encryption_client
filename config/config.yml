@@ -26,6 +26,7 @@ FRDR_API_BASE_URL: "https://dev4-web-c1.frdr.ca/v1/api"
 FRDR_API_LOGIN_TIMEOUT: 60
 FRDR_PROFILE_URL: "https://dev4-web-c1.frdr.ca/repo/profile"
 FRDR_CONTACTUS_URL: "https://dev4-web-c1.frdr.ca/repo/contactus?locale="
+FRDR_DEPOSIT_DASHBOARD_URL: "https://dev4-web-c1.frdr.ca/repo/PublishDashboard"
 
 # Dataset key server configuration
 VAULT_DATASET_KEY_PATH: "dataset"
