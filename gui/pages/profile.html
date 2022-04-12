@@ -5,10 +5,11 @@
   <meta charset="utf-8">
   <title>FRDR Encryption Application</title>
   <script>window.jQuery = window.$ = require('jquery'); </script>
-  <script src="../assests/js/bootstrap.min.js"></script>
+  <script src="../assests/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
   <link rel="stylesheet" href="../assests/css/bootstrap-theme.min.css" type="text/css" />
   <link rel="stylesheet" href="../assests/css/frdr-theme.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/fonts/fontawesome-5.15.4/css/all.min.css" type="text/css" />
   <script src="../assests/js/jquery_i18n/CLDRPluralRuleParser.js"></script>
   <script src="../assests/js/jquery_i18n/jquery.i18n.js"></script>
   <script src="../assests/js/jquery_i18n/jquery.i18n.messagestore.js"></script>
@@ -36,18 +37,20 @@
   <div class="container">
     <h2 data-i18n="app-profile-title"></h2>
     <div class="row">
-      <label class="col-sm-offset-2 col-sm-3" data-i18n="app-profile-email"></label>
-      <div id="vault_email" class="col-sm-7"></div>
+      <label class="offset-md-2 col-md-3" data-i18n="app-profile-email"></label>
+      <div id="vault_email" class="col-md-7"></div>
     </div>
 
     <div class="row">
-      <label class="col-sm-offset-2 col-sm-3" data-i18n="app-profile-user-id"></label>
-        <div style="position: relative;">
-          <div id="vault_user_id" class="col-sm-6"></div>
-          <span id="copy_to_clipboard" data-toggle="tooltip" data-placement="bottom" class="glyphicon glyphicon-file js-copy"></span>
-        </div>
+      <label class="offset-md-2 col-md-3" data-i18n="app-profile-user-id"></label>
+      <div id="vault_user_id" class="col-md-6 col-11"></div>
+      <div class="col-md-1 col-1">
+        <span id="copy_to_clipboard" data-toggle="tooltip" data-placement="bottom" class="fas fa-copy"></span>
+      </div>
     </div>
-    <p id="vault-id-intro"></p>
+    <div class="row">
+      <div id="vault-id-intro" class="offset-md-2 col-md-10"></div>
+    </div>
   </div>
 
   <!--Footer-->

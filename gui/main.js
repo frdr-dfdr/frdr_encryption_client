@@ -48,6 +48,7 @@ const getScriptPath = () => {
 
 loadMainProcessJs();
 
+
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,

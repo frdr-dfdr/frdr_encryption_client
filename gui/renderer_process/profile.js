@@ -42,7 +42,6 @@ ipcRenderer.on('notify-get-entity-name-error', function (_event, errMessage) {
 function copyToClipboard(text, el) {
   var copyTest = document.queryCommandSupported('copy');
   var elOriginalText = el.attr('data-original-title');
-
   if (copyTest === true) {
     var copyTextArea = document.createElement("textarea");
     copyTextArea.value = text;
@@ -52,9 +51,9 @@ function copyToClipboard(text, el) {
       var successful = document.execCommand('copy');
       var msg = successful ? $.i18n("app-profile-copied") : $.i18n("app-profile-copy-error");
       if (successful) {
-        $("#copy_to_clipboard").removeClass("glyphicon-file").addClass("glyphicon-ok");
+        $("#copy_to_clipboard").removeClass("fa-copy").addClass("fa-clipboard-check");
         setTimeout(function(){ 
-          $("#copy_to_clipboard").removeClass("glyphicon-ok").addClass("glyphicon-file"); 
+          $("#copy_to_clipboard").removeClass("fa-clipboard-check").addClass("fa-copy"); 
           el.attr('data-original-title', $.i18n("app-profile-copy-to-clipboard"));
         }, 2000);
       }
@@ -74,7 +73,7 @@ $('[data-toggle="tooltip"]').tooltip({
   container: 'body'
 });
 
-$('.js-copy').click(function() {
+$('.fa-copy').click(function() {
   var text = $("#vault_user_id").html();
   var el = $(this);
   copyToClipboard(text, el);

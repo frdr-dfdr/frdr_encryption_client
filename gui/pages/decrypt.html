@@ -5,10 +5,11 @@
   <meta charset="utf-8">
   <title>FRDR Encryption Application</title>
   <script>window.jQuery = window.$ = require('jquery'); </script>
-  <script src="../assests/js/bootstrap.min.js"></script>
+  <script src="../assests/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
   <link rel="stylesheet" href="../assests/css/bootstrap-theme.min.css" type="text/css" />
   <link rel="stylesheet" href="../assests/css/frdr-theme.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/fonts/fontawesome-5.15.4/css/all.min.css" type="text/css" />
   <script src="../assests/js/jquery_i18n/CLDRPluralRuleParser.js"></script>
   <script src="../assests/js/jquery_i18n/jquery.i18n.js"></script>
   <script src="../assests/js/jquery_i18n/jquery.i18n.messagestore.js"></script>
@@ -36,32 +37,32 @@
     <p data-i18n="app-decrypt-desc"></p>
 
     <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+      <div class="col-12">
         <h3 data-i18n="app-decrypt-url"></h3>
         <input class="form-control" name="key_url" id="key_url" type="text" style="width:75%;display:inline" required/>
         <a data-placement="right" data-toggle="tooltip" id="decrypt-url-tooltip">
-          <span class="glyphicon glyphicon-question-sign" ></span>
+          <span class="fas fa-question-circle" ></span>
         </a>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+      <div class="col-12">
         <h3 data-i18n="app-decrypt-input"></h3>
         <button class="btn btn-secondary" id="input_path_file" data-i18n="app-decrypt-input-select"></button>
         <a data-placement="right" data-toggle="tooltip" id="decrypt-input-tooltip">
-          <span class="glyphicon glyphicon-question-sign" ></span>
+          <span class="fas fa-question-circle" ></span>
         </a>
         <p id="selected-file" data-i18n="app-decrypt-no-selection"></p>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+      <div class="col-12">
         <h3 data-i18n="app-decrypt-output"></h3>
         <button class="btn btn-secondary" id="output_path_dir" data-i18n="app-decrypt-output-select"></button>
         <a data-placement="right" data-toggle="tooltip" id="decrypt-output-tooltip">
-          <span class="glyphicon glyphicon-question-sign" ></span>
+          <span class="fas fa-question-circle" ></span>
         </a>
         <p id="selected-output-dir" data-i18n="app-decrypt-no-selection"></p>
       </div>
