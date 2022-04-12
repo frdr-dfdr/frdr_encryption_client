@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from collections import defaultdict
-import signal
 import hvac
 import nacl.utils
 import nacl.secret
@@ -14,9 +13,7 @@ import shutil
 import tempfile
 from zipfile import ZipFile
 import bagit
-import re
 import json
-
 
 class EncryptionClient(object):
     def __init__(self, dataset_key_manager, person_key_manager, input_dir=None, output_dir=None):
@@ -38,13 +35,14 @@ class EncryptionClient(object):
             # default output path is the desktop
             self._output = os.path.expanduser("~/Desktop/")
 
-    def encrypt(self, dataset_uuid):
+    def encrypt(self, dataset_uuid, queue):
         """Compress the input package, encrypt it, put the encrypted package in a bag. 
            Encrypt the dataset key with the owner's public key and save this encrypted
            dataset key to a key server.
 
         Args:
             dataset_uuid (string): The unique id for the dataset
+            queue(object): The queue to track the directories created during encryption
 
         Returns:
             string: The output path of the generated bag including the encrypted package
@@ -54,24 +52,6 @@ class EncryptionClient(object):
         bag_dir_parent = None
         bag_output_path = None
         key_path_on_vault = None
-
-        def cleanup(*args):
-            logger.info("Encryption has been terminated by the user. Now clean up...")
-            # delete temp dir
-            if bag_dir_parent is not None and os.path.exists(bag_dir_parent) and os.path.isdir(bag_dir_parent):
-                logger.info("Deleting temp dir")
-                shutil.rmtree(bag_dir_parent)
-            # delete output dir
-            if bag_output_path is not None and os.path.exists(bag_output_path):
-                logger.info("Deleting output package")
-                os.remove(bag_output_path)
-            # remove dataset key saved on Vault
-            if key_path_on_vault is not None:
-                self._dataset_key_manager.delete_key(key_path_on_vault)
-            exit(0)
-
-        signal.signal(signal.SIGINT, cleanup)
-        signal.signal(signal.SIGTERM, cleanup)
         
         # generate key
         self._dataset_key_manager.generate_key()
@@ -83,10 +63,20 @@ class EncryptionClient(object):
         bag_dir = os.path.join(bag_dir_parent, 'bag')
         os.makedirs(bag_dir)
 
+        logger.debug("The temp directory created to hold the bag {}".format(bag_dir_parent))
+        queue.put(bag_dir_parent)
+
         # encrypt each file in the dirname
         if os.path.isdir(self._input):
+            logger.info("Start to compress data.")
             zip_filepath = self._compress_folder(self._input, bag_dir)
+            size = os.path.getsize(zip_filepath) / (1024**3)
+            logger.info("Finished compressing data. The size of the zip file is {} GB".format(size))
+            # TODO: Check size
+
+            logger.info("Start to encrypt data.")
             self._encrypt_file(zip_filepath, logger)
+            logger.info("Finished encrypting data.")
             os.remove(zip_filepath)
         else:
             self._encrypt_file(self._input, logger)
@@ -105,9 +95,10 @@ class EncryptionClient(object):
             str(bag_dir_parent), (os.path.basename(self._input)+"_bag"))
         zipname = shutil.make_archive(bag_destination, 'zip', bag_dir)
         bag_output_path = os.path.join(self._output, os.path.basename(zipname))
-        logger.info("bag output path is " + bag_output_path)
         shutil.move(zipname, bag_output_path)
         shutil.rmtree(bag_dir_parent)
+        queue.put(bag_output_path)
+        logger.info("Encrypted package is moved from the temp directory {} to the output directory {}".format(bag_destination, bag_output_path))
 
         # save key
         self._dataset_key_manager.encrypt_key(
@@ -126,7 +117,7 @@ class EncryptionClient(object):
         """
         logger = logging.getLogger('frdr-encryption-client.decrypt')
 
-        depositor_uuid, dataset_uuid, requester_uuid = self._parse_url(url)
+        depositor_uuid, dataset_uuid, requester_uuid = Util.parse_url(url)
 
         if requester_uuid == "":
             assert self._dataset_key_manager.get_vault_entity_id(
@@ -317,11 +308,3 @@ class EncryptionClient(object):
                 output_path, os.path.basename(input_path))
             zipfile_name = shutil.make_archive(zipfile_path, 'zip', input_path)
         return zipfile_name
-
-    def _parse_url(self, url):
-        match = re.match(
-            r"^.*secret/data/dataset/([0-9a-f\-]*)/([0-9a-f\-]*)/?(.*)?", url)
-        depositor_uuid = match.group(1)
-        dataset_uuid = match.group(2)
-        requester_uuid = match.group(3)
-        return (depositor_uuid, dataset_uuid, requester_uuid)

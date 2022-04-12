@@ -37,7 +37,8 @@ function decrypt() {
     title: "Confirmation",
     message: $.i18n("app-decrypt-confirm")
   }
-  ipcRenderer.send("decrypt", dataset, options, input_path[0], output_path[0], url);
+  var loginSuccessMsg = $.i18n("app-grant-access-login-success-message");
+  ipcRenderer.send("decrypt", dataset, options, input_path[0], output_path[0], url, loginSuccessMsg);
 }
 
 ipcRenderer.on('notify-decrypt-done', function (_event) {
@@ -46,6 +47,10 @@ ipcRenderer.on('notify-decrypt-done', function (_event) {
 
 ipcRenderer.on('notify-decrypt-error', function (_event, errMessage) {
   alert($.i18n('app-decrypt-error', errMessage), "");
+});
+
+ipcRenderer.on('notify-login-frdr-api-error', function (_event, errMessage) {
+  alert(`Error logging in with Globus OAuth for FRDR API Usage.  \n${errMessage}`, "")
 });
 
 $('#decrypt').on("click", function(){

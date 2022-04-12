@@ -1,4 +1,25 @@
-const {ipcRenderer} = require('electron');
+const {ipcRenderer, shell} = require('electron');
+const fs = require('fs');
+const yaml = require('js-yaml');
+const path = require('path');
+
+var profileURL = null;
+
+try {
+  var configPath = "";
+  if (process.env.NODE_ENV == "development") {
+    configPath = path.join(__dirname, '..', '..','config', 'config.yml');
+  }
+  else {
+    var configPath = path.join(__dirname, '..', 'app_gui','config', 'config.yml');
+  }
+  let fileContents = fs.readFileSync(configPath, 'utf8');
+  let config = yaml.load(fileContents);
+  profileURL = config["FRDR_PROFILE_URL"];
+} catch (e) {
+  // log error, the link to FRDR profile page is not working
+  console.log(e);
+}
 
 ipcRenderer.send("get-entity-id");
 
@@ -57,3 +78,9 @@ $('.fa-copy').click(function() {
   var el = $(this);
   copyToClipboard(text, el);
 });
+
+function openFRDRProfile() {
+  shell.openExternal(profileURL);
+}
+
+document.getElementById("open-frdr-profile").addEventListener("click", openFRDRProfile);

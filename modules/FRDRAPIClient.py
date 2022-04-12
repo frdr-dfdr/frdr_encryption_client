@@ -20,8 +20,11 @@ class DataPublicationClient(BaseClient):
                             app_name=app_name, **kwargs)
         self._headers = {'Content-Type': 'application/json'}
 
-    def update_requestitem(self, data):
-        return self.put('requestitem', data=data, headers=self._headers)
+    def update_requestitem_grant_access(self, data):
+        return self.put('requestitem/grant-access', data=data, headers=self._headers)
+
+    def update_requestitem_decrypt(self, data):
+        return self.put('requestitem/decrypt', data=data, headers=self._headers)
     
     def lookup_dataset_title(self, dataset_id):
         return self.get('dataset-title/{}'.format(dataset_id))
@@ -70,7 +73,7 @@ class FRDRAPIClient():
                 "Failed to auth for FRDR API usage. {}".format(e))
             raise Exception(e)
 
-    def update_requestitem(self, data):
+    def update_requestitem_grant_access(self, data):
         """Update requestitem data on FRDR when depositors grant access
            to the key on FRDR Encryption App.
 
@@ -82,7 +85,21 @@ class FRDRAPIClient():
         Returns:
             [string]: REST API call response 
         """
-        return self._pub_client.update_requestitem(data)
+        return self._pub_client.update_requestitem_grant_access(data)
+
+    def update_requestitem_decrypt(self, data):
+        """Update requestitem data on FRDR when depositors grant access
+           to the key on FRDR Encryption App.
+
+        Args:
+            data (dict): {"expires": The expiry data of the granted access, 
+                          "vault_dataset_id": The id for the dataset on Vault,
+                          "vault_requester_id": The id for the requester on Vault}
+
+        Returns:
+            [string]: REST API call response 
+        """
+        return self._pub_client.update_requestitem_decrypt(data)
 
     def get_dataset_title(self, dataset_id):
         """Look up the dataset title from FRDR using the dataset's vault id

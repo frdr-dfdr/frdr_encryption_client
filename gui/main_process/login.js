@@ -12,3 +12,15 @@ ipcMain.on('login-vault-oidc-globus', (event, hostname, hostnamePKI, loginSucces
     }
   });
 });
+
+ipcMain.on('verify-local-user-keys', (event) => {
+  client.invoke("verify_local_keys", function(_error, res) {
+    var errMessage = res;
+    if (errMessage != null) {
+      event.reply('notify-verify-local-user-keys-error', errMessage);
+    }
+    else {
+      event.reply('notify-verify-local-user-keys-done');
+    }
+  });
+});

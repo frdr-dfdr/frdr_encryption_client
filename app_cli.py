@@ -3,7 +3,7 @@
 """
 Usage:
   app_cli.py encrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> [--output=<op>] [--loglevel=<l>]
-  app_cli.py decrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> --url=<key_addr> [--output=<op>] [--loglevel=<l>]
+  app_cli.py decrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> --url=<key_addr> [--output=<op>] [--frdr_api_url=<url>] [--loglevel=<l>]
   app_cli.py grant_access --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --dataset=<id> --requester=<id> [--frdr_api_url=<url>] [--loglevel=<l>]
   app_cli.py show_vault_id --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>)
   app_cli.py -h | --help
@@ -56,7 +56,7 @@ def main():
         if (arguments["encrypt"]) and (not Util.check_dir_exists(arguments["--input"])):
             raise ValueError("The input directory does not exist.")
 
-        if (arguments["decrypt"]) and (not Util.check_dir_exists(arguments["--input"])):
+        if (arguments["decrypt"]) and (not Util.check_file_exists(arguments["--input"])):
             raise ValueError("The input zip file does not exist.")
 
         if (arguments["--output"] is not None) and (not Util.check_dir_exists(arguments["--output"])):
@@ -71,6 +71,30 @@ def main():
             elif arguments["--oauth"]:
                 vault_client.login(vault_addr=arguments["--vault"],
                                    auth_method="oidc")
+            
+            # verify public and private key pair saved locally
+            person_key_manager = PersonKeyManager(vault_client)
+            error_msg = None
+            try:
+                person_key_manager.create_or_retrieve_public_key()
+            except ValueError as e:
+                logger.error(e)
+                error_msg = str(e)
+            except FileNotFoundError as e:
+                logger.error(e)
+                error_msg = "No public key is found locally."
+            try:
+                private_key_path = os.path.join(Util.get_key_dir(
+                    person_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
+                person_key_manager.read_private_key(private_key_path)
+            except FileNotFoundError as e:
+                logger.error(e)
+                if error_msg is not None:
+                    error_msg = error_msg + " No private key is found locally." 
+                else:
+                    error_msg = "No private key is found locally."
+            if error_msg is not None:
+                raise Exception("Local public and private key pair verification failed. {}".format(error_msg))
 
             if arguments["encrypt"]:
                 dataset_uuid = str(uuid.uuid4())
@@ -82,11 +106,25 @@ def main():
 
             elif arguments["decrypt"]:
                 url = arguments["--url"]
+
+                frdr_api_url = arguments["--frdr_api_url"]
+                if frdr_api_url is None:
+                    frdr_api_url = config.FRDR_API_BASE_URL
+
+                frdr_api_client = FRDRAPIClient(base_url=frdr_api_url)
+                frdr_api_client.login()
+
                 dataset_key_manager = DatasetKeyManager(vault_client)
                 person_key_manager = PersonKeyManager(vault_client)
                 encryptor = EncryptionClient(
                     dataset_key_manager, person_key_manager, arguments["--input"], arguments["--output"])
+                
                 encryptor.decrypt(url)
+
+                # make api call to FRDR to put grant access info in db
+                _, dataset_uuid, requester_uuid = Util.parse_url(url)
+                data = {"vault_dataset_id": dataset_uuid, "vault_requester_id": requester_uuid}
+                print(frdr_api_client.update_requestitem_decrypt(data))
 
             elif arguments["grant_access"]:
                 requester_uuid = arguments["--requester"]
@@ -113,13 +151,11 @@ def main():
                     frdr_api_client.login()
                     data = {"expires": expire_date, "vault_dataset_id": dataset_uuid,
                             "vault_requester_id": requester_uuid}
-                    print(frdr_api_client.update_requestitem(data))
+                    print(frdr_api_client.update_requestitem_grant_access(data))
 
             elif arguments["show_vault_id"]:
                 entity_id = vault_client.entity_id
                 person_key_manager = PersonKeyManager(vault_client)
-                # make sure there is a public key saved on Vault for the requester
-                person_key_manager.create_or_retrieve_public_key()
                 print(
                     "Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.")
                 print(Util.wrap_text(entity_id))

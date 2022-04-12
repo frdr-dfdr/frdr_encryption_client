@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <title>FRDR Encryption Application</title>
   <script>window.jQuery = window.$ = require('jquery'); </script>
-  <script src="../assests/js/bootstrap.bundle.min.js"></script>
+  <script src="../assests/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
   <link rel="stylesheet" href="../assests/css/bootstrap-theme.min.css" type="text/css" />
   <link rel="stylesheet" href="../assests/css/frdr-theme.css" type="text/css" />
@@ -21,16 +21,19 @@
 
 <body>
   <!--Navigation bar-->
-  <div id="nav-placeholder"></div>
+  <div id="nav-placeholder">
+  </div>
+
   <script>
   $(function(){
-    $("#nav-placeholder").load("../components/navbar.html");
+    $("#nav-placeholder").load("../components/navbar-limited.html");
   });
   </script>
   <!--end of Navigation bar-->
+  
   <div class="container">
-    <h2 data-i18n="app-name"></h2>
-    <p data-i18n="app-desc-homepage"></p>
+    <h2 data-i18n="app-login-local-keys-error-title"></h2> 
+    <p data-i18n="app-login-local-keys-error-text"></p>
   </div>
 
   <!--Footer-->
@@ -40,7 +43,8 @@
     $("#footer-placeholder").load("../components/footer.html");
   });
   </script>
-  <!--end of Footer-->
+  <!--end of Footer-->  
+
 </body>
 
 </html>
