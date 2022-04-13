@@ -51,8 +51,8 @@ loadMainProcessJs();
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 690,
+        width: 850,
+        height: 710,
         webPreferences: {
             nodeIntegration: true,
         }

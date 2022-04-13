@@ -14,7 +14,7 @@ var update_texts = function() {
 
       // Add hyperlink to open FRDR profile page on request access page
       $('#vault-id-intro').html($.i18n('app-request-access-intro1') 
-          + '<a id="open-frdr-profile">' + $.i18n('app-request-access-profile') +'</a>'
+          + '<a id="open-frdr-profile" href="#">' + $.i18n('app-request-access-profile') +'</a>'
           + $.i18n('app-request-access-intro2'));
 
       $('#open-frdr-profile').on("click", function(){
@@ -22,7 +22,7 @@ var update_texts = function() {
       });
 
       // Add hyperlink to open FRDR Deposit Dashboard
-      $('#frdr-dashboard-link').html('<a id="open-frdr-dashboard">' + $.i18n('app-encrypt-done-text2') +'</a>');
+      $('#frdr-dashboard-link').html('<a id="open-frdr-dashboard" href="#">' + $.i18n('app-encrypt-done-text2') +'</a>');
 
       $('#open-frdr-dashboard').on("click", function(){
         openFRDRDepositDashboard();
