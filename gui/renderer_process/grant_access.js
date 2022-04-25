@@ -17,8 +17,7 @@ function grantAccess() {
     title: "Confirmation",
     message: $.i18n("app-grant-access-login-api")
   };
-  var loginSuccessMsg = $.i18n("app-grant-access-login-success-message");
-  ipcRenderer.send("grant-access", requester, dataset, dialogOptions, dialogOptions2, loginSuccessMsg);
+  ipcRenderer.send("grant-access", requester, dataset, dialogOptions, dialogOptions2);
 }
 
 ipcRenderer.on('notify-get-entity-name-error', function (_event, result) {
@@ -36,10 +35,6 @@ ipcRenderer.on('notify-grant-access-done', function (_event) {
 
 ipcRenderer.on('notify-grant-access-error', function (_event, errMessage) {
   alert($.i18n('app-grant-access-error', errMessage), "");
-});
-
-ipcRenderer.on('notify-login-frdr-api-error', function (_event, errMessage) {
-  alert(`Error logging in with Globus OAuth for FRDR API Usage.  \n${errMessage}`, "")
 });
 
 $('#grant_access').on("click", function(){

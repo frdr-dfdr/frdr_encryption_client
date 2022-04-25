@@ -10,14 +10,20 @@
     "app-desc": "Welcome to the FRDR Encryption App. You can use the app to encrypt, decrypt, and share access to sensitive datasets with the Federated Research Data Repository.",
     "app-desc-homepage": "Welcome to the FRDR Encryption App. You can use the app to encrypt sensitive datasets before uploading them to FRDR, to decrypt datasets that you have accessed through FRDR, and to manage who has access to your sensitive datasets.",
     
-    "app-login-title": "Login Now",
-    "app-login-url-title": "Key Server URL",
+    "app-login-frdr-title": "Login Step 1",
+    "app-login-frdr-desc": "You need to log into FRDR first.",
     "app-login-url-tooltip": "If running for development, probably http://127.0.0.1:8200.",
-    "app-login-btn": "Login with Globus",
-    "app-login-error": "Error logging in with Globus OAuth. \n$1",
-    "app-login-success-message": "Authentication to HashiCorp Vault successful, you can close the browser now.",
-    "app-login-local-keys-error-title": "Error with local public and private key pair",
-    "app-login-local-keys-error-text": "You are not able to use FRDR Encryption App on this device",
+    "app-login-frdr-btn": "Login with Globus",
+    "app-login-frdr-error": "Error logging into FRDR. \n$1",
+    "app-login-frdr-success-message": "Authentication to FRDR successful, you can close the browser now.",
+
+    "app-login-vault-title": "Login Step 2",
+    "app-login-vault-desc": "You need to log into Vault for key management.",
+    "app-login-vault-btn": "Login with Globus",
+    "app-login-vault-error": "Error logging into HashiCorp Vault with Globus OAuth. \n$1",
+    "app-login-vault-success-message": "Authentication to HashiCorp Vault successful, you can close the browser now.",
+    "app-login-vault-local-keys-error-title": "Error with local public and private key pair",
+    "app-login-vault-local-keys-error-text": "You are not able to use FRDR Encryption App on this device",
     
     "app-cancel-btn": "Cancel",
 
@@ -73,12 +79,6 @@
     "app-grant-access-confirm": "You are trying to grant requester $1 access to dataset $2. \n\nPlease confirm the dataset name and requester name are correct before granting access. \n\nDo you want to continue?",
     "app-grant-access-confirm-btn1": "Yes",
     "app-grant-access-confirm-btn2": "Cancel",
-
-    "app-grant-access-login-api": "You need to log into FRDR for access granting.",
-    "app-grant-access-login-api-btn1": "Login with Globus",
-    "app-grant-access-login-api-btn2": "Cancel",
-    "app-grant-access-login-success-message": "Authentication to FRDR successful, you can close the browser now.",
-
     "app-grant-access-done": "Access Granted",
     "app-grant-access-error": "Error granting access. $1",
     "app-grant-access-find-user-error": "Error finding the user in Vault. \n$1.",

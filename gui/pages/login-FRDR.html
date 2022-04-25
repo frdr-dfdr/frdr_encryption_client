@@ -141,18 +141,14 @@
               </li>
             </ul>
           </div>
-          <h2 class="text-center" data-i18n="app-login-title"></h2>  
+          <h2 class="text-center" data-i18n="app-login-frdr-title"></h2>  
 
           <div>
-            <label for="hostname" data-i18n="app-login-url-title"></label>
-            <input id="hostname" type="text" style='width:90%;display:inline'/>
-            <a data-placement="top" data-toggle="tooltip" id="login-url-tooltip">
-              <span class="fas fa-question-circle" ></span>
-            </a>
+            <p data-i18n="app-login-frdr-desc"></p>
           </div>
 
           <div class="text-center">
-            <button id="globus_submit" class="btn-primary btn-login" data-i18n="app-login-btn" onclick="oidcGlobusLogin()"></button>
+            <button id="globus_submit" class="btn-primary btn-login" data-i18n="app-login-frdr-btn" onclick="FRDRGlobusLogin()"></button>
           </div>
   
     </div>
@@ -160,7 +156,7 @@
   </div>
   </section>  
 
-  <script src="../renderer_process/login.js" charset="utf-8"></script> 
+  <script src="../renderer_process/login_FRDR.js" charset="utf-8"></script> 
   <script src="../assests/js/jquery_i18n/app.js"></script>
 
 </body>

@@ -62,7 +62,7 @@ function createWindow() {
 
     // Load the login page by default.
     mainWindow.loadURL(require('url').format({
-        pathname: path.join(__dirname, 'pages/login.html'),
+        pathname: path.join(__dirname, 'pages/login-FRDR.html'),
         protocol: 'file:',
         slashes: true
     }));
@@ -70,7 +70,7 @@ function createWindow() {
     // Load the login page when user is unauthenticated.
     ipcMain.on("unauthenticated", (_event) => {
         mainWindow.loadURL(require('url').format({
-            pathname: path.join(__dirname, 'pages/login.html'),
+            pathname: path.join(__dirname, 'pages/login-FRDR.html'),
             protocol: 'file:',
             slashes: true
         }))
@@ -80,6 +80,15 @@ function createWindow() {
     ipcMain.on("authenticated", (_event) => {
         mainWindow.loadURL(require('url').format({
             pathname: path.join(__dirname, 'pages/home.html'),
+            protocol: 'file:',
+            slashes: true
+        }))
+    });
+
+    // Load our app when user is authenticated.
+    ipcMain.on("frdr-authenticated", (_event) => {
+        mainWindow.loadURL(require('url').format({
+            pathname: path.join(__dirname, 'pages/login-Vault.html'),
             protocol: 'file:',
             slashes: true
         }))

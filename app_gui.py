@@ -68,7 +68,7 @@ class EncryptionClientGui(object):
             self._logger.error(str(e), exc_info=True)
             return (False, str(e))
 
-    def login_oidc_globus(self, hostname, hostname_pki, success_msg):
+    def login_oidc_globus(self, success_msg, hostname=config.VAULT_HOSTNAME, hostname_pki=None):
         try:
             self._logger.info(
                 "Log into Vault using oidc method with globus acccount")

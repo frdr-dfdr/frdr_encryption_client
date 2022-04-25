@@ -15,7 +15,6 @@ try {
   }
   let fileContents = fs.readFileSync(configPath, 'utf8');
   let config = yaml.load(fileContents);
-  document.getElementById('hostname').value = config['VAULT_HOSTNAME'];
   timeout = config["VAULT_LOGIN_TIMEOUT"];
 } catch (e) {
   // log error, but the login workflow still works
@@ -26,7 +25,7 @@ $(function () {
   $('[data-toggle="tooltip"]').tooltip();
 })
 
-function oidcGlobusLogin() {
+function vaultOIDCGlobusLogin() {
 
   var countdownNum = timeout;
   incTimer();
@@ -36,24 +35,17 @@ function oidcGlobusLogin() {
       if(countdownNum != 0){
         countdownNum--;
         document.getElementById("globus_submit").disabled = true;
-        document.getElementById('globus_submit').innerHTML = $.i18n('app-login-btn') + ' (' + countdownNum + 's)';
+        document.getElementById('globus_submit').innerHTML = $.i18n('app-login-vault-btn') + ' (' + countdownNum + 's)';
         incTimer();
       } else {
         document.getElementById("globus_submit").disabled = false;
-        document.getElementById('globus_submit').innerHTML = $.i18n('app-login-btn');
+        document.getElementById('globus_submit').innerHTML = $.i18n('app-login-vault-btn');
       }
     },1000);
   }
 
-  var hostname = document.getElementById("hostname").value;
-  if (document.getElementById("pki-hostname") != null) {
-    var hostnamePKI = document.getElementById("pki-hostname").value;
-  }
-  else {
-    var hostnamePKI = hostname;
-  }
-  var loginSuccessMsg = $.i18n("app-login-success-message");
-  ipcRenderer.send("login-vault-oidc-globus", hostname, hostnamePKI, loginSuccessMsg);
+  var loginSuccessMsg = $.i18n("app-login-vault-success-message");
+  ipcRenderer.send("login-vault-oidc-globus", loginSuccessMsg);
 }
 
 ipcRenderer.on('notify-login-oidc-done', function (_event) {
@@ -61,7 +53,7 @@ ipcRenderer.on('notify-login-oidc-done', function (_event) {
 });
 
 ipcRenderer.on('notify-login-oidc-error', function (_event, errMessage) {
-  alert($.i18n('app-login-error', errMessage), "");
+  alert($.i18n('app-login-vault-error', errMessage), "");
 });
 
 ipcRenderer.on('notify-verify-local-user-keys-error', function (_event, errMessage) {

@@ -1,7 +1,7 @@
 const {BrowserWindow, dialog, ipcMain} = require('electron');
 const path = require('path');
 
-ipcMain.on('grant-access', (event, requester, dataset, dialogOptions, dialogOptions2, loginSuccessMsg) => {
+ipcMain.on('grant-access', (event, requester, dataset, dialogOptions, dialogOptions2) => {
   client.invoke("get_request_info", requester, dataset, function(_error, res) {
     var entity_success = res[0];
     var entity_result = res[1];
@@ -11,27 +11,15 @@ ipcMain.on('grant-access', (event, requester, dataset, dialogOptions, dialogOpti
       dialogOptions['message'] = dialogOptions['message'].replace("$1", entity_result).replace("$2", dataset_result);
       const response = dialog.showMessageBoxSync(dialogOptions);
       if (response == 0) {
-        const response2 = dialog.showMessageBoxSync(dialogOptions2);
-        if (response2 == 0) {
-          client.invoke("login_frdr_api_globus", loginSuccessMsg, function(_error, res) {
-            var successLogin = res[0];
-            var errMessageLogin = res[1];
-            if (successLogin) {
-              client.invoke("grant_access", dataset, requester, function(_error, res) {
-                var successGrantAccess = res[0];
-                var errMessageGrantAccess = res[1];
-                if (true){
-                  event.reply('notify-grant-access-done');
-                } else {
-                  event.reply('notify-grant-access-error', errMessageGrantAccess);
-                }
-              });  
-            }
-            else {
-              event.reply('notify-login-frdr-api-error', errMessageLogin);
-            }
-          });         
-        }
+        client.invoke("grant_access", dataset, requester, function(_error, res) {
+          var successGrantAccess = res[0];
+          var errMessageGrantAccess = res[1];
+          if (successGrantAccess){
+            event.reply('notify-grant-access-done');
+          } else {
+            event.reply('notify-grant-access-error', errMessageGrantAccess);
+          }
+        });  
       }
     }
     else if (!entity_success || entity_result == null){
