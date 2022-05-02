@@ -167,6 +167,7 @@ class EncryptionClientGui(object):
             if expire_date is None:
                 expire_date = (datetime.date.today() + datetime.timedelta(days=30*6)).strftime("%Y-%m-%d")
             
+            self._frdr_api_client.verify_requestitem_grant_access(dataset_uuid, requester_uuid)
             dataset_key_manager = DatasetKeyManager(self._vault_client)
             person_key_manager = PersonKeyManager(self._vault_client)
             encryptor = EncryptionClient(

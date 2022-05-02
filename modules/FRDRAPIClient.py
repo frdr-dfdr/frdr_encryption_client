@@ -1,3 +1,4 @@
+from requests import request
 from util.util import Util
 from globus_sdk import RefreshTokenAuthorizer, NativeAppAuthClient
 from globus_sdk import BaseClient
@@ -19,6 +20,9 @@ class DataPublicationClient(BaseClient):
         BaseClient.__init__(self, base_url=base_url,
                             app_name=app_name, **kwargs)
         self._headers = {'Content-Type': 'application/json'}
+
+    def verify_requestitem_grant_access(self, dataset_uuid, requester_uuid):
+        return self.get('requestitem/grant-access/verify?vault_dataset_id={}&vault_requester_id={}'.format(dataset_uuid, requester_uuid))
 
     def update_requestitem_grant_access(self, data):
         return self.put('requestitem/grant-access', data=data, headers=self._headers)
@@ -73,6 +77,14 @@ class FRDRAPIClient():
                 "Failed to auth for FRDR API usage. {}".format(e))
             raise Exception(e)
 
+    
+    def verify_requestitem_grant_access(self, dataset_uuid, requester_uuid):
+        try:
+            self._pub_client.verify_requestitem_grant_access(dataset_uuid, requester_uuid)
+        except Exception as e:
+            self._logger.error("No pending requests for this dataset from this requester. {}".format(e))
+            raise Exception("No pending requests for this dataset from this requester")
+    
     def update_requestitem_grant_access(self, data):
         """Update requestitem data on FRDR when depositors grant access
            to the key on FRDR Encryption App.
