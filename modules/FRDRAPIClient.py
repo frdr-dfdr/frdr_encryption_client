@@ -1,6 +1,6 @@
 from requests import request
 from util.util import Util
-from globus_sdk import RefreshTokenAuthorizer, NativeAppAuthClient
+from globus_sdk import GlobusAPIError, RefreshTokenAuthorizer, NativeAppAuthClient
 from globus_sdk import BaseClient
 import logging
 from util.config_loader import config
@@ -22,7 +22,11 @@ class DataPublicationClient(BaseClient):
         self._headers = {'Content-Type': 'application/json'}
 
     def verify_requestitem_grant_access(self, dataset_uuid, requester_uuid):
-        return self.get('requestitem/grant-access/verify?vault_dataset_id={}&vault_requester_id={}'.format(dataset_uuid, requester_uuid))
+        params = {
+            "vault_dataset_id": dataset_uuid,
+            "vault_requester_id": requester_uuid
+        }
+        return self.get('requestitem/grant-access/verify', query_params=params)
 
     def update_requestitem_grant_access(self, data):
         return self.put('requestitem/grant-access', data=data, headers=self._headers)
@@ -81,9 +85,12 @@ class FRDRAPIClient():
     def verify_requestitem_grant_access(self, dataset_uuid, requester_uuid):
         try:
             self._pub_client.verify_requestitem_grant_access(dataset_uuid, requester_uuid)
+        except GlobusAPIError as e:
+            self._logger.error("No pending requests for this dataset from this requester. {}".format(e.message))
+            raise Exception("No pending requests for this dataset from this requester. {}".format(e.message))
         except Exception as e:
             self._logger.error("No pending requests for this dataset from this requester. {}".format(e))
-            raise Exception("No pending requests for this dataset from this requester")
+            raise Exception("No pending requests for this dataset from this requester. {}".format(e))
     
     def update_requestitem_grant_access(self, data):
         """Update requestitem data on FRDR when depositors grant access
