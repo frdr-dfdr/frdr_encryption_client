@@ -66,7 +66,6 @@
 
 			if ( typeof source === 'string' ) {
 				// This is a URL to the messages file.
-				$.i18n.log( 'Loading messages from: ' + source );
 				return jsonMessageLoader( source )
 					.then( function ( localization ) {
 						return messageStore.load( localization, locale );

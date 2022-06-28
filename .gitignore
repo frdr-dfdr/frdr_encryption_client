@@ -149,3 +149,4 @@ gui/node_modules
 gui/package-lock.json
 *.ipynb
 gui/app_gui.app
+.vscode/settings.json
