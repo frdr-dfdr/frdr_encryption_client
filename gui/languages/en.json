@@ -132,5 +132,5 @@
     "app-get-entity-name-error": "Error getting user email on Vault. \n$1.",
 
     "app-footer-copyright": "© 2021 Digital Research Alliance of Canada",
-    "app-footer-version": "FRDR Encryption App 0.0.3"
+    "app-footer-version": "FRDR Encryption App 0.3.0"
 }
