@@ -38,35 +38,42 @@
 
     <div class="row">
       <div class="col-12">
-        <h3 data-i18n="app-decrypt-url"></h3>
-        <input class="form-control" name="key_url" id="key_url" type="text" style="width:75%;display:inline" required/>
-        <a data-placement="right" data-toggle="tooltip" id="decrypt-url-tooltip">
-          <span class="fas fa-question-circle" ></span>
-        </a>
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-decrypt-url"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-decrypt-url-tooltip"></p>
+        <input class="form-control" name="key_url" id="key_url" type="text" required/>
       </div>
     </div>
 
+    <br/>
+
     <div class="row">
       <div class="col-12">
-        <h3 data-i18n="app-decrypt-input"></h3>
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-decrypt-input"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-decrypt-input-tooltip"></p>
         <button class="btn btn-secondary" id="input_path_file" data-i18n="app-decrypt-input-select"></button>
-        <a data-placement="right" data-toggle="tooltip" id="decrypt-input-tooltip">
-          <span class="fas fa-question-circle" ></span>
-        </a>
-        <p id="selected-file" data-i18n="app-decrypt-no-selection"></p>
+        <div class="btn" id="selected-file"></div>
       </div>
     </div>
 
+    <br/>
+
+
     <div class="row">
       <div class="col-12">
-        <h3 data-i18n="app-decrypt-output"></h3>
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-decrypt-output"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-decrypt-output-tooltip"></p>
         <button class="btn btn-secondary" id="output_path_dir" data-i18n="app-decrypt-output-select"></button>
-        <a data-placement="right" data-toggle="tooltip" id="decrypt-output-tooltip">
-          <span class="fas fa-question-circle" ></span>
-        </a>
-        <p id="selected-output-dir" data-i18n="app-decrypt-no-selection"></p>
+        <div class="btn" id="selected-file"></div>
       </div>
     </div>
+
+    <br/><br/>
 
     <div class="button">
       <button class="btn btn-primary" type="submit" id="decrypt" data-i18n="app-decrypt-button"></button>
