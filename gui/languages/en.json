@@ -49,7 +49,6 @@
     "app-encrypt-output-tooltip": "Select a local directory location that you can upload from to FRDR for your encrypted package. Your encrypted package only needs to be at this location temporarily.",
     "app-encrypt-output-select": "Select Directory",
     "app-encrypt-output-missing": "Please select the directory location for your encrypted package.",
-    "app-encrypt-no-selection": "No Selection",
     "app-encrypt-selected": "You selected: $1",
     "app-encrypt-button": "Encrypt Data",
     "app-encrypt-in-progress": "Encrypting dataset...",

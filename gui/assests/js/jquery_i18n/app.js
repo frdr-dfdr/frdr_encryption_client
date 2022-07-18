@@ -31,19 +31,7 @@ var update_texts = function() {
       // tooltip
       $('#login-url-tooltip').attr("data-original-title", $.i18n('app-login-url-tooltip'));
 
-      $('#encrypt-input-tooltip').attr("data-original-title", $.i18n('app-encrypt-input-tooltip'));
-      $('#encrypt-output-tooltip').attr("data-original-title", $.i18n('app-encrypt-output-tooltip'));
-
-      $('#dataset-tooltip').attr("data-original-title", $.i18n('app-grant-access-dataset-tooltip'));
-      $('#requester-tooltip').attr("data-original-title", $.i18n('app-grant-access-requester-tooltip'));
-      $('#expire-tooltip').attr("data-original-title", $.i18n('app-grant-access-expire-tooltip'));
-
-      $('#decrypt-url-tooltip').attr("data-original-title", $.i18n('app-decrypt-url-tooltip'));
-      $('#decrypt-input-tooltip').attr("data-original-title", $.i18n('app-decrypt-input-tooltip'));
-      $('#decrypt-output-tooltip').attr("data-original-title", $.i18n('app-decrypt-output-tooltip'));
-
       $('#copy_to_clipboard').attr("data-original-title", $.i18n('app-profile-copy-to-clipboard'));
-      
       
       $('[data-toggle="tooltip"]').tooltip();
     }
