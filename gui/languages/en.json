@@ -49,7 +49,6 @@
     "app-encrypt-output-tooltip": "Select the directory location for your encrypted package",
     "app-encrypt-output-select": "Select Directory",
     "app-encrypt-output-missing": "Please select the directory location for your encrypted package.",
-    "app-encrypt-no-selection": "No Selection",
     "app-encrypt-selected": "You selected: $1",
     "app-encrypt-button": "Encrypt Data",
     "app-encrypt-in-progress": "Encrypting dataset...",

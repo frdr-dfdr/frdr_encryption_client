@@ -39,33 +39,38 @@
     <p data-i18n="app-grant-access-desc"></p>
     <div class="row">
       <div class="col-12">
-        <h3 data-i18n="app-grant-access-dataset"></h3>
-        <input class="form-control" name="dataset" id="dataset" type="text" style="width:75%;display:inline"/>
-        <a data-placement="right" data-toggle="tooltip" id="dataset-tooltip">
-          <span class="fas fa-question-circle" ></span>
-        </a>
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-grant-access-dataset"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-grant-access-dataset-tooltip"></p>
+        <input class="form-control" name="dataset" id="dataset" type="text"/>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-12">
-        <h3 data-i18n="app-grant-access-requester"></h3>
-        <input class="form-control" name="requester" id="requester" type="text" style="width:75%;display:inline"/>
-        <a data-placement="right" data-toggle="tooltip" id="requester-tooltip">
-          <span class="fas fa-question-circle" ></span>
-        </a>
-      </div>
-    </div>
+    <br/>
 
     <div class="row">
       <div class="col-12">
-        <h3 data-i18n="app-grant-access-expire"></h3>
-        <p data-i18n="app-grant-access-expire-info"></p>
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-grant-access-requester"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-grant-access-requester-tooltip"></p>
+        <input class="form-control" name="requester" id="requester" type="text"/>
+      </div>
+    </div>
+
+    <br/>
+
+    <div class="row">
+      <div class="col-12">
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-grant-access-expire"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-grant-access-expire-tooltip"></p>
       </div>
     </div>
     
-
-    <br/>
+    <br/><br/>
 
     <div class="button">
       <button class="btn btn-primary" type="submit" id="grant_access" data-i18n="app-grant-access-button"></button>
