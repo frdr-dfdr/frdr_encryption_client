@@ -19,38 +19,41 @@ ipcMain.on('encrypt-open-output-dir-dialog', function (event) {
   }
 })
 
-ipcMain.on('encrypt', (event, input_path, output_path) => {
-  var childWindow = new BrowserWindow({ 
-    parent: BrowserWindow.getFocusedWindow(), 
-    modal: true, 
-    show: false, 
-    width: 400, 
-    height: 200, 
-    webPreferences: {
-      nodeIntegration: true
-    }
-  });
-  childWindow.loadURL(require('url').format({
-    pathname: path.join(__dirname, '../pages/encrypt-in-progress.html'),
-    protocol: 'file:',
-    slashes: true
-  }));
-  childWindow.once('ready-to-show', () => {
-    childWindow.show()
-  });
-  client.invoke("encrypt", input_path, output_path, function(_error, res) {
-    var success = res[0];
-    var result = res[1];
-    if (result != "") {
-      childWindow.close();
-    }
-    if (success){
-      event.reply('notify-encrypt-done', result);
-      shell.showItemInFolder(result);
-    } else {
-      event.reply('notify-encrypt-error', result);
-    }
-  });
+ipcMain.on('encrypt', (event, input_path, output_path, options) => {
+  var response = dialog.showMessageBoxSync(options);
+  if (response == 0) {
+    var childWindow = new BrowserWindow({ 
+      parent: BrowserWindow.getFocusedWindow(), 
+      modal: true, 
+      show: false, 
+      width: 400, 
+      height: 200, 
+      webPreferences: {
+        nodeIntegration: true
+      }
+    });
+    childWindow.loadURL(require('url').format({
+      pathname: path.join(__dirname, '../pages/encrypt-in-progress.html'),
+      protocol: 'file:',
+      slashes: true
+    }));
+    childWindow.once('ready-to-show', () => {
+      childWindow.show()
+    });
+    client.invoke("encrypt", input_path, output_path, function(_error, res) {
+      var success = res[0];
+      var result = res[1];
+      if (result != "") {
+        childWindow.close();
+      }
+      if (success){
+        event.reply('notify-encrypt-done', result);
+        shell.showItemInFolder(result);
+      } else {
+        event.reply('notify-encrypt-error', result);
+      }
+    });
+  }
 });
 
 ipcMain.on('encrypt-cancel', (event) => {

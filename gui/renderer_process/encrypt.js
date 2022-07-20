@@ -65,7 +65,14 @@ $('#encrypt').on("click", function(){
     alert($.i18n('app-encrypt-output-missing'));
   }
   else {
-    ipcRenderer.send("encrypt", input_path[0], output_path[0]);
+    var options = {
+      type: "question",
+      buttons: [$.i18n("app-encrypt-confirm-btn1"), $.i18n("app-encrypt-confirm-btn2")],
+      defaultId: 1,
+      title: "Confirmation",
+      message: $.i18n("app-encrypt-confirm")
+    }
+    ipcRenderer.send("encrypt", input_path[0], output_path[0], options);
   }
 });
 
