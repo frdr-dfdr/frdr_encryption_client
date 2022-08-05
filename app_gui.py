@@ -246,8 +246,20 @@ class EncryptionClientGui(object):
             return (True, self._frdr_api_client.get_dataset_title(dataset_uuid))
         except Exception as e:
             return (False, str(e))
+   
+    def get_user_vault_id_from_frdr(self):
+        try:
+            return (True, self._frdr_api_client.get_user_vault_id_from_frdr())
+        except Exception as e:
+            return (False, str(e))
 
-
+    def send_user_vault_id_to_frdr(self, user_vault_id):
+        try:
+            data = {"user_vault_id": user_vault_id}
+            self._frdr_api_client.send_user_vault_id_to_frdr(data)
+            return (True, None)
+        except Exception as e:
+            return (False, str(e))
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()

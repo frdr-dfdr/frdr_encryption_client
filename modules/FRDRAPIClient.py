@@ -37,6 +37,12 @@ class DataPublicationClient(BaseClient):
     def lookup_dataset_title(self, dataset_id):
         return self.get('dataset-title/{}'.format(dataset_id))
 
+    def lookup_user_vault_id(self):
+        return self.get('uservaultid')
+
+    def update_user_vault_id(self, data):
+        return self.put('uservaultid', data=data, headers=self._headers)
+
 
 class FRDRAPIClient():
 
@@ -138,6 +144,28 @@ class FRDRAPIClient():
         except Exception as e:
             self._logger.error("Error getting dataset title from FRDR {}".format(e))
             raise Exception(e)
+
+    def get_user_vault_id_from_frdr(self):
+        try:
+            resp = self._pub_client.lookup_user_vault_id()
+            return resp['user_vault_id']
+        except Exception as e:
+            self._logger.error("Error getting current user's vault id from FRDR {}".format(e))
+            raise Exception(e)
+        
+    def send_user_vault_id_to_frdr(self, data):
+        """Update requestitem data on FRDR when depositors grant access
+           to the key on FRDR Encryption App.
+
+        Args:
+            data (dict): {"expires": The expiry data of the granted access, 
+                          "vault_dataset_id": The id for the dataset on Vault,
+                          "vault_requester_id": The id for the requester on Vault}
+
+        Returns:
+            [string]: REST API call response 
+        """
+        return self._pub_client.update_user_vault_id(data)
 
     def _load_auth_client(self):
         return NativeAppAuthClient(

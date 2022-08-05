@@ -89,9 +89,9 @@
     "app-grant-access-done-text": "Please return to FRDR to complete your approval by digitally signing the data access agreement.",
 
     "app-request-access-title": "Show Vault ID",
-    "app-request-access-intro1": "Your Vault User ID is needed for a sensitive data access request. Copy the ID or save this ID on your ",
-    "app-request-access-profile": "profile",
-    "app-request-access-intro2": " page on FRDR and it will be auto-generated for all your access requests. Once you have saved your ID on FRDR you do not need to retrieve it again.",
+    "app-request-access-intro1": "Your Vault User ID is needed for a sensitive data access request. You can find send this ID to FRDR by clicking the above button and find it on your ",
+    "app-request-access-profile": "settings",
+    "app-request-access-intro2": " page on FRDR and it will be pre-populated for all your access requests. Once you have sent your ID to FRDR you do not need to retrieve it again.",
     "app-request-access-button": "Show Vault ID",
     "app-request-access-confirm-msg": "Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.",
     "app-request-access-confirm-btn": "Copy to Clipboard",
@@ -129,6 +129,9 @@
     "app-profile-copied": "Copied!",
     "app-profile-copy-error": "Whoops, not copied!",
     "app-profile-copy-error-2": "Copy to clipboard: Ctrl+C or Command+C, Enter",
+    "app-profile-send-to-frdr": "Send to FRDR",
+    "app-profile-send-to-frdr-disabled": "Your Vault User ID has already been sent to FRDR.",
+    "app-profile-send-to-frdr-done": "Your Vault User ID has been sent to FRDR successfully",
 
     "app-get-entity-id-error": "Error getting user entity id on Vault. \n$1.",
     "app-get-entity-name-error": "Error getting user email on Vault. \n$1.",

@@ -44,9 +44,12 @@
 
     <div class="row">
       <label class="col-md-3" data-i18n="app-profile-user-id"></label>
-      <div id="vault_user_id" class="col-md-6 col-11"></div>
-      <div class="col-md-1 col-1">
-        <span id="copy_to_clipboard" data-toggle="tooltip" data-placement="bottom" class="fas fa-copy"></span>
+      <div class="col-md-9">
+        <span id="vault_user_id"></span>
+        <span tabindex="0" data-toggle="tooltip" data-placement="top" >
+          <button class="btn btn-primary disabled" type="submit" id="send_to_frdr" data-i18n="app-profile-send-to-frdr"></button>
+        </span>
+        <!-- <span id="copy_to_clipboard" data-toggle="tooltip" data-placement="bottom" class="fas fa-copy"></span> -->
       </div>
     </div>
     <div class="row">

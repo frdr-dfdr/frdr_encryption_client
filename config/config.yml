@@ -24,7 +24,7 @@ GLOBUS_DATA_PUBLICATION_CLIENT_NAME: "DataPublication Client v0.1"
 GLOBUS_LOGOUT_URL: "https://auth.globus.org/v2/web/logout"
 FRDR_API_BASE_URL: "https://dev4-web-c1.frdr.ca/v1/api"
 FRDR_API_LOGIN_TIMEOUT: 60
-FRDR_PROFILE_URL: "https://dev4-web-c1.frdr.ca/repo/profile"
+FRDR_PROFILE_URL: "https://dev4-web-c1.frdr.ca/repo/settings/sensitive"
 FRDR_CONTACTUS_URL: "https://dev4-web-c1.frdr.ca/repo/contactus?locale="
 FRDR_DEPOSIT_DASHBOARD_URL: "https://dev4-web-c1.frdr.ca/repo/PublishDashboard"
 
