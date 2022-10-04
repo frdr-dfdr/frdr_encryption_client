@@ -1,5 +1,4 @@
-if (require('electron-squirrel-startup')) return;
-const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
 // Does not allow a second instance
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -12,7 +11,6 @@ if (!gotTheLock) {
 
 require('update-electron-app')();
 const glob = require('glob');
-const notifier = require("node-notifier");
 const zerorpc = require("zerorpc");
 const constLargeEnoughHeartbeat = 1000 * 60 * 60 * 2 // 2 hour in ms
 const clientOptions = {

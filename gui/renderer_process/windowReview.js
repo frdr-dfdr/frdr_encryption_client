@@ -1,7 +1,6 @@
 // Not using it now, keep it for future feature
 "use strict";
 
-const notifier = require('node-notifier');
 const {dialog} = require('electron').remote;
 let client = remote.getGlobal('client');
 
@@ -24,10 +23,10 @@ function revoke() {
   if (response == 0){
     client.invoke("revoke_access", datasetId, entityId, function(error, res, more) {
       if (res === true){
-        notifier.notify({"title" : "FRDR Encryption Application", "message" : "Access Revoked"});
+        // notifier.notify({"title" : "FRDR Encryption Application", "message" : "Access Revoked"});
         window.location.reload();
       } else {
-        notifier.notify({"title" : "FRDR Encryption Application", "message" : "Error revoking access."});
+        // notifier.notify({"title" : "FRDR Encryption Application", "message" : "Error revoking access."});
       }
     });
   }
