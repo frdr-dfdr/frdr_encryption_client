@@ -1,7 +1,18 @@
-const {ipcRenderer} = require('electron');
-const fs = require('fs');
-const yaml = require('js-yaml');
-const path = require('path');
+if (typeof ipcRenderer == 'undefined') {
+  const {ipcRenderer} = require('electron');
+}
+
+if (typeof fs == 'undefined') {
+  const fs = require('fs');
+}
+
+if (typeof yaml == 'undefined') {
+  const yaml = require('js-yaml');
+}
+
+if (typeof path == 'undefined') {
+  const path = require('path');
+}
 
 function contactus() {
   var contactURL = "";

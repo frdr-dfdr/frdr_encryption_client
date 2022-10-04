@@ -1,4 +1,6 @@
-const {ipcRenderer} = require('electron');
+if (typeof ipcRenderer == 'undefined') {
+  const {ipcRenderer} = require('electron');
+}
 
 // Allow the user to logout
 document.getElementById("logout").addEventListener("click", logout);
