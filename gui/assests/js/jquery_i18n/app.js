@@ -33,8 +33,6 @@ var update_texts = function() {
 
       $('#copy_to_clipboard').attr("data-original-title", $.i18n('app-profile-copy-to-clipboard'));
 
-      $("#send_to_frdr").parent().attr("data-original-title", $.i18n("app-profile-send-to-frdr-disabled"));
-      
       $('[data-toggle="tooltip"]').tooltip();
     }
   );  

@@ -5,7 +5,6 @@ ipcMain.on('login-frdr-api-globus', (event, loginSuccessMsg) => {
     var successLogin = res[0];
     var errMessageLogin = res[1];
     if (successLogin) {
-      console.log("done");
       event.reply('notify-login-frdr-done');
     }
     else {

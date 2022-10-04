@@ -86,21 +86,3 @@ function openFRDRProfile() {
 $('#open-frdr-profile').on("click", function() {
   shell.openExternal(profileURL);
 });
-
-$('#send_to_frdr').on("click", function() {
-  var vaultId = document.getElementById("vault_user_id").innerText;
-  console.log(vaultId);
-  ipcRenderer.send("send_user_vault_id_to_frdr", vaultId);
-});
-
-ipcRenderer.on('notify-send-vault-id-done', function (_event) {
-  alert($.i18n('app-profile-send-to-frdr-done'), "");
-  $('#send_to_frdr').addClass("disabled");
-  $("#send_to_frdr").parent().attr("data-original-title", $.i18n("app-profile-send-to-frdr-disabled"));
-});
-
-
-ipcRenderer.on('notify-enable-send-button', function (_event) {
-  $('#send_to_frdr').removeClass("disabled");
-  $("#send_to_frdr").parent().attr("data-original-title", "");
-});
