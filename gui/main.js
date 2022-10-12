@@ -11,13 +11,10 @@ if (!gotTheLock) {
 
 require('update-electron-app')();
 const glob = require('glob');
-const zerorpc = require("zerorpc");
-const constLargeEnoughHeartbeat = 1000 * 60 * 60 * 2 // 2 hour in ms
-const clientOptions = {
-    "heartbeatInterval": constLargeEnoughHeartbeat,
-    "timeout": 60 * 60 * 2
-};
-client = new zerorpc.Client(clientOptions);
+
+const zmq = require("zeromq");
+sock = new zmq.Request();
+
 const portfinder = require("portfinder");
 const session = require('electron').session;
 
@@ -44,8 +41,21 @@ const getScriptPath = () => {
     return path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE)
 };
 
-loadMainProcessJs();
+async function sendMessage(command, args) {
+    await sock.send(
+      JSON.stringify({
+        command,
+        args,
+      })
+    );
+    let [result] = await sock.receive();
+    result = JSON.parse(result.toString());
+    return result;
+}
 
+module.exports = {sendMessage};
+
+loadMainProcessJs();
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -124,7 +134,7 @@ app.on('ready', () => {
 
 portfinder.basePort = 4242;
 portfinder.getPort(function(_err, port) {
-    client.connect("tcp://127.0.0.1:" + String(port));
+    sock.connect("tcp://127.0.0.1:" + String(port));
     const createApp = () => {
         let script = getScriptPath();
         if (guessPackaged()) {
@@ -150,9 +160,10 @@ portfinder.getPort(function(_err, port) {
 
 
 const exitApp = () => {
+    sock.send(JSON.stringify({ command: "Exit" }));
     pythonChild.kill()
     pythonChild = null
-    client.close();
+    sock.close();
 }
 
 app.on("before-quit", () => {
