@@ -1,5 +1,6 @@
 from ctypes import c_char_p
 import datetime
+import json
 from multiprocessing import Process, Manager, Queue
 import multiprocessing
 import shutil
@@ -8,7 +9,6 @@ from modules.PersonKeyManager import PersonKeyManager
 from modules.EncryptionClient import EncryptionClient
 from appdirs import AppDirs
 import sys
-import zerorpc
 import os
 from modules.VaultClient import VaultClient
 from util.config_loader import config
@@ -17,6 +17,8 @@ from util.util import Util
 import uuid
 from modules.DatasetKeyManager import DatasetKeyManager
 from modules.FRDRAPIClient import FRDRAPIClient
+
+import zmq
 
 __version__ = config.VERSION
 dirs = AppDirs(config.APP_NAME, config.APP_AUTHOR)
@@ -247,10 +249,39 @@ class EncryptionClientGui(object):
         except Exception as e:
             return (False, str(e))
 
+class NoCommandError(Exception):
+    pass
 
+class ProgramExit(Exception):
+    pass
+
+def process_message(encryption_client, message):
+    data = json.loads(message)
+    command = data["command"]
+    args = data.get("args", [])
+    if hasattr(encryption_client, command):
+        func = getattr(encryption_client, command)
+        ret = func(*args)
+        return {"result": ret}
+    elif command == "Exit":
+        raise ProgramExit
+    else:
+        raise NoCommandError(f"No such command : '{command}'")
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    s = zerorpc.Server(EncryptionClientGui())
-    s.bind("tcp://127.0.0.1:" + str(sys.argv[1]))
-    s.run()
+    addr = "tcp://127.0.0.1:" + str(sys.argv[1])
+    ctx = zmq.Context()
+    socket = ctx.socket(zmq.REP)
+    socket.bind(addr)
+    encryption_client = EncryptionClientGui()
+    while True:
+        message = socket.recv_string()
+        try:
+            ret = process_message(encryption_client, message)
+            ret = json.dumps(ret)
+            socket.send(ret.encode()) 
+        except NoCommandError:
+            continue
+        except ProgramExit:
+            break
