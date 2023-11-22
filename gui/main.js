@@ -9,7 +9,7 @@ if (!gotTheLock) {
     });
 }
 
-require('update-electron-app')();
+require('update-electron-app');
 const glob = require('glob');
 
 const zmq = require("zeromq");
@@ -63,6 +63,7 @@ function createWindow() {
         height: 750,
         webPreferences: {
             nodeIntegration: true,
+            contextIsolation: false
         }
     });
 
