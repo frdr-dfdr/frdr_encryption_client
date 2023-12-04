@@ -33,7 +33,8 @@ ipcMain.on('decrypt', async (event, dataset_id, options, input_path, output_path
       width: 400, 
       height: 200,
       webPreferences: {
-        nodeIntegration: true
+        nodeIntegration: true,
+        contextIsolation: false
       } 
     });
   

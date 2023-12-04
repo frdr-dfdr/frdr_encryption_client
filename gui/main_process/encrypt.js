@@ -30,7 +30,8 @@ ipcMain.on('encrypt', async (event, input_path, output_path, options) => {
       width: 400, 
       height: 200, 
       webPreferences: {
-        nodeIntegration: true
+        nodeIntegration: true,
+        contextIsolation: false
       }
     });
     childWindow.loadURL(require('url').format({
