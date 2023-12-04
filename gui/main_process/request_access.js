@@ -1,19 +1,19 @@
 const {dialog, ipcMain, clipboard} = require('electron');
- 
-ipcMain.on('request-access', (event, dialogOptions, copiedDoneDialogOptions) => {
-  client.invoke("get_entity_id", function(_error, res) {
-    var success = res[0];
-    var result = res[1];
-    if (success) {
-      dialogOptions['detail'] = result;
-      const response = dialog.showMessageBoxSync(dialogOptions);
-      if (response == 0) {
-        clipboard.writeText(result);
-        dialog.showMessageBoxSync(copiedDoneDialogOptions);
-      }
+const {sendMessage} = require('../main.js');
+
+ipcMain.on('request-access', async (event, dialogOptions, copiedDoneDialogOptions) => {
+  const {result} = await sendMessage("get_entity_id");
+  var success = result[0];
+  var message = result[1];
+  if (success) {
+    dialogOptions['detail'] = message;
+    const response = dialog.showMessageBoxSync(dialogOptions);
+    if (response == 0) {
+      clipboard.writeText(message);
+      dialog.showMessageBoxSync(copiedDoneDialogOptions);
     }
-    else {
-      event.reply('notify-request-access-error', result);
-    }
-  });  
+  }
+  else {
+    event.reply('notify-request-access-error', message);
+  }
 });

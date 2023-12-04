@@ -64,6 +64,26 @@ Finally, to package for install:
 `hdiutil create tmp.dmg -ov -volname "FRDRSecure" -fs HFS+ -srcfolder frdr-encryption-client-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDRSecure.dmg && rm tmp.dmg` (Mac)
 
 
+## Upgrade Dependencies
+
+### Upgrade Python Packages
+Upgrade packages and update requirements.txt.
+```
+pip-upgrade
+```
+
+### Update Electron App Dependencies
+Upgrade dependencies in package.json and update it.
+```
+cd gui
+
+## install npm-check-updates if needed
+npm install -g npm-check-updates
+
+ncu -u
+npm install
+```
+
 ## CLI Usage
 ### Encryption
 ```sh
@@ -156,3 +176,5 @@ You need **Request Access** to retrieve your uuid on key server when you fill ou
 ![decrypt](doc/img/decrypt.png)
 
 The **Decrypt** menu option allows you to decrypt an encrypted package for access. Assuming you've already downloaded the package, clicking `Decrypt Data` will retrieve its encrypted dataset key from a Vault API endpoint URL (which will be normally be provided to you upon acceptance of an access request), decrypt the key with your private key (saved on your local machine) and then decrypt the package with the dataset key. You should only decrypt packages on trusted computers, as their contents may be very sensitive.
+
+

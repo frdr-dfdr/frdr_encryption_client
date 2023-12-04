@@ -1,13 +1,13 @@
 const {ipcMain} = require('electron');
+const {sendMessage} = require('../main.js');
  
-ipcMain.on('logout', (event) => {
-  client.invoke("logout", function(_error, res) {
-    var success = res[0];
-    var result = res[1];
-    if (success){
-      event.reply('notify-logout-done');
-    } else {
-      event.reply('notify-logout-error', result);
-    }
-  });  
+ipcMain.on('logout', async (event) => {
+  const {result} = await sendMessage("logout");
+  var success = result[0];
+  var error = result[1];
+  if (success){
+    event.reply('notify-logout-done');
+  } else {
+    event.reply('notify-logout-error', error);
+  }
 });
