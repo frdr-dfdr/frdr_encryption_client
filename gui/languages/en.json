@@ -89,9 +89,9 @@
     "app-grant-access-done-text": "Please return to FRDR to complete your approval by digitally signing the data access agreement.",
 
     "app-request-access-title": "Show Vault ID",
-    "app-request-access-intro1": "Your Vault User ID is needed for a sensitive data access request. Copy the ID or save this ID on your ",
-    "app-request-access-profile": "profile",
-    "app-request-access-intro2": " page on FRDR and it will be auto-generated for all your access requests. Once you have saved your ID on FRDR you do not need to retrieve it again.",
+    "app-request-access-intro1": "Your Vault User ID is needed for a sensitive data access request. This ID has been sent to FRDR automatically and you can find it on your ",
+    "app-request-access-profile": "settings",
+    "app-request-access-intro2": " page on FRDR and it will be pre-populated for all your access requests. If you find it not set on FRDR, please contact <a href=mailto:support@frdr-dfdr.ca>support@frdr-dfdr.ca</a> for help.",
     "app-request-access-button": "Show Vault ID",
     "app-request-access-confirm-msg": "Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.",
     "app-request-access-confirm-btn": "Copy to Clipboard",
@@ -134,5 +134,8 @@
     "app-get-entity-name-error": "Error getting user email on Vault. \n$1.",
 
     "app-footer-copyright": "© 2022 Digital Research Alliance of Canada",
-    "app-footer-version": "FRDR Encryption App 0.3.1"
+    "app-footer-version": "FRDR Encryption App 0.3.1",
+
+    "app-get-entity-id-from-frdr-error": "Your Vault ID is not retrieved from FRDR successfully. Please go to Settings page and make sure it is set correctly on FRDR",
+    "app-send-entity-id-to-frdr-error": "Your Vault User ID has not been sent to FRDR successfully. Please contact support@frdr-dfdr.ca for help."
 }

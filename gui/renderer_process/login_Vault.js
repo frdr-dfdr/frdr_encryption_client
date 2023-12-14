@@ -68,4 +68,5 @@ ipcRenderer.on('notify-verify-local-user-keys-error', function (_event, errMessa
 
 ipcRenderer.on('notify-verify-local-user-keys-done', function (_event) {
   ipcRenderer.send("authenticated");
+  ipcRenderer.send("sync-entity-id");
 });

@@ -5,7 +5,7 @@ Usage:
   app_cli.py encrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> [--output=<op>] [--loglevel=<l>]
   app_cli.py decrypt --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --input=<ip> --url=<key_addr> [--output=<op>] [--frdr_api_url=<url>] [--loglevel=<l>]
   app_cli.py grant_access --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) --dataset=<id> --requester=<id> [--frdr_api_url=<url>] [--loglevel=<l>]
-  app_cli.py show_vault_id --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>)
+  app_cli.py show_vault_id --vault=<vault_addr> (--oauth | --username=<un> --password=<pd>) [--send_to_frdr] [--frdr_api_url=<url>]
   app_cli.py -h | --help
 
 Options:
@@ -156,9 +156,20 @@ def main():
             elif arguments["show_vault_id"]:
                 entity_id = vault_client.entity_id
                 person_key_manager = PersonKeyManager(vault_client)
-                print(
-                    "Please copy the following id to the Requester ID Field on the Access Request Page on FRDR.")
+                print("Here is your Vault User ID")
                 print(Util.wrap_text(entity_id))
+                if (arguments["--send_to_frdr"]):
+                    frdr_api_url = arguments["--frdr_api_url"]
+                    if frdr_api_url is None:
+                        frdr_api_url = config.FRDR_API_BASE_URL
+                    frdr_api_client = FRDRAPIClient(base_url=frdr_api_url)
+                    frdr_api_client.login()
+                    data = {"user_vault_id": entity_id}
+                    try: 
+                        frdr_api_client.send_user_vault_id_to_frdr(data)
+                        print("Your Vault User ID has been sent to FRDR successfully")
+                    except Exception as e:
+                        print("Something is wrong when sending your Vault ID to FRDR. {}".format(str(e)))
 
     except ValueError as ve:
         logger.error(ve)

@@ -32,7 +32,7 @@ var update_texts = function() {
       $('#login-url-tooltip').attr("data-original-title", $.i18n('app-login-url-tooltip'));
 
       $('#copy_to_clipboard').attr("data-original-title", $.i18n('app-profile-copy-to-clipboard'));
-      
+
       $('[data-toggle="tooltip"]').tooltip();
     }
   );  

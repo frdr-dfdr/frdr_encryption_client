@@ -73,7 +73,7 @@ $('[data-toggle="tooltip"]').tooltip({
   container: 'body'
 });
 
-$('.fa-copy').click(function() {
+$('.fa-copy').on("click", function() {
   var text = $("#vault_user_id").html();
   var el = $(this);
   copyToClipboard(text, el);
@@ -83,4 +83,6 @@ function openFRDRProfile() {
   shell.openExternal(profileURL);
 }
 
-document.getElementById("open-frdr-profile").addEventListener("click", openFRDRProfile);
+$('#open-frdr-profile').on("click", function() {
+  shell.openExternal(profileURL);
+});
