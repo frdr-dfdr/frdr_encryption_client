@@ -37,6 +37,8 @@ Availability Zones: Pick 3
 
 Permitted IP Range: 0.0.0.0/0 (Users will be coming from arbitrary ip ranges)
 
+KeyPair: Your us-west-2 keypair should be in the dropdown list.
+
 Kubernetes Host Url/Kubernetes CA Certificate/Kubernetes JWT Token: Leave blank.
 
 Internal/External Load Balancer: External
