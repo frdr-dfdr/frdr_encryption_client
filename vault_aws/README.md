@@ -31,7 +31,7 @@ https://github.com/aws-ia/cfn-ps-hashicorp-vault
 
 For user-defined parameters:
 
-Stack Name: frdr-<current date>
+Stack Name: frdr-current date
 
 Availability Zones: Pick 3
 
