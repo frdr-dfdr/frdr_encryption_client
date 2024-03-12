@@ -41,7 +41,9 @@ Kubernetes Host Url/Kubernetes CA Certificate/Kubernetes JWT Token: Leave blank.
 
 Internal/External Load Balancer: External
 
-Load Balancer DNS Name: <domain name>
+Load Balancer DNS Name: The hostname you picked.
+
+Hosted Zone Id: Leave blank.
 
 SSL Certificate ARN: Get ARN from the SSL certificate manager for the certificate you created for this domain (starts with arn:)
 
