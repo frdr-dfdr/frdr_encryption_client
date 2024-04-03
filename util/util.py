@@ -7,6 +7,8 @@ import textwrap
 from pathlib import Path
 from util.config_loader import config
 import socket
+import hashlib
+import time
 
 logger = logging.getLogger("frdr-encryption-client.util")
 
@@ -129,3 +131,42 @@ class Util(object):
         dataset_uuid = match.group(2)
         requester_uuid = match.group(3)
         return (depositor_uuid, dataset_uuid, requester_uuid)
+    
+    @classmethod
+    def path_tree(cls, path, generate_checksum=False):
+        d = {'path': "/" + os.path.normpath(path), 'name': os.path.basename(path)}
+        d['size'] = os.path.getsize(path)
+        d['lastModified'] = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(os.path.getmtime(path)))
+
+        if os.path.isdir(path):
+            d['path'] = d['path'] + "/"
+            d['type'] = "dir"
+            d['count'] = 1
+            d['contents'] = [Util.path_tree(os.path.join(path,x), generate_checksum) for x in sorted(os.listdir(path))]
+            for item in d['contents']:
+                if item['type'] == "dir":
+                    d['count'] = d['count'] + item['count']
+                    d['size'] = d['size'] + item['size']
+                else:
+                    d['count'] = d['count'] + 1
+                    d['size'] = d['size'] + item['size']
+        else:
+            d['type'] = "file"
+            if generate_checksum:
+                # Only generate checksum if file is 1 GB or less
+                if d['size'] < 1024000000:
+                    d['sha256'] = Util.compute_sha256(os.path.normpath(path))
+                else:
+                    d['sha256'] = 0
+
+        return d
+
+    @classmethod
+    def compute_sha256(cls, file_name):
+        # Read chunks of 4096 bytes for files
+        CHUNK_SIZE = 4 * 1024
+        hash_sha256 = hashlib.sha256()
+        with open(file_name, "rb") as f:
+            for chunk in iter(lambda: f.read(CHUNK_SIZE), b""):
+                hash_sha256.update(chunk)
+        return hash_sha256.hexdigest()

@@ -7,6 +7,7 @@ import nacl.utils
 import nacl.secret
 import os
 from util.util import Util
+from util.Tree import Tree
 from util.config_loader import config
 import logging
 import shutil
@@ -88,6 +89,21 @@ class EncryptionClient(object):
             bag.save()
         except (bagit.BagError, Exception) as e:
             logger.error("Error creating a bag of the encrypted package.")
+            shutil.rmtree(bag_dir_parent)
+            return False
+        
+        # create a file tree file
+        try:
+            with open(os.path.join(bag_dir, "file_tree.json"), "w") as f:
+                tree = Tree()
+                tree.totalSize += os.path.getsize(self._input)
+                print(self._input, file=f)
+                tree.walk(self._input, f)
+                print("\n" + tree.summary(), file=f)
+                bag.save()
+        except Exception as e:
+            logger.error("Error in creating a file tree file: {}".format(e))
+            shutil.rmtree(bag_dir_parent)
             return False
 
         # zip bag dir and move it to the output path
