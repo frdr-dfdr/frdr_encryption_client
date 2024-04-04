@@ -18,7 +18,7 @@ class Util(object):
     @classmethod
     def make_dir(cls, dir_name):
         if not os.path.exists(dir_name):
-            os.mkdir(dir_name)
+            os.makedirs(dir_name)
             logger.info("A new directory {} created.".format(dir_name))
         else:
             logger.info(
