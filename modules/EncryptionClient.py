@@ -94,7 +94,7 @@ class EncryptionClient(object):
         
         # create a file tree file
         try:
-            with open(os.path.join(bag_dir, "file_tree.json"), "w") as f:
+            with open(os.path.join(bag_dir, "file_tree.txt"), "w") as f:
                 tree = Tree()
                 tree.totalSize += os.path.getsize(self._input)
                 print(self._input, file=f)
