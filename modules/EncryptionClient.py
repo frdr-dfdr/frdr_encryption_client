@@ -67,20 +67,32 @@ class EncryptionClient(object):
         logger.debug("The temp directory created to hold the bag {}".format(bag_dir_parent))
         queue.put(bag_dir_parent)
 
-        # encrypt each file in the dirname
-        if os.path.isdir(self._input):
-            logger.info("Start to compress data.")
-            zip_filepath = self._compress_folder(self._input, bag_dir)
-            size = os.path.getsize(zip_filepath) / (1024**3)
-            logger.info("Finished compressing data. The size of the zip file is {} GB".format(size))
-            # TODO: Check size
+        try:
+            if os.path.isdir(self._input):
+                # Generate checksums of each file in the directory
+                sums_fullpath = Util.generate_checksums(self._input)
+                
+                # compress the directory and encrypt the zip file
+                logger.info("Start to compress data.")
+                zip_filepath = self._compress_folder(self._input, bag_dir)
+                size = os.path.getsize(zip_filepath) / (1024**3)
+                logger.info("Finished compressing data. The size of the zip file is {} GB".format(size))
 
-            logger.info("Start to encrypt data.")
-            self._encrypt_file(zip_filepath, logger)
-            logger.info("Finished encrypting data.")
-            os.remove(zip_filepath)
-        else:
-            self._encrypt_file(self._input, logger)
+                logger.info("Start to encrypt data.")
+                # self._encrypt_file(zip_filepath, logger)
+                logger.info("Finished encrypting data.")
+                # os.remove(zip_filepath)
+                # Remove the generated checksum file from the original data directory
+                os.remove(sums_fullpath)
+            else:
+                logger.error("Please select a directory to encrypt.")
+                return False
+        except Exception as e:
+            logger.error("Error in compressing and encrypting input directory")
+            if os.path.exists(sums_fullpath):
+                os.remove(sums_fullpath)
+            shutil.rmtree(bag_dir_parent)            
+            return False
 
         try:
             bag = bagit.make_bag(bag_dir, None, 1, ['sha256'])
