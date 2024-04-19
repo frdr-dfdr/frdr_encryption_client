@@ -53,6 +53,7 @@ class EncryptionClient(object):
         bag_dir_parent = None
         bag_output_path = None
         key_path_on_vault = None
+        sums_fullpath = None
         
         # generate key
         self._dataset_key_manager.generate_key()
