@@ -205,8 +205,13 @@ class Util(object):
                         continue
                     current_file = os.path.join(dirpath, filename)
                     checksum = Util.compute_sha256(current_file)
-                    format_text = magic.from_file(current_file)
-                    relative_current_file_path = re.sub(input_path, "", current_file).strip("/")
+                    
+                    try:
+                        format_text = magic.from_file(current_file)
+                    except magic.MagicException as e:
+                        format_text = "unknown"
+                        
+                    relative_current_file_path = os.path.normpath(current_file.replace(input_path, ""))
                     hash_output_fp.write(f"**Filename/Fichier:** {relative_current_file_path} \n")
                     hash_output_fp.write(f"**SHA256 Checksum:/Sommes de contrôle** {checksum} \n")
                     hash_output_fp.write(f"**Estimated File Type/Le fichier estimé types:** {format_text} \n\n")
