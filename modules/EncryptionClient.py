@@ -79,9 +79,9 @@ class EncryptionClient(object):
                 logger.info("Finished compressing data. The size of the zip file is {} GB".format(size))
 
                 logger.info("Start to encrypt data.")
-                # self._encrypt_file(zip_filepath, logger)
+                self._encrypt_file(zip_filepath, logger)
                 logger.info("Finished encrypting data.")
-                # os.remove(zip_filepath)
+                os.remove(zip_filepath)
                 # Remove the generated checksum file from the original data directory
                 os.remove(sums_fullpath)
             else:
