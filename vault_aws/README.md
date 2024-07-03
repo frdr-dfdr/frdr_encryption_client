@@ -21,6 +21,7 @@ https://github.com/aws-ia/cfn-ps-hashicorp-vault
 
 
 3. Create a SSL certificate for your domain name using the [Amazon SSL Cert Manager](https://us-west-2.console.aws.amazon.com/acm/home?region=us-west-2#/certificates/list)
+   Make sure the certificate is verified against a registrar, you can use DNS-based verification.
 
 
 ### Deployment ###
