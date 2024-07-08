@@ -15,7 +15,7 @@
     "app-login-url-tooltip": "If running for development, probably http://127.0.0.1:8200.",
     "app-login-frdr-btn": "Login with Globus",
     "app-login-frdr-error": "Error logging into FRDR. \n$1",
-    "app-login-frdr-success-message": "Authentication to FRDR successful, you can close the browser now.",
+    "app-login-frdr-success-message": "Your authentication to FRDR was successful. Kindly return to the FRDR Encryption application and click on \"Login with Globus\" to access Vault for key management. You may close this browser now.",
 
     "app-login-vault-title": "Login Step 2",
     "app-login-vault-desc": "You need to log into Vault for key management.",
@@ -59,7 +59,7 @@
     "app-encrypt-done": "Dataset has been encrypted and transfer package has been created on $1",
     "app-encrypt-done-title": "Encryption complete",
     "app-encrypt-done-text1": "Your dataset has been encrypted. Please continue with your data deposit and upload the encrypted package to FRDR once you reach the Transfer Data tab.",
-    "app-encrypt-done-text2": "FRDR Deposit Dashboard",
+    "app-encrypt-done-text2": "FRDR Publication Dashboard",
 
     "app-encrypt-error": "Error encrypting. $1",
     "app-encrypt-cancel-error": "Stopping encryption failed. $1",
