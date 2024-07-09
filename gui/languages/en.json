@@ -6,9 +6,9 @@
         "last-updated": "2021-08-07",
         "locale": "en"
     },
-    "app-name": "FRDR Encryption App",
-    "app-desc": "Welcome to the FRDR Encryption App. You can use the app to encrypt, decrypt, and share access to sensitive datasets with the Federated Research Data Repository.",
-    "app-desc-homepage": "Welcome to the FRDR Encryption App. You can use the app to encrypt sensitive datasets before uploading them to FRDR, to decrypt datasets that you have accessed through FRDR, and to manage who has access to your sensitive datasets.",
+    "app-name": "FRDR Encryption Application",
+    "app-desc": "Welcome to the FRDR Encryption Application. You can use the app to encrypt, decrypt, and share access to sensitive datasets with the Federated Research Data Repository.",
+    "app-desc-homepage": "Welcome to the FRDR Encryption Application. You can use the app to encrypt sensitive datasets before uploading them to FRDR, to decrypt datasets that you have accessed through FRDR, and to manage who has access to your sensitive datasets.",
     
     "app-login-frdr-title": "Login Step 1",
     "app-login-frdr-desc": "You need to log into FRDR first.",
@@ -23,7 +23,7 @@
     "app-login-vault-error": "Error logging into HashiCorp Vault with Globus OAuth. \n$1",
     "app-login-vault-success-message": "Authentication to HashiCorp Vault successful, you can close the browser now.",
     "app-login-vault-local-keys-error-title": "Error with local public and private key pair",
-    "app-login-vault-local-keys-error-text": "You are not able to use FRDR Encryption App on this device",
+    "app-login-vault-local-keys-error-text": "You are not able to use FRDR Encryption Application on this device",
     
     "app-cancel-btn": "Cancel",
 
@@ -65,7 +65,7 @@
     "app-encrypt-cancel-error": "Stopping encryption failed. $1",
 
     "app-grant-access-title": "Grant Access",
-    "app-grant-access-desc": "To approve this access request you must grant access in the FRDR Encryption App and on FRDR. Please retrieve the Dataset ID and the Requester ID from the email sent to you about this access request.",
+    "app-grant-access-desc": "To approve this access request you must grant access in the FRDR Encryption Application and on FRDR. Please retrieve the Dataset ID and the Requester ID from the email sent to you about this access request.",
     "app-grant-access-dataset": "Dataset ID",
     "app-grant-access-dataset-tooltip": "To grant access to a dataset insert the Dataset ID ",
     "app-grant-access-dataset-missing": "Please insert the Dataset ID to grant access to a dataset.",
@@ -134,7 +134,7 @@
     "app-get-entity-name-error": "Error getting user email on Vault. \n$1.",
 
     "app-footer-copyright": "© 2022 Digital Research Alliance of Canada",
-    "app-footer-version": "FRDR Encryption App 0.3.1",
+    "app-footer-version": "FRDR Encryption Application 0.3.1",
 
     "app-get-entity-id-from-frdr-error": "Your Vault ID is not retrieved from FRDR successfully. Please go to Settings page and make sure it is set correctly on FRDR",
     "app-send-entity-id-to-frdr-error": "Your Vault User ID has not been sent to FRDR successfully. Please contact support@frdr-dfdr.ca for help."

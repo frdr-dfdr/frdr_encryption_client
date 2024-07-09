@@ -14,7 +14,7 @@
 # PURPOSE. See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Foobar. If not, see <https://www.gnu.org/licenses/>.
+# along with FRDR Encryption Application. If not, see <https://www.gnu.org/licenses/>.
 #
 from requests import request
 from util.util import Util
@@ -118,7 +118,7 @@ class FRDRAPIClient():
     
     def update_requestitem_grant_access(self, data):
         """Update requestitem data on FRDR when depositors grant access
-           to the key on FRDR Encryption App.
+           to the key on FRDR Encryption Application.
 
         Args:
             data (dict): {"expires": The expiry data of the granted access, 
@@ -132,7 +132,7 @@ class FRDRAPIClient():
 
     def update_requestitem_decrypt(self, data):
         """Update requestitem data on FRDR when depositors grant access
-           to the key on FRDR Encryption App.
+           to the key on FRDR Encryption Application.
 
         Args:
             data (dict): {"expires": The expiry data of the granted access, 
@@ -173,7 +173,7 @@ class FRDRAPIClient():
         
     def send_user_vault_id_to_frdr(self, data):
         """Update requestitem data on FRDR when depositors grant access
-           to the key on FRDR Encryption App.
+           to the key on FRDR Encryption Application.
 
         Args:
             data (dict): {"expires": The expiry data of the granted access, 

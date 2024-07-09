@@ -1,5 +1,5 @@
 {
-  "name": "FRDR Encryption App",
+  "name": "FRDR Encryption Application",
   "version": "0.3.1",
   "homepage": "https://github.com/frdr-dfdr/frdr_encryption_client",
   "main": "main.js",
