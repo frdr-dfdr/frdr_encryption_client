@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu} = require("electron");
 // Does not allow a second instance
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -10,6 +10,9 @@ if (!gotTheLock) {
 }
 
 require('update-electron-app');
+
+const openAboutWindow = require('electron-about-window').default;
+
 const glob = require('glob');
 
 const zmq = require("zeromq");
@@ -131,6 +134,30 @@ app.on('ready', () => {
     });
     createWindow();
     mainWindow.webContents.session.clearStorageData();
+
+    const menu = Menu.buildFromTemplate([
+        {
+            label: 'Example',
+            submenu: [
+                {
+                    label: 'About This App',
+                    click: () =>
+                        openAboutWindow({
+                            icon_path: path.join(__dirname, 'resources/icon.png'),
+                            copyright: '<p style="text-align:center; ">Copyright (c) 2024 Digital Research Alliance of Canada <br> Distributed under GPL-3.0-or-later license</p>',
+                            package_json_dir: __dirname,
+                            use_version_info: false,
+                            adjust_window_size: true,
+                            use_inner_html: true
+                        }),
+                },
+                {
+                    role: 'quit',
+                },
+            ],
+        },
+    ]);
+    app.applicationMenu = menu;
 });
 
 portfinder.basePort = 4242;
