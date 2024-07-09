@@ -163,7 +163,7 @@ app.on('ready', () => {
                     click: () =>
                         openAboutWindow({
                             icon_path: path.join(__dirname, 'resources/icon.png'),
-                            copyright: '<p style="text-align:center; ">Copyright (c) 2024 Digital Research Alliance of Canada <br> Distributed under GPL-3.0-only license</p>',
+                            copyright: '<p style="text-align:center; ">Copyright (c) 2024 Digital Research Alliance of Canada <br> Distributed under GPL-3.0-or-later license</p>',
                             package_json_dir: __dirname,
                             use_version_info: false,
                             adjust_window_size: true,
