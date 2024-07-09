@@ -11,7 +11,7 @@ from appdirs import AppDirs
 import sys
 import os
 from modules.VaultClient import VaultClient
-from util.config_loader import config
+from util.configLoader import config
 import logging
 from util.util import Util
 import uuid

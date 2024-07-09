@@ -5,7 +5,7 @@ import logging
 from base64 import b64encode, b64decode
 import textwrap
 from pathlib import Path
-from util.config_loader import config
+from util.configLoader import config
 import socket
 
 logger = logging.getLogger("frdr-encryption-client.util")

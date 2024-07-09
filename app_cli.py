@@ -30,7 +30,7 @@ from docopt import docopt
 import sys
 import os
 from util.util import Util
-from util.config_loader import config
+from util.configLoader import config
 from modules.VaultClient import VaultClient
 from modules.DatasetKeyManager import DatasetKeyManager
 from appdirs import AppDirs

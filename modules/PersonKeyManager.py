@@ -1,7 +1,7 @@
 import os
 import logging
 from util.util import Util
-from util.config_loader import config
+from util.configLoader import config
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography import x509

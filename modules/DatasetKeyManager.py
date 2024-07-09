@@ -1,5 +1,5 @@
 import datetime
-from util.config_loader import config
+from util.configLoader import config
 import logging
 
 from pytz import timezone

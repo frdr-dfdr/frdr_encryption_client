@@ -3,7 +3,7 @@ from util.util import Util
 from globus_sdk import GlobusAPIError, RefreshTokenAuthorizer, NativeAppAuthClient
 from globus_sdk import BaseClient
 import logging
-from util.config_loader import config
+from util.configLoader import config
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib import parse

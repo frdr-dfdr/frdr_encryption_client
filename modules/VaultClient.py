@@ -3,7 +3,7 @@ import logging
 import webbrowser
 from urllib import parse
 from util.util import Util
-from util.config_loader import config
+from util.configLoader import config
 from hvac.exceptions import InvalidRequest
 
 

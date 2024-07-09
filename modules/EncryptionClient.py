@@ -7,7 +7,7 @@ import nacl.utils
 import nacl.secret
 import os
 from util.util import Util
-from util.config_loader import config
+from util.configLoader import config
 import logging
 import shutil
 import tempfile
