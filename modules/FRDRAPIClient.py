@@ -1,3 +1,21 @@
+#
+# Copyright (c) 2024 Digital Research Alliance of Canada
+#
+# This file is part of FRDR Encryption Application.
+#
+# FRDR Encryption Application is free software: you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the FRDR Encryption Application Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# FRDR Encryption Application is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+# PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with FRDR Encryption Application. If not, see <https://www.gnu.org/licenses/>.
+#
 from requests import request
 from util.util import Util
 from globus_sdk import GlobusAPIError, RefreshTokenAuthorizer, NativeAppAuthClient
@@ -100,7 +118,7 @@ class FRDRAPIClient():
     
     def update_requestitem_grant_access(self, data):
         """Update requestitem data on FRDR when depositors grant access
-           to the key on FRDR Encryption App.
+           to the key on FRDR Encryption Application.
 
         Args:
             data (dict): {"expires": The expiry data of the granted access, 
@@ -114,7 +132,7 @@ class FRDRAPIClient():
 
     def update_requestitem_decrypt(self, data):
         """Update requestitem data on FRDR when depositors grant access
-           to the key on FRDR Encryption App.
+           to the key on FRDR Encryption Application.
 
         Args:
             data (dict): {"expires": The expiry data of the granted access, 
@@ -155,7 +173,7 @@ class FRDRAPIClient():
         
     def send_user_vault_id_to_frdr(self, data):
         """Update requestitem data on FRDR when depositors grant access
-           to the key on FRDR Encryption App.
+           to the key on FRDR Encryption Application.
 
         Args:
             data (dict): {"expires": The expiry data of the granted access, 

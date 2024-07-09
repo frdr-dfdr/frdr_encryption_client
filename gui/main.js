@@ -1,4 +1,23 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
+/*
+ *   Copyright (c) 2024 Digital Research Alliance of Canada
+ *  
+ *   This file is part of FRDR Encryption Application.
+ *  
+ *   FRDR Encryption Application is free software: you can redistribute it
+ *   and/or modify it under the terms of the GNU General Public License as
+ *   published by the FRDR Encryption Application Software Foundation,
+ *   either version 3 of the License, or (at your option) any later version.
+ *  
+ *   FRDR Encryption Application is distributed in the hope that it will be
+ *   useful, but WITHOUT ANY WARRANTY; without even the implied
+ *   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *   PURPOSE. See the GNU General Public License for more details.
+ *  
+ *   You should have received a copy of the GNU General Public License
+ *   along with FRDR Encryption Application. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu} = require("electron");
 // Does not allow a second instance
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -10,6 +29,9 @@ if (!gotTheLock) {
 }
 
 require('update-electron-app');
+
+const openAboutWindow = require('electron-about-window').default;
+
 const glob = require('glob');
 
 const zmq = require("zeromq");
@@ -131,6 +153,30 @@ app.on('ready', () => {
     });
     createWindow();
     mainWindow.webContents.session.clearStorageData();
+
+    const menu = Menu.buildFromTemplate([
+        {
+            label: 'Example',
+            submenu: [
+                {
+                    label: 'About This App',
+                    click: () =>
+                        openAboutWindow({
+                            icon_path: path.join(__dirname, 'resources/icon.png'),
+                            copyright: '<p style="text-align:center; ">Copyright (c) 2024 Digital Research Alliance of Canada <br> Distributed under GPL-3.0-or-later license</p>',
+                            package_json_dir: __dirname,
+                            use_version_info: false,
+                            adjust_window_size: true,
+                            use_inner_html: true
+                        }),
+                },
+                {
+                    role: 'quit',
+                },
+            ],
+        },
+    ]);
+    app.applicationMenu = menu;
 });
 
 portfinder.basePort = 4242;

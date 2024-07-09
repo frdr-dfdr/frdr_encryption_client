@@ -177,4 +177,16 @@ You need **Request Access** to retrieve your uuid on key server when you fill ou
 
 The **Decrypt** menu option allows you to decrypt an encrypted package for access. Assuming you've already downloaded the package, clicking `Decrypt Data` will retrieve its encrypted dataset key from a Vault API endpoint URL (which will be normally be provided to you upon acceptance of an access request), decrypt the key with your private key (saved on your local machine) and then decrypt the package with the dataset key. You should only decrypt packages on trusted computers, as their contents may be very sensitive.
 
+## License
 
+FRDR Encryption Application, a local application to encrypt and decrypt data.
+
+Copyright (c) 2024 Digital Research Alliance of Canada
+
+License: GNU General Public License v3.0 (https://www.gnu.org/licenses/gpl-3.0.en.html)
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+See http://www.gnu.org/licenses/ for full license.
