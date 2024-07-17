@@ -14,7 +14,8 @@ pip install -r requirements.txt
 Run inside a virtual environment:
 ```sh
 python3 -m venv env
-source env/bin/activate
+source env/bin/activate (Mac)
+. env\Scripts\activate (Windows)
 ```
 at this point you should see (env) to the right of your command prompt, showing you that you are running inside a virtual environment.  You can now check the version of Python inside this environment:
 ```sh
