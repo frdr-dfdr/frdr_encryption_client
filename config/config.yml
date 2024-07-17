@@ -1,5 +1,5 @@
 # App configuration
-VERSION: "0.3.1"
+VERSION: "0.3.2"
 EXCLUDED_FILES:
   [
     ".*",
@@ -30,6 +30,7 @@ FRDR_DEPOSIT_DASHBOARD_URL: "https://dev4-web-c1.frdr.ca/repo/PublishDashboard"
 
 # Dataset key server configuration
 VAULT_DATASET_KEY_PATH: "dataset"
+# VAULT_HOSTNAME: "https://frdrvault.org"
 VAULT_HOSTNAME: "https://vault-dev.frdr.ca"
 # VAULT_HOSTNAME: "https://frdrvault.mit.c3.ca/"
 VAULT_CLIENT_LOGIN_REDIRECT_PORT_MIN: 8250
@@ -40,6 +41,7 @@ VAULT_LOGIN_TIMEOUT: 60
 VAULT_PUBLIC_KEY_PATH: "public_key"
 VAULT_GENERATE_CERT_ROLE_NAME: "example-dot-com"
 # VAULT_GENERATE_CERT_ROLE_NAME: "frdr-dot-ca"
+# VAULT_GENERATE_CERT_COMMON_NAME: "test.frdrvault.org"
 VAULT_GENERATE_CERT_COMMON_NAME: "test.vault-dev.frdr.ca"
 # VAULT_GENERATE_CERT_COMMON_NAME: "test.frdr-dfdr.ca"
 VAULT_GENERATE_CERT_MOUNT_NAME: "pki_int"

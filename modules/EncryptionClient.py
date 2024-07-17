@@ -24,6 +24,7 @@ import nacl.utils
 import nacl.secret
 import os
 from util.util import Util
+from util.Tree import Tree
 from util.configLoader import config
 import logging
 import shutil
@@ -69,6 +70,7 @@ class EncryptionClient(object):
         bag_dir_parent = None
         bag_output_path = None
         key_path_on_vault = None
+        sums_fullpath = None
         
         # generate key
         self._dataset_key_manager.generate_key()
@@ -83,20 +85,30 @@ class EncryptionClient(object):
         logger.debug("The temp directory created to hold the bag {}".format(bag_dir_parent))
         queue.put(bag_dir_parent)
 
-        # encrypt each file in the dirname
         if os.path.isdir(self._input):
-            logger.info("Start to compress data.")
-            zip_filepath = self._compress_folder(self._input, bag_dir)
-            size = os.path.getsize(zip_filepath) / (1024**3)
-            logger.info("Finished compressing data. The size of the zip file is {} GB".format(size))
-            # TODO: Check size
+            try:
+                # Generate checksums of each file in the directory
+                sums_fullpath = Util.generate_checksums(self._input)
+                
+                # compress the directory and encrypt the zip file
+                logger.info("Start to compress data.")
+                zip_filepath = self._compress_folder(self._input, bag_dir)
+                size = os.path.getsize(zip_filepath) / (1024**3)
+                logger.info("Finished compressing data. The size of the zip file is {} GB".format(size))
 
-            logger.info("Start to encrypt data.")
-            self._encrypt_file(zip_filepath, logger)
-            logger.info("Finished encrypting data.")
-            os.remove(zip_filepath)
+                logger.info("Start to encrypt data.")
+                self._encrypt_file(zip_filepath, logger)
+                logger.info("Finished encrypting data.")
+                os.remove(zip_filepath)
+                # Remove the generated checksum file from the original data directory
+                os.remove(sums_fullpath)
+            except Exception as e:
+                if sums_fullpath is not None and os.path.exists(sums_fullpath):
+                    os.remove(sums_fullpath)
+                shutil.rmtree(bag_dir_parent)
+                raise Exception("Error in compressing and encrypting input directory")
         else:
-            self._encrypt_file(self._input, logger)
+            raise Exception("Please select a directory to encrypt.")
 
         try:
             bag = bagit.make_bag(bag_dir, None, 1, ['sha256'])
@@ -104,8 +116,21 @@ class EncryptionClient(object):
             bag.info['Dataset-UUID'] = dataset_uuid
             bag.save()
         except (bagit.BagError, Exception) as e:
-            logger.error("Error creating a bag of the encrypted package.")
-            return False
+            shutil.rmtree(bag_dir_parent)
+            raise Exception("Error creating a bag of the encrypted package.")
+        
+        # create a file tree file
+        try:
+            with open(os.path.join(bag_dir, "file_tree.txt"), "w", encoding="utf-8") as f:
+                tree = Tree()
+                tree.totalSize += os.path.getsize(self._input)
+                print(os.path.basename(os.path.normpath(self._input)), file=f)
+                tree.walk(self._input, f)
+                print("\n" + tree.summary(), file=f)
+                bag.save()
+        except Exception as e:
+            shutil.rmtree(bag_dir_parent)
+            raise Exception("Error in creating a file tree file: {}".format(e))
 
         # zip bag dir and move it to the output path
         bag_destination = os.path.join(
