@@ -16,7 +16,7 @@ EXCLUDED_FILES:
     "NULLEXT",
   ]
 APP_NAME: "frdr-encryption-application"
-APP_AUTHOR: "Compute Canada"
+APP_AUTHOR: "Digital Research Alliance of Canada"
 TIMEZONE: "America/Regina"
 APP_LOG_FILENAME: "frdr-encryption-application_log.txt"
 GLOBUS_DATA_PUBLICATION_CLIENT_ID: "7dbc22b3-60c1-4e75-b148-3ee89f95792d"
