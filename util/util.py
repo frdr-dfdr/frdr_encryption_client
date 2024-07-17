@@ -24,6 +24,7 @@ import logging
 from base64 import b64encode, b64decode
 import textwrap
 from pathlib import Path
+from urllib.parse import urlparse
 from util.configLoader import config
 import socket
 
@@ -59,7 +60,8 @@ class Util(object):
     @classmethod
     def get_key_dir(cls, subdir):
         home = str(Path.home())
-        key_dir = os.path.join(home, config.LOCAL_KEY_DIR_NAME, subdir)
+        local_key_dir = config.LOCAL_KEY_DIR_NAME + "_" + urlparse(config.VAULT_HOSTNAME).hostname
+        key_dir = os.path.join(home, local_key_dir, subdir)
         if not os.path.exists(key_dir):
             Util.make_dir(key_dir)
         return key_dir
