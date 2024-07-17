@@ -61,7 +61,7 @@ Finally, to package for install:
 
 `electron-installer-windows --src frdr-encryption-application-win32-x64/ --dest install/ --config config.json` (Windows)
 
-`hdiutil create tmp.dmg -ov -volname "FRDRSecure" -fs HFS+ -srcfolder frdr-encryption-application-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDRSecure.dmg && rm tmp.dmg` (Mac)
+`hdiutil create tmp.dmg -ov -volname "FRDREncryptionApplication" -fs HFS+ -srcfolder frdr-encryption-application-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDREncryptionApplication.dmg && rm tmp.dmg` (Mac)
 
 
 ## Upgrade Dependencies
