@@ -65,7 +65,7 @@ class EncryptionClient(object):
         Returns:
             string: The output path of the generated bag including the encrypted package
         """
-        logger = logging.getLogger('frdr-encryption-client.encrypt')
+        logger = logging.getLogger('frdr-encryption-application.encrypt')
         # initialize these variables to avoid free variable 'bag_output_path' referenced before assignment error in cleanup
         bag_dir_parent = None
         bag_output_path = None
@@ -157,7 +157,7 @@ class EncryptionClient(object):
         Args:
             url (string): The path of the encrypted dataset key saved on the key server
         """
-        logger = logging.getLogger('frdr-encryption-client.decrypt')
+        logger = logging.getLogger('frdr-encryption-application.decrypt')
 
         depositor_uuid, dataset_uuid, requester_uuid = Util.parse_url(url)
 

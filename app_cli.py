@@ -64,7 +64,7 @@ os.makedirs(dirs.user_data_dir, exist_ok=True)
 def main():
     try:
         arguments = docopt(__doc__, version=__version__)
-        logger = Util.get_logger("frdr-encryption-client",
+        logger = Util.get_logger("frdr-encryption-application",
                                  log_level=arguments["--loglevel"],
                                  filepath=os.path.join(dirs.user_data_dir, config.APP_LOG_FILENAME))
         if sys.version_info[0] < 3:

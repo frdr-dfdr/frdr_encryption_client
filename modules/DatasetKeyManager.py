@@ -36,7 +36,7 @@ class DatasetKeyManager(object):
             vault_client (VaultClient): Wrapper of HashiCorp Vault API client
         """
         self._logger = logging.getLogger(
-            "frdr-encryption-client.dataset-key-manager")
+            "frdr-encryption-application.dataset-key-manager")
         self._vault_client = vault_client
         # key_ring_name is the user_entity_id
         self._key_ring_name = self._vault_client.entity_id

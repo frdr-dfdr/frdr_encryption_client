@@ -50,18 +50,18 @@ After building the crawler, the GUI can be built from the `gui` subdirectory wit
 
 On Mac, you can sign for distribution with `electron-osx-sign` and `electron-notarize-cli`, and you need to include the embedded Python binaries:
 
-`IFS=$'\n' && electron-osx-sign frdr-encryption-client-darwin-x64/frdr-encryption-client.app/ $(find frdr-encryption-client-darwin-x64/frdr-encryption-client.app/Contents/ -type f -perm -u+x) --identity [hash] --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
+`IFS=$'\n' && electron-osx-sign frdr-encryption-application-darwin-x64/frdr-encryption-application.app/ $(find frdr-encryption-application-darwin-x64/frdr-encryption-application.app/Contents/ -type f -perm -u+x) --identity [hash] --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
 
-`electron-notarize --bundle-id ca.frdr-dfdr.secure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-encryption-client-darwin-x64/frdr-encryption-client.app/`
+`electron-notarize --bundle-id ca.frdr-dfdr.secure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-encryption-application-darwin-x64/frdr-encryption-application.app/`
 
 To build for development on Mac, don't need to create a new key and can ad-hoc code sign 
-`cd frdr-encryption-client-darwin-x64/ && codesign --deep --force --verbose --sign - frdr-encryption-client.app/`
+`cd frdr-encryption-application-darwin-x64/ && codesign --deep --force --verbose --sign - frdr-encryption-application.app/`
 
 Finally, to package for install:
 
-`electron-installer-windows --src frdr-encryption-client-win32-x64/ --dest install/ --config config.json` (Windows)
+`electron-installer-windows --src frdr-encryption-application-win32-x64/ --dest install/ --config config.json` (Windows)
 
-`hdiutil create tmp.dmg -ov -volname "FRDRSecure" -fs HFS+ -srcfolder frdr-encryption-client-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDRSecure.dmg && rm tmp.dmg` (Mac)
+`hdiutil create tmp.dmg -ov -volname "FRDRSecure" -fs HFS+ -srcfolder frdr-encryption-application-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDRSecure.dmg && rm tmp.dmg` (Mac)
 
 
 ## Upgrade Dependencies

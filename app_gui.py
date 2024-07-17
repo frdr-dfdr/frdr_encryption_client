@@ -47,10 +47,10 @@ def encrypt_in_new_process(input_path, output_path, vault_client_token,
                        vault_client_entity_id, vault_client_addr, 
                        return_message, queue):
     try:
-        Util.get_logger("frdr-encryption-client",
+        Util.get_logger("frdr-encryption-application",
                         log_level="info",
                         filepath=os.path.join(dirs.user_data_dir, config.APP_LOG_FILENAME))
-        logger = logging.getLogger("frdr-encryption-client.gui.encrypt")
+        logger = logging.getLogger("frdr-encryption-application.gui.encrypt")
         logger.info("Encrypt files in the path {}".format(input_path))
         with open(os.path.join(dirs.user_data_dir, "pid"), 'w') as f:
             f.write(str(os.getpid()))
@@ -69,10 +69,10 @@ def encrypt_in_new_process(input_path, output_path, vault_client_token,
 
 class EncryptionClientGui(object):
     def __init__(self):
-        Util.get_logger("frdr-encryption-client",
+        Util.get_logger("frdr-encryption-application",
                         log_level="info",
                         filepath=os.path.join(dirs.user_data_dir, config.APP_LOG_FILENAME))
-        self._logger = logging.getLogger("frdr-encryption-client.gui")
+        self._logger = logging.getLogger("frdr-encryption-application.gui")
         self._vault_client = VaultClient()
         self._frdr_api_client = FRDRAPIClient(base_url = config.FRDR_API_BASE_URL)
         # self._vault_client_pki = VaultClient()

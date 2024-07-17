@@ -40,7 +40,7 @@ class VaultClient(object):
             url (string, optional): Base URL for the Vault instance being addressed. Defaults to None.
             entity_id (string, optional): The authenticated user's id on Vault. Defaults to None.
         """
-        self._logger = logging.getLogger("frdr-encryption-client.vault-client")
+        self._logger = logging.getLogger("frdr-encryption-application.vault-client")
         self.hvac_client = hvac.Client(token=token, url=url)
         self._entity_id = entity_id
 

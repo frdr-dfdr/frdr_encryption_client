@@ -1,5 +1,5 @@
 # App configuration
-VERSION: "0.3.2"
+VERSION: "0.3.3"
 EXCLUDED_FILES:
   [
     ".*",
@@ -15,10 +15,10 @@ EXCLUDED_FILES:
     "~$*",
     "NULLEXT",
   ]
-APP_NAME: "frdr-encryption-client"
+APP_NAME: "frdr-encryption-application"
 APP_AUTHOR: "Compute Canada"
 TIMEZONE: "America/Regina"
-APP_LOG_FILENAME: "frdr-encryption-client_log.txt"
+APP_LOG_FILENAME: "frdr-encryption-application_log.txt"
 GLOBUS_DATA_PUBLICATION_CLIENT_ID: "7dbc22b3-60c1-4e75-b148-3ee89f95792d"
 GLOBUS_DATA_PUBLICATION_CLIENT_NAME: "DataPublication Client v0.1"
 GLOBUS_LOGOUT_URL: "https://auth.globus.org/v2/web/logout"

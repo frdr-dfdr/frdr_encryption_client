@@ -32,7 +32,7 @@ import time
 import pytz
 import magic
 
-logger = logging.getLogger("frdr-encryption-client.util")
+logger = logging.getLogger("frdr-encryption-application.util")
 
 
 class Util(object):
