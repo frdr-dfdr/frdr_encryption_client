@@ -8,7 +8,8 @@ Python 3 is required to run the FRDR Encryption Application from the command lin
 
 You may want to run inside a virutal environment (see below) before running this command.
 ```sh
-pip install -r requirements.txt
+pip install -r requirements.txt (Mac)
+pip install -r .\requirements_windows.txt (Windows)
 ```
 
 Run inside a virtual environment:
@@ -23,14 +24,25 @@ python --version
 ```
 And if it's indeed version 3, then install the requirements inside the virtual environment:
 ```sh
-pip install -r requirements.txt
+pip install -r requirements.txt (Mac)
+pip install -r .\requirements_windows.txt (Windows)
 ```
 To exit the virtual environment:
 ```sh
 deactivate
 ```
 
-The Electron GUI in /gui should work for development after runing  `cd gui` and `npm install` and `NODE_ENV=development npm start`.
+The Electron GUI in /gui should work for development after runing  `cd gui` and `npm install` and `NODE_ENV=development npm start` (Mac), or `set NODE_ENV=development` and `npm start` (Windows).
+
+### Troubleshooting on Windows
+After running `npm start` on Windows but got error, 
+```
+Error: spawn python3 ENOENT
+at Process.ChildProcess._handle.onexit (node:internal/child_process:286:19)
+at onErrorNT (node:internal/child_process:484:16)
+at processTicksAndRejections (node:internal/process/task_queues:82:21)
+```
+change the code `pythonChild = require('child_process').spawn('python3', [script, port])` in `main.js` to `pythonChild = require('child_process').spawn('python', [script, port])`.
 
 
 ## Building
@@ -64,13 +76,48 @@ Finally, to package for install:
 
 `hdiutil create tmp.dmg -ov -volname "FRDREncryptionApplication" -fs HFS+ -srcfolder frdr-encryption-application-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDREncryptionApplication.dmg && rm tmp.dmg` (Mac)
 
+### Troubleshooting on Windows
+If found the following error on Windows, Requests is not working in PyInstaller packages because of missing file from charset_normalizer module.
+```
+Traceback (most recent call last):
+  File "requests\compat.py", line 11, in <module>
+ModuleNotFoundError: No module named 'chardet'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "app_gui.py", line 28, in <module>
+  File "PyInstaller\loader\pyimod03_importers.py", line 546, in exec_module
+  File "modules\EncryptionClient.py", line 22, in <module>
+  File "PyInstaller\loader\pyimod03_importers.py", line 546, in exec_module
+  File "hvac\__init__.py", line 1, in <module>
+  File "PyInstaller\loader\pyimod03_importers.py", line 546, in exec_module
+  File "hvac\v1\__init__.py", line 3, in <module>
+  File "PyInstaller\loader\pyimod03_importers.py", line 546, in exec_module
+  File "hvac\adapters.py", line 7, in <module>
+  File "PyInstaller\loader\pyimod03_importers.py", line 546, in exec_module
+  File "requests\__init__.py", line 45, in <module>
+  File "PyInstaller\loader\pyimod03_importers.py", line 546, in exec_module
+  File "requests\exceptions.py", line 9, in <module>
+  File "PyInstaller\loader\pyimod03_importers.py", line 546, in exec_module
+  File "requests\compat.py", line 13, in <module>
+  File "PyInstaller\loader\pyimod03_importers.py", line 546, in exec_module
+  File "charset_normalizer\__init__.py", line 24, in <module>
+  File "PyInstaller\loader\pyimod03_importers.py", line 546, in exec_module
+  File "charset_normalizer\api.py", line 5, in <module>
+  File "PyInstaller\loader\pyimod03_importers.py", line 546, in exec_module
+  File "charset_normalizer\cd.py", line 14, in <module>
+ModuleNotFoundError: No module named 'charset_normalizer.md__mypyc'
+``` 
+Run `pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml;./config' --hiddenimport charset_normalizer.md__mypyc` or upgrade pyinstaller `pip install pyinstaller==5.10.1` and install hooks repo `pip install "pyinstaller-hooks-contrib>=2022.15"`.
 
 ## Upgrade Dependencies
 
 ### Upgrade Python Packages
-Upgrade packages and update requirements.txt.
+Upgrade packages and update requirements.txt or requirements_windows.txt.
 ```
-pip-upgrade
+pip-upgrade (Mac)
+pip-upgrade .\requirements_windows.txt (Windows)
 ```
 
 ### Update Electron App Dependencies
