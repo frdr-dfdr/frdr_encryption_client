@@ -15,7 +15,7 @@ EXCLUDED_FILES:
     "~$*",
     "NULLEXT",
   ]
-APP_NAME: "frdr-encryption-application"
+APP_NAME: "FRDR Encryption"
 APP_AUTHOR: "Digital Research Alliance of Canada"
 TIMEZONE: "America/Regina"
 APP_LOG_FILENAME: "frdr-encryption-application_log.txt"

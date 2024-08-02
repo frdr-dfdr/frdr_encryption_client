@@ -1,5 +1,5 @@
 {
-  "name": "frdr-encryption-application",
+  "name": "FRDR Encryption",
   "version": "0.3.3",
   "homepage": "https://github.com/frdr-dfdr/frdr_encryption_client",
   "main": "main.js",
@@ -14,7 +14,6 @@
     "test": "electron . --run-tests"
   },
   "dependencies": {
-    "electron": "^31.2.1",
     "electron-about-window": "^1.15.2",
     "jquery": "^3.7.1",
     "js-yaml": "4.1.0",
@@ -27,6 +26,7 @@
   ],
   "author": "Digital Research Alliance of Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)",
   "devDependencies": {
+    "electron": "^31.2.1",
     "electron-rebuild": "^3.2.5"
   }
 }
