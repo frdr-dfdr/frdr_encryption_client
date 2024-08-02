@@ -29,8 +29,11 @@ try {
   if (process.env.NODE_ENV == "development") {
     configPath = path.join(__dirname, '..', '..','config', 'config.yml');
   }
+  else if (process.platform === 'win32') {
+    configPath = path.join(__dirname, '..', 'app_gui', 'config', 'config.yml');
+  }
   else {
-    var configPath = path.join(__dirname, '..', 'app_gui', '_internal', 'config', 'config.yml');
+    configPath = path.join(__dirname, '..', 'app_gui', '_internal', 'config', 'config.yml');
   }
   let fileContents = fs.readFileSync(configPath, 'utf8');
   let config = yaml.load(fileContents);
