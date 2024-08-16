@@ -58,7 +58,10 @@ const getScriptPath = () => {
         return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
     }
     if (process.platform === 'win32') {
-        return path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE + '.exe')
+        const scriptPath = process.env.NODE_ENV === 'development' 
+            ? path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE + '.exe')
+            : path.join(process.resourcesPath, PY_APP_GUI_FOLDER, PY_MODULE + '.exe')
+        return scriptPath;
     }
     return path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE)
 };

@@ -32,7 +32,7 @@ To exit the virtual environment:
 deactivate
 ```
 
-The Electron GUI in /gui should work for development after runing  `cd gui` and `npm install` and `NODE_ENV=development npm start` (Mac), or `set NODE_ENV=development` and `npm start` (Windows).
+The Electron GUI in /gui should work for development after runing  `cd gui` and `npm install` and `NODE_ENV=development npm start` (Mac), or `set NODE_ENV=development` or `$env:NODE_ENV="development"`(powershell) and `npm start` (Windows).
 
 ### Troubleshooting on Windows
 After running `npm start` on Windows but got error, 
@@ -45,7 +45,8 @@ at processTicksAndRejections (node:internal/process/task_queues:82:21)
 change the code `pythonChild = require('child_process').spawn('python3', [script, port])` in `main.js` to `pythonChild = require('child_process').spawn('python', [script, port])`.
 
 
-## Building
+## Building 
+
 The Python code needs to be built on its target platform using `pyinstaller`:
 
 `pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml;./config'` (Windows)
@@ -56,26 +57,51 @@ We need to include the config file when generating the bundle.
 
 (On Mac, this also builds a .app version of the Python code, which you'll actually want to delete -- just keep the folder of CLI tools.)
 
-After building the crawler, the GUI can be built from the `gui` subdirectory with:
+### Build for Development
 
-`electron-packager . --icon=resources/icon.ico` (Windows)
+#### MacOS 
 
-`electron-packager . --icon=resources/icon.icns` (Mac)
+After building the python code, the GUI can be built from the `gui` subdirectory with `electron-packager`:
 
+`electron-packager . --icon=resources/icon.icns`
+
+To build for development on Mac, don't need to create a new key and can ad-hoc code sign:
+
+`cd FRDR\ Encryption-darwin-x64/ && codesign --deep --force --verbose --sign - FRDR\ Encryption.app/`
+
+To package for install:
+
+`hdiutil create tmp.dmg -ov -volname "FRDREncryptionApplication" -fs HFS+ -srcfolder frdr-encryption-application-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDREncryptionApplication.dmg && rm tmp.dmg` (Mac)
+
+#### Windows
+
+After building the python code, the GUI can be built from the `gui` subdirectory with `electron-packager`:
+
+`electron-packager . --icon=resources/icon.ico`
+
+To package for install:
+`electron-installer-windows --src frdr-encryption-application-win32-x64/ --dest install/ --config config.json` 
+
+### Build and Sign for Distribution
+
+#### Mac
 On Mac, you can sign for distribution with `electron-osx-sign` and `electron-notarize-cli`, and you need to include the embedded Python binaries:
 
 `IFS=$'\n' && electron-osx-sign FRDR\ Encryption\ Application-darwin-x64/FRDR\ Encryption.app/ $(find FRDR\ Encryption-darwin-x64/FRDR\ Encryption.app/Contents/ -type f -perm -u+x) --identity='[DISTRIBUTION CERTIFICATE COMMON NAME]' --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
 
 `electron-notarize --bundle-id ca.frdr-dfdr.secure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-encryption-application-darwin-x64/frdr-encryption-application.app/`
 
-To build for development on Mac, don't need to create a new key and can ad-hoc code sign 
-`cd FRDR\ Encryption-darwin-x64/ && codesign --deep --force --verbose --sign - FRDR\ Encryption.app/`
+#### Windows
+Set the path to your Host and client authentication certificate in SMCTL:
 
-Finally, to package for install:
+```
+set SM_HOST=<host URL>
+set SM_CLIENT_CERT_FILE=<P12 client authentication certificate file path>
+```
 
-`electron-installer-windows --src frdr-encryption-application-win32-x64/ --dest install/ --config config.json` (Windows)
+Run the command to build the app, make sure `"sign": "./windowsSign.js"` is included in the package.json file to sign the binaries. 
 
-`hdiutil create tmp.dmg -ov -volname "FRDREncryptionApplication" -fs HFS+ -srcfolder frdr-encryption-application-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDREncryptionApplication.dmg && rm tmp.dmg` (Mac)
+`npm run dist`
 
 ### Troubleshooting on Windows
 If found the following error on Windows, Requests is not working in PyInstaller packages because of missing file from charset_normalizer module.
