@@ -75,12 +75,19 @@ To package for install:
 
 #### Windows
 
+##### Option 1: build with `electron-packager`
 After building the python code, the GUI can be built from the `gui` subdirectory with `electron-packager`:
 
 `electron-packager . --icon=resources/icon.ico`
 
 To package for install:
-`electron-installer-windows --src frdr-encryption-application-win32-x64/ --dest install/ --config config.json` 
+`electron-installer-windows --src frdr-encryption-application-win32-x64/ --dest install/ --config config.json`
+
+##### Option 2: build with `electron-builder`
+
+Remove `"sign": "./windowsSign.js"` from the package.json file, and run command: 
+
+`npm run dist`
 
 ### Build and Sign for Distribution
 
