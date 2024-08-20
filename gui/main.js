@@ -63,6 +63,14 @@ const getScriptPath = () => {
             : path.join(process.resourcesPath, PY_APP_GUI_FOLDER, PY_MODULE + '.exe')
         return scriptPath;
     }
+
+    if (process.platform === 'darwin') {
+        const scriptPath = process.env.NODE_ENV === 'development' 
+            ? path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE)
+            : path.join(process.resourcesPath, PY_APP_GUI_FOLDER, PY_MODULE)
+        return scriptPath;
+    }
+
     return path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE)
 };
 
@@ -253,6 +261,7 @@ portfinder.getPort(function(_err, port) {
     sock.connect("tcp://127.0.0.1:" + String(port));
     const createApp = () => {
         let script = getScriptPath();
+        console.log(script)
         if (guessPackaged()) {
             pythonChild = require('child_process').spawn(script, [port])
         } else {

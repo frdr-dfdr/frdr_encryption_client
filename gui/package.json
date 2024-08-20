@@ -1,5 +1,6 @@
 {
   "name": "frdr-encryption-application",
+  "productName": "FRDR Encryption",
   "version": "0.3.3",
   "homepage": "https://github.com/frdr-dfdr/frdr_encryption_client",
   "main": "main.js",
@@ -27,21 +28,35 @@
   ],
   "author": "Digital Research Alliance of Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)",
   "devDependencies": {
+    "@electron/notarize": "^2.4.0",
     "electron": "^31.2.1",
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "productName" : "FRDR Encryption",
+    "productName": "FRDR Encryption",
     "win": {
       "target": "NSIS",
       "icon": "resources/icon.ico",
       "sign": "../codesign_scripts/windowsSign.js"
     },
+    "dmg": {
+      "title": "${productName} ${version}"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "resources/icon.icns",
+      "hardenedRuntime": true,
+      "entitlements": "entitlements.plist",
+      "entitlementsInherit": "entitlements.plist",
+      "notarize": {
+        "teamId": "CHANGE ME: FRDR DEVELOPER TEAM ID"
+      }
+    },
     "asar": true,
     "extraResources": [
       {
-          "from": "app_gui",
-          "to": "app_gui"
+        "from": "app_gui",
+        "to": "app_gui"
       }
     ]
   }
