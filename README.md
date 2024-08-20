@@ -96,7 +96,7 @@ On Mac, you can sign for distribution with `electron-osx-sign` and `electron-not
 
 `IFS=$'\n' && electron-osx-sign FRDR\ Encryption\ Application-darwin-x64/FRDR\ Encryption.app/ $(find FRDR\ Encryption-darwin-x64/FRDR\ Encryption.app/Contents/ -type f -perm -u+x) --identity='[DISTRIBUTION CERTIFICATE COMMON NAME]' --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
 
-`electron-notarize --bundle-id ca.frdr-dfdr.secure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-encryption-application-darwin-x64/frdr-encryption-application.app/`
+`APPLE_ID=[DEVELOPER APPLE ID] APPLE_PASSWORD=[APP SPECIFIC PASSWORD] APPLE_TEAM_ID=[APPLE DEVELOPER TEAM ID] node ../codesign_scripts/notarize.js`
 
 #### Windows
 Set the path to your Host and client authentication certificate in SMCTL:
