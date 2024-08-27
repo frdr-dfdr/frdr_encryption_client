@@ -92,11 +92,23 @@ Remove `"sign": "./windowsSign.js"` from the package.json file, and run command:
 ### Build and Sign for Distribution
 
 #### Mac
+
+##### Method 1: Use electron-builder
+
+Change `teamId` in the package.json file, and run the command to package, sign and notarize the app.
+
+`APPLE_ID=[DEVELOPER APPLE ID] APPLE_APP_SPECIFIC_PASSWORD=[APP SPECIFIC PASSWORD] APPLE_TEAM_ID=[DEVELOPER TEAM ID] npm run dist`
+
+##### Method 2: Use @electron/osx-sign and @electron/notarize
+After building the python code, the GUI can be built from the `gui` subdirectory with `electron-packager`:
+
+`electron-packager . --icon=resources/icon.icns --asar --extra-resource=app_gui`
+
 On Mac, you can sign for distribution with `electron-osx-sign` and `electron-notarize-cli`, and you need to include the embedded Python binaries:
 
-`IFS=$'\n' && electron-osx-sign FRDR\ Encryption\ Application-darwin-x64/FRDR\ Encryption.app/ $(find FRDR\ Encryption-darwin-x64/FRDR\ Encryption.app/Contents/ -type f -perm -u+x) --identity='[DISTRIBUTION CERTIFICATE COMMON NAME]' --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
+`IFS=$'\n' && electron-osx-sign FRDR\ Encryption-darwin-x64/FRDR\ Encryption.app/ $(find FRDR\ Encryption-darwin-x64/FRDR\ Encryption.app/Contents/ -type f -perm -u+x) --identity='[DISTRIBUTION CERTIFICATE COMMON NAME]' --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
 
-`APPLE_ID=[DEVELOPER APPLE ID] APPLE_PASSWORD=[APP SPECIFIC PASSWORD] APPLE_TEAM_ID=[APPLE DEVELOPER TEAM ID] node ../codesign_scripts/notarize.js`
+`APPLE_ID=[DEVELOPER APPLE ID] APPLE_APP_SPECIFIC_PASSWORD=[APP SPECIFIC PASSWORD] APPLE_TEAM_ID=[APPLE DEVELOPER TEAM ID] node ../codesign_scripts/notarize.js`
 
 #### Windows
 Set the path to your Host and client authentication certificate in SMCTL:

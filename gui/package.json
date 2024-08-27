@@ -40,7 +40,12 @@
       "sign": "../codesign_scripts/windowsSign.js"
     },
     "dmg": {
-      "title": "${productName} ${version}"
+      "title": "${productName} ${version}",
+      "background": "resources/dmg_installer_background.png",
+      "window": {
+        "width": 600,
+        "height": 390
+      }
     },
     "mac": {
       "target": "dmg",
