@@ -37,7 +37,8 @@
     "win": {
       "target": "NSIS",
       "icon": "resources/icon.ico",
-      "sign": "../codesign_scripts/windowsSign.js"
+      "sign": "../codesign_scripts/windowsSign.js",
+      "signingHashAlgorithms": ["sha256"]
     },
     "dmg": {
       "title": "${productName} ${version}",
