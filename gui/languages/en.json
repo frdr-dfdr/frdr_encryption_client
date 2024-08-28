@@ -15,13 +15,13 @@
     "app-login-url-tooltip": "If running for development, probably http://127.0.0.1:8200.",
     "app-login-frdr-btn": "Login with Globus",
     "app-login-frdr-error": "Error logging into FRDR. \n$1",
-    "app-login-frdr-success-message": "Your authentication to FRDR was successful. Kindly return to the FRDR Encryption application and click on \"Login with Globus\" to access Vault for key management. You may close this browser now.",
+    "app-login-frdr-success-message": "Your authentication to FRDR was successful. Kindly return to the FRDR Encryption application and click on \"Login with Globus\" to access Vault for key management. You may close this tab now.",
 
     "app-login-vault-title": "Login Step 2",
     "app-login-vault-desc": "You need to log into Vault for key management.",
     "app-login-vault-btn": "Login with Globus",
-    "app-login-vault-error": "Error logging into HashiCorp Vault with Globus OAuth. \n$1",
-    "app-login-vault-success-message": "Authentication to HashiCorp Vault successful, you can close the browser now.",
+    "app-login-vault-error": "Error logging into Vault with Globus OAuth. \n$1",
+    "app-login-vault-success-message": "Your authentication to Vault was successful, you may close this tab now.",
     "app-login-vault-local-keys-error-title": "Error with local public and private key pair",
     "app-login-vault-local-keys-error-text": "You are not able to use FRDR Encryption Application on this device",
     
@@ -58,7 +58,7 @@
     "app-encrypt-cancel-button": "Stop Encryption",
     "app-encrypt-done": "Dataset has been encrypted and transfer package has been created on $1",
     "app-encrypt-done-title": "Encryption complete",
-    "app-encrypt-done-text1": "Your dataset has been encrypted. Please continue with your data deposit and upload the encrypted package to FRDR once you reach the Transfer Data tab.",
+    "app-encrypt-done-text1": "Your dataset has been encrypted. Please continue with your data deposit and upload the encrypted package into the sensitive directory once you reach the Transfer Data tab on FRDR.",
     "app-encrypt-done-text2": "FRDR Publication Dashboard",
 
     "app-encrypt-error": "Error encrypting. $1",
@@ -72,7 +72,7 @@
 
     "app-grant-access-requester": "Requester ID",
     "app-grant-access-requester-tooltip": "To grant access to a dataset insert the user ID of the requester",
-    "app-grant-access-requester-missing": "Please insert the user ID of the requester to grant access to a dataset",
+    "app-grant-access-requester-missing": "Please insert the user ID of the requester to grant access to a dataset.",
 
     "app-grant-access-expire": "Access Expiration Date",
     "app-grant-access-expire-info": "The access period will automatically be 6 months from the date you grant access.",
