@@ -45,8 +45,21 @@
       "background": "resources/dmg_installer_background.png",
       "window": {
         "width": 600,
-        "height": 390
-      }
+        "height": 400
+      },
+      "contents": [
+        {
+          "x": 200,
+          "y": 200,
+          "type": "file"
+        },
+        {
+          "x": 400,
+          "y": 200,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
     },
     "mac": {
       "target": "dmg",
