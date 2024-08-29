@@ -28,7 +28,8 @@ if (!gotTheLock) {
     });
 }
 
-require('update-electron-app');
+const { updateElectronApp } = require('update-electron-app');
+updateElectronApp();
 
 const openAboutWindow = require('electron-about-window').default;
 
