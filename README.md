@@ -6,12 +6,6 @@ FRDR Encryption Application allows users to encrypt dataset saved on their local
 
 Python 3 is required to run the FRDR Encryption Application from the command line. Ensure that the output of `python3 --version` shows 3.6 or higher.  
 
-You may want to run inside a virutal environment (see below) before running this command.
-```sh
-pip install -r requirements.txt (Mac)
-pip install -r .\requirements_windows.txt (Windows)
-```
-
 Run inside a virtual environment:
 ```sh
 python3 -m venv env
@@ -24,15 +18,36 @@ python --version
 ```
 And if it's indeed version 3, then install the requirements inside the virtual environment:
 ```sh
-pip install -r requirements.txt (Mac)
+pip install -r requirements_mac_intel.txt (Mac with Intel processor)
+pip install -r requirements_mac_silicon.txt (Mac with Apple Silicon processor)
 pip install -r .\requirements_windows.txt (Windows)
 ```
+
+Download and install Node.js and npm is needed: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
+
+Navigate to the /gui folded and install required packages:
+
+```sh
+cd gui
+npm install
+```
+
+To start the Electron GUI in development environment:
+
+```sh
+# Mac
+NODE_ENV=development npm start
+
+# Windows 
+set NODE_ENV=development (command prompt)
+$env:NODE_ENV="development" (powershell)
+npm start
+```
+
 To exit the virtual environment:
 ```sh
 deactivate
 ```
-
-The Electron GUI in /gui should work for development after runing  `cd gui` and `npm install` and `NODE_ENV=development npm start` (Mac), or `set NODE_ENV=development` or `$env:NODE_ENV="development"`(powershell) and `npm start` (Windows).
 
 ### Troubleshooting on Windows
 After running `npm start` on Windows but got error, 
@@ -49,6 +64,8 @@ change the code `pythonChild = require('child_process').spawn('python3', [script
 
 The Python code needs to be built on its target platform using `pyinstaller`:
 
+(Install `pyinstaller` if not installed: `pip install pyinstaller`)
+
 `pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml;./config'` (Windows)
 
 `pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config'` (Mac)
@@ -62,6 +79,8 @@ We need to include the config file when generating the bundle.
 #### MacOS 
 
 After building the python code, the GUI can be built from the `gui` subdirectory with `electron-packager`:
+
+(Install `electron-packager` if not installed: `npm install --save-dev @electron/packager`)
 
 `electron-packager . --icon=resources/icon.icns`
 
@@ -77,6 +96,8 @@ To package for install:
 
 ##### Option 1: build with `electron-packager`
 After building the python code, the GUI can be built from the `gui` subdirectory with `electron-packager`:
+
+(Install `electron-packager` if not installed: `npm install --save-dev @electron/packager`)
 
 `electron-packager . --icon=resources/icon.ico`
 

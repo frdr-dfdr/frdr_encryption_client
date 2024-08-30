@@ -29,6 +29,7 @@
   "author": "Digital Research Alliance of Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)",
   "devDependencies": {
     "@electron/notarize": "^2.4.0",
+    "@electron/packager": "^18.3.4",
     "electron": "^31.2.1",
     "electron-builder": "^24.13.3"
   },
