@@ -37,9 +37,8 @@
     "productName": "FRDR Encryption",
     "win": {
       "target": "NSIS",
-      "icon": "resources/icon.ico",
-      "sign": "../codesign_scripts/windowsSign.js",
-      "signingHashAlgorithms": ["sha256"]
+      "artifactName": "${name}-${platform}-${arch}-${version}.${ext}",
+      "icon": "resources/icon.ico"
     },
     "dmg": {
       "title": "${productName} ${version}",
