@@ -38,7 +38,9 @@
     "win": {
       "target": "NSIS",
       "artifactName": "${name}-${platform}-${arch}-${version}.${ext}",
-      "icon": "resources/icon.ico"
+      "icon": "resources/icon.ico",
+      "sign": "../codesign_scripts/windowsSign.js",
+      "signingHashAlgorithms": ["sha256"]
     },
     "dmg": {
       "title": "${productName} ${version}",
