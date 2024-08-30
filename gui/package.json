@@ -62,7 +62,8 @@
       ]
     },
     "mac": {
-      "target": "dmg",
+      "target": ["dmg","zip"],
+      "artifactName": "${name}-${platform}-${arch}-${version}.${ext}",
       "icon": "resources/icon.icns",
       "hardenedRuntime": true,
       "entitlements": "entitlements.plist",
