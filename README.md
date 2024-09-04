@@ -23,7 +23,9 @@ pip install -r requirements_mac_silicon.txt (Mac with Apple Silicon processor)
 pip install -r .\requirements_windows.txt (Windows)
 ```
 
-Download and install Node.js and npm is needed: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
+Download and install Node.js and npm is needed: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm (on a Mac you can use brew: `brew update` then `brew install node`)
+
+Install libmagic (On a Mac: `brew install libmagic`)
 
 Navigate to the /gui folded and install required packages:
 
