@@ -17,6 +17,8 @@
  *   along with FRDR Encryption Application. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const {ipcRenderer} = require('electron');
+
 // Allow the user to logout
 document.getElementById("logout").addEventListener("click", logout);
 
