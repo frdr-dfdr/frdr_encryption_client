@@ -24,6 +24,10 @@ var update_texts = function() {
       // Add hyperlink to open FRDR Deposit Dashboard
       $('#frdr-dashboard-link').html('<a id="open-frdr-dashboard" href="#">' + $.i18n('app-encrypt-done-text2') +'</a>');
 
+      var date = new Date();
+      date.setMonth(date.getMonth() + 6);
+      $('#access-expire').html($.i18n('app-grant-access-expire-tooltip', date.toISOString().split('T')[0]));
+      
       $('#open-frdr-dashboard').on("click", function(){
         openFRDRDepositDashboard();
       });
@@ -35,7 +39,7 @@ var update_texts = function() {
 
       $('[data-toggle="tooltip"]').tooltip();
     }
-  );  
+  );
 };
 
 $( document ).ready( function ( $ ) {

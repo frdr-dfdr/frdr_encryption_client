@@ -1,9 +1,9 @@
 {
     "@metadata": {
         "authors": [
-            "Compute Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)"
+            "Digital Research Alliance of Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)"
         ],
-        "last-updated": "2021-08-07",
+        "last-updated": "2024-09-06",
         "locale": "en"
     },
     "app-name": "FRDR Encryption Application",
@@ -75,8 +75,7 @@
     "app-grant-access-requester-missing": "Please insert the user ID of the requester to grant access to a dataset.",
 
     "app-grant-access-expire": "Access Expiration Date",
-    "app-grant-access-expire-info": "The access period will automatically be 6 months from the date you grant access.",
-    "app-grant-access-expire-tooltip": "The date that this access is going to expire",
+    "app-grant-access-expire-tooltip": "The access period will automatically be 6 months from the date you grant access. The access to the key will expire on $1.",
     "app-grant-access-button": "Grant Access",
     "app-grant-access-confirm": "You are trying to grant requester $1 access to dataset $2. \n\nPlease confirm the dataset name and requester name are correct before granting access. \n\nDo you want to continue?",
     "app-grant-access-confirm-btn1": "Yes",
