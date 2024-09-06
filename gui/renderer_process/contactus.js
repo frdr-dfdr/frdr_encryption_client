@@ -17,22 +17,6 @@
  *   along with FRDR Encryption Application. If not, see <https://www.gnu.org/licenses/>.
  */
 
-if (typeof ipcRenderer == 'undefined') {
-  const {ipcRenderer} = require('electron');
-}
-
-if (typeof fs == 'undefined') {
-  const fs = require('fs');
-}
-
-if (typeof yaml == 'undefined') {
-  const yaml = require('js-yaml');
-}
-
-if (typeof path == 'undefined') {
-  const path = require('path');
-}
-
 function contactus() {
   var contactURL = "";
   try {
