@@ -28,8 +28,20 @@ if (!gotTheLock) {
     });
 }
 
-const { updateElectronApp } = require('update-electron-app');
-updateElectronApp();
+// Auto Update
+const log = require("electron-log");
+if (process.platform === 'win32') {
+    const {autoUpdater}  = require('electron-updater');
+    autoUpdater.logger = log;
+    autoUpdater.checkForUpdatesAndNotify();
+}
+
+if (process.platform === 'darwin') {
+    const { updateElectronApp } = require('update-electron-app');
+    updateElectronApp({
+        logger: log
+    });
+}
 
 const openAboutWindow = require('electron-about-window').default;
 
