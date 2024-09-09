@@ -40,7 +40,7 @@ from modules.FRDRAPIClient import FRDRAPIClient
 import zmq
 
 __version__ = config.VERSION
-dirs = AppDirs(config.APP_NAME, config.APP_AUTHOR)
+dirs = AppDirs(config.APP_NAME, appauthor=False, roaming=True)
 os.makedirs(dirs.user_data_dir, exist_ok=True)
 
 def encrypt_in_new_process(input_path, output_path, vault_client_token, 
@@ -150,7 +150,7 @@ class EncryptionClientGui(object):
             self.cleanup_failed_encryption(temp_bag_dir, bag_output_path)
             if (p.exitcode == -9):
                 message.value = "Failed. The machine is out of memory."
-            elif (p.exitcode == -15):
+            elif (p.exitcode == -15 or p.exitcode == 1):
                 message.value = "Terminated by user."
         queue.close()
         return (successful, message.value)
