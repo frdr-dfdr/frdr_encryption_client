@@ -1,5 +1,6 @@
 {
-  "name": "FRDR Encryption",
+  "name": "frdr-encryption-application",
+  "productName": "FRDR Encryption",
   "version": "0.3.3",
   "homepage": "https://github.com/frdr-dfdr/frdr_encryption_client",
   "main": "main.js",
@@ -11,10 +12,13 @@
   },
   "scripts": {
     "start": "electron .",
-    "test": "electron . --run-tests"
+    "test": "electron . --run-tests",
+    "dist": "electron-builder"
   },
   "dependencies": {
     "electron-about-window": "^1.15.2",
+    "electron-log": "^5.2.0",
+    "electron-updater": "^6.3.4",
     "jquery": "^3.7.1",
     "js-yaml": "4.1.0",
     "portfinder": "^1.0.32",
@@ -26,7 +30,58 @@
   ],
   "author": "Digital Research Alliance of Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)",
   "devDependencies": {
+    "@electron/notarize": "^2.4.0",
+    "@electron/packager": "^18.3.4",
     "electron": "^31.2.1",
-    "electron-rebuild": "^3.2.5"
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "productName": "FRDR Encryption",
+    "win": {
+      "target": "NSIS",
+      "artifactName": "${name}-${platform}-${arch}-${version}.${ext}",
+      "icon": "resources/icon.ico",
+      "sign": "../codesign_scripts/windowsSign.js",
+      "signingHashAlgorithms": ["sha256"]
+    },
+    "dmg": {
+      "title": "${productName} ${version}",
+      "background": "resources/dmg_installer_background.png",
+      "window": {
+        "width": 600,
+        "height": 400
+      },
+      "contents": [
+        {
+          "x": 200,
+          "y": 200,
+          "type": "file"
+        },
+        {
+          "x": 400,
+          "y": 200,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "mac": {
+      "target": ["dmg","zip"],
+      "artifactName": "${name}-${platform}-${arch}-${version}.${ext}",
+      "icon": "resources/icon.icns",
+      "hardenedRuntime": true,
+      "entitlements": "entitlements.plist",
+      "entitlementsInherit": "entitlements.plist",
+      "notarize": {
+        "teamId": "CHANGE ME: FRDR DEVELOPER TEAM ID"
+      }
+    },
+    "asar": true,
+    "extraResources": [
+      {
+        "from": "app_gui",
+        "to": "app_gui"
+      }
+    ]
   }
 }
