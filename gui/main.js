@@ -274,7 +274,6 @@ portfinder.getPort(function(_err, port) {
     sock.connect("tcp://127.0.0.1:" + String(port));
     const createApp = () => {
         let script = getScriptPath();
-        console.log(script)
         if (guessPackaged()) {
             pythonChild = require('child_process').spawn(script, [port])
         } else {

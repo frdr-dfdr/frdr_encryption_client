@@ -142,12 +142,16 @@ class EncryptionClientGui(object):
                 temp_bag_dir = queue.get(timeout=0)
             except:
                 temp_bag_dir = None
+            try: 
+                sums_fullpath = queue.get(timeout=0)
+            except:
+                sums_fullpath = None
             try:
                 bag_output_path = queue.get(timeout=0)
             except:
                 bag_output_path = None
-                
-            self.cleanup_failed_encryption(temp_bag_dir, bag_output_path)
+
+            self.cleanup_failed_encryption(sums_fullpath, temp_bag_dir, bag_output_path)
             if (p.exitcode == -9):
                 message.value = "Failed. The machine is out of memory."
             elif (p.exitcode == -15 or p.exitcode == 1):
@@ -155,8 +159,12 @@ class EncryptionClientGui(object):
         queue.close()
         return (successful, message.value)
     
-    def cleanup_failed_encryption(self, temp_bag_dir=None, bag_output_path=None):
+    def cleanup_failed_encryption(self, sums_fullpath=None, temp_bag_dir=None, bag_output_path=None):
         self._logger.info("Clean up after failed encryption.")
+        # delete checksum file in input data directory
+        if sums_fullpath is not None and os.path.exists(sums_fullpath):
+            self._logger.info("Deleting generated checksum file {}".format(sums_fullpath))
+            os.remove(sums_fullpath)
         # delete temp dir
         if temp_bag_dir is not None and os.path.exists(temp_bag_dir) and os.path.isdir(temp_bag_dir):
             self._logger.info("Deleting temp dir {}".format(temp_bag_dir))
