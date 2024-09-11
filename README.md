@@ -6,12 +6,6 @@ FRDR Encryption Application allows users to encrypt dataset saved on their local
 
 Python 3 is required to run the FRDR Encryption Application from the command line. Ensure that the output of `python3 --version` shows 3.6 or higher.  
 
-You may want to run inside a virutal environment (see below) before running this command.
-```sh
-pip install -r requirements.txt (Mac)
-pip install -r .\requirements_windows.txt (Windows)
-```
-
 Run inside a virtual environment:
 ```sh
 python3 -m venv env
@@ -24,15 +18,38 @@ python --version
 ```
 And if it's indeed version 3, then install the requirements inside the virtual environment:
 ```sh
-pip install -r requirements.txt (Mac)
+pip install -r requirements_mac_intel.txt (Mac with Intel processor)
+pip install -r requirements_mac_silicon.txt (Mac with Apple Silicon processor)
 pip install -r .\requirements_windows.txt (Windows)
 ```
+
+Download and install Node.js and npm is needed: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm (on a Mac you can use brew: `brew update` then `brew install node`)
+
+Install libmagic (On a Mac: `brew install libmagic`)
+
+Navigate to the /gui folded and install required packages:
+
+```sh
+cd gui
+npm install
+```
+
+To start the Electron GUI in development environment:
+
+```sh
+# Mac
+NODE_ENV=development npm start
+
+# Windows 
+set NODE_ENV=development (command prompt)
+$env:NODE_ENV="development" (powershell)
+npm start
+```
+
 To exit the virtual environment:
 ```sh
 deactivate
 ```
-
-The Electron GUI in /gui should work for development after runing  `cd gui` and `npm install` and `NODE_ENV=development npm start` (Mac), or `set NODE_ENV=development` and `npm start` (Windows).
 
 ### Troubleshooting on Windows
 After running `npm start` on Windows but got error, 
@@ -45,8 +62,11 @@ at processTicksAndRejections (node:internal/process/task_queues:82:21)
 change the code `pythonChild = require('child_process').spawn('python3', [script, port])` in `main.js` to `pythonChild = require('child_process').spawn('python', [script, port])`.
 
 
-## Building
+## Building 
+
 The Python code needs to be built on its target platform using `pyinstaller`:
+
+(Install `pyinstaller` if not installed: `pip install pyinstaller`)
 
 `pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml;./config'` (Windows)
 
@@ -56,26 +76,74 @@ We need to include the config file when generating the bundle.
 
 (On Mac, this also builds a .app version of the Python code, which you'll actually want to delete -- just keep the folder of CLI tools.)
 
-After building the crawler, the GUI can be built from the `gui` subdirectory with:
+### Build for Development
 
-`electron-packager . --icon=resources/icon.ico` (Windows)
+#### MacOS 
 
-`electron-packager . --icon=resources/icon.icns` (Mac)
+After building the python code, the GUI can be built from the `gui` subdirectory with `electron-packager`:
+
+(Install `electron-packager` if not installed: `npm install --save-dev @electron/packager`)
+
+`electron-packager . --icon=resources/icon.icns`
+
+To build for development on Mac, don't need to create a new key and can ad-hoc code sign:
+
+`cd FRDR\ Encryption-darwin-x64/ && codesign --deep --force --verbose --sign - FRDR\ Encryption.app/`
+
+To package for install:
+
+`hdiutil create tmp.dmg -ov -volname "FRDREncryptionApplication" -fs HFS+ -srcfolder frdr-encryption-application-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDREncryptionApplication.dmg && rm tmp.dmg` (Mac)
+
+#### Windows
+
+##### Option 1: build with `electron-packager`
+After building the python code, the GUI can be built from the `gui` subdirectory with `electron-packager`:
+
+(Install `electron-packager` if not installed: `npm install --save-dev @electron/packager`)
+
+`electron-packager . --icon=resources/icon.ico`
+
+To package for install:
+`electron-installer-windows --src frdr-encryption-application-win32-x64/ --dest install/ --config config.json`
+
+##### Option 2: build with `electron-builder`
+
+Remove `"sign": "./windowsSign.js"` from the package.json file, and run command: 
+
+`npm run dist`
+
+### Build and Sign for Distribution
+
+#### Mac
+
+##### Method 1: Use electron-builder
+
+Change `teamId` in the package.json file, and run the command to package, sign and notarize the app.
+
+`APPLE_ID=[DEVELOPER APPLE ID] APPLE_APP_SPECIFIC_PASSWORD=[APP SPECIFIC PASSWORD] APPLE_TEAM_ID=[DEVELOPER TEAM ID] npm run dist`
+
+##### Method 2: Use @electron/osx-sign and @electron/notarize
+After building the python code, the GUI can be built from the `gui` subdirectory with `electron-packager`:
+
+`electron-packager . --icon=resources/icon.icns --asar --extra-resource=app_gui`
 
 On Mac, you can sign for distribution with `electron-osx-sign` and `electron-notarize-cli`, and you need to include the embedded Python binaries:
 
-`IFS=$'\n' && electron-osx-sign FRDR\ Encryption\ Application-darwin-x64/FRDR\ Encryption.app/ $(find FRDR\ Encryption-darwin-x64/FRDR\ Encryption.app/Contents/ -type f -perm -u+x) --identity='[DISTRIBUTION CERTIFICATE COMMON NAME]' --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
+`IFS=$'\n' && electron-osx-sign FRDR\ Encryption-darwin-x64/FRDR\ Encryption.app/ $(find FRDR\ Encryption-darwin-x64/FRDR\ Encryption.app/Contents/ -type f -perm -u+x) --identity='[DISTRIBUTION CERTIFICATE COMMON NAME]' --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
 
-`electron-notarize --bundle-id ca.frdr-dfdr.secure --username my.apple.id@example.com --password @keystore:AC_PASSWORD frdr-encryption-application-darwin-x64/frdr-encryption-application.app/`
+`APPLE_ID=[DEVELOPER APPLE ID] APPLE_APP_SPECIFIC_PASSWORD=[APP SPECIFIC PASSWORD] APPLE_TEAM_ID=[APPLE DEVELOPER TEAM ID] node ../codesign_scripts/notarize.js`
 
-To build for development on Mac, don't need to create a new key and can ad-hoc code sign 
-`cd FRDR\ Encryption-darwin-x64/ && codesign --deep --force --verbose --sign - FRDR\ Encryption.app/`
+#### Windows
+Set the path to your Host and client authentication certificate in SMCTL:
 
-Finally, to package for install:
+```
+set SM_HOST=<host URL>
+set SM_CLIENT_CERT_FILE=<P12 client authentication certificate file path>
+```
 
-`electron-installer-windows --src frdr-encryption-application-win32-x64/ --dest install/ --config config.json` (Windows)
+Run the command to build the app, make sure `"sign": "./windowsSign.js"` is included in the package.json file to sign the binaries. 
 
-`hdiutil create tmp.dmg -ov -volname "FRDREncryptionApplication" -fs HFS+ -srcfolder frdr-encryption-application-darwin-x64/ && hdiutil convert tmp.dmg -format UDZO -o FRDREncryptionApplication.dmg && rm tmp.dmg` (Mac)
+`npm run dist`
 
 ### Troubleshooting on Windows
 If found the following error on Windows, Requests is not working in PyInstaller packages because of missing file from charset_normalizer module.

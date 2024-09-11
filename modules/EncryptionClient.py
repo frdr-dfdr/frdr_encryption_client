@@ -89,6 +89,7 @@ class EncryptionClient(object):
             try:
                 # Generate checksums of each file in the directory
                 sums_fullpath = Util.generate_checksums(self._input)
+                queue.put(sums_fullpath)
                 
                 # compress the directory and encrypt the zip file
                 logger.info("Start to compress data.")
@@ -106,7 +107,7 @@ class EncryptionClient(object):
                 if sums_fullpath is not None and os.path.exists(sums_fullpath):
                     os.remove(sums_fullpath)
                 shutil.rmtree(bag_dir_parent)
-                raise Exception("Error in compressing and encrypting input directory")
+                raise Exception("Error in compressing and encrypting input directory") from e
         else:
             raise Exception("Please select a directory to encrypt.")
 
@@ -141,7 +142,6 @@ class EncryptionClient(object):
         shutil.rmtree(bag_dir_parent)
         queue.put(bag_output_path)
         logger.info("Encrypted package is moved from the temp directory {} to the output directory {}".format(bag_destination, bag_output_path))
-
         # save key
         self._dataset_key_manager.encrypt_key(
             self._person_key_manager.my_public_key)

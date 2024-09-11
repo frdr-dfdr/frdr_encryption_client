@@ -204,7 +204,7 @@ class Util(object):
         logger.info("Starting checksum generation")
         try:
             # Walk directory structure and generate checksums.
-            sums_filename = 'frdr-checksums-and-filetypes-client.md'
+            sums_filename = 'frdr-checksums-and-filetypes-client-' + time.strftime("%Y%m%d%H%M%S") + '.md'
             sums_fullpath = os.path.join(input_path, sums_filename)
             logger.info(f"Writing sums to {sums_fullpath}")
             if os.path.exists(sums_fullpath):
@@ -236,8 +236,8 @@ class Util(object):
                     hash_output_fp.write(f"**SHA256 Checksum:/Sommes de contrôle** {checksum} \n")
                     hash_output_fp.write(f"**Estimated File Type/Le fichier estimé types:** {format_text} \n\n")
             hash_output_fp.close()
-        except os.error as e:
-            logger.error("Problems with generating sums and types file.")
-            logger.exception(e)
-            raise os.error 
+        except Exception as e:
+            if sums_fullpath is not None and os.path.exists(sums_fullpath):
+                os.remove(sums_fullpath)
+            raise Exception("Problems with generating sums and types file.") from e
         return sums_fullpath

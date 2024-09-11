@@ -28,8 +28,20 @@ if (!gotTheLock) {
     });
 }
 
-const { updateElectronApp } = require('update-electron-app');
-updateElectronApp();
+// Auto Update
+const log = require("electron-log");
+if (process.platform === 'win32') {
+    const {autoUpdater}  = require('electron-updater');
+    autoUpdater.logger = log;
+    autoUpdater.checkForUpdatesAndNotify();
+}
+
+if (process.platform === 'darwin') {
+    const { updateElectronApp } = require('update-electron-app');
+    updateElectronApp({
+        logger: log
+    });
+}
 
 const openAboutWindow = require('electron-about-window').default;
 
@@ -59,8 +71,19 @@ const getScriptPath = () => {
         return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
     }
     if (process.platform === 'win32') {
-        return path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE + '.exe')
+        const scriptPath = process.env.NODE_ENV === 'development' 
+            ? path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE + '.exe')
+            : path.join(process.resourcesPath, PY_APP_GUI_FOLDER, PY_MODULE + '.exe')
+        return scriptPath;
     }
+
+    if (process.platform === 'darwin') {
+        const scriptPath = process.env.NODE_ENV === 'development' 
+            ? path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE)
+            : path.join(process.resourcesPath, PY_APP_GUI_FOLDER, PY_MODULE)
+        return scriptPath;
+    }
+
     return path.join(__dirname, PY_APP_GUI_FOLDER, PY_MODULE)
 };
 
