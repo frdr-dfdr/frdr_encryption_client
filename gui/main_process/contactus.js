@@ -17,9 +17,8 @@
  *   along with FRDR Encryption Application. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const {ipcMain, BrowserWindow} = require('electron');
+const {ipcMain, shell} = require('electron');
 
 ipcMain.on('contact-us', (_event, url) => {
-  const win = new BrowserWindow({width: 800, height: 600});
-  win.loadURL(url);  
+  shell.openExternal(url);
 });

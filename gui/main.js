@@ -122,6 +122,11 @@ function createWindow() {
         slashes: true
     }));
 
+    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: 'deny' };
+      });
+    
     // Load the login page when user is unauthenticated.
     ipcMain.on("unauthenticated", (_event) => {
         mainWindow.loadURL(require('url').format({
