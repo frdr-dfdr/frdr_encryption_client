@@ -42,7 +42,7 @@
     "app-navbar-locale-french": "French",
 
     "app-encrypt-title": "Encrypt Dataset",
-    "app-encrypt-info": "To deposit access-limited data on FRDR, you must create an encrypted data package. Each deposit may contain only one encrypted package. Place any restricted-use file(s) you intend to deposit in one “top-level” directory. This directory may contain many files and subdirectories.",
+    "app-encrypt-info": "To deposit access-limited data on FRDR, you must create an encrypted data package. Each deposit may contain only one encrypted package. Please put the restricted-use file(s) or folders you intend to deposit in one “top-level” directory, and ensure the files are not compressed (i.e., extract .zip or .gz files).",
     "app-encrypt-input": "Dataset Directory",
     "app-encrypt-input-tooltip": "Select the top-level directory that contains the data file(s) you want to encrypt.",
     "app-encrypt-input-select": "Select Directory",
