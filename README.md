@@ -74,7 +74,7 @@ The Python code needs to be built on its target platform using `pyinstaller`:
 
 We need to include the config file when generating the bundle.
 
-(On Mac, this also builds a .app version of the Python code, which you'll actually want to delete -- just keep the folder of CLI tools.)
+(On Mac, this also builds a .app version of the Python code, which you'll actually want to delete -- just keep the folder of CLI tools. Run this command: `rm -rf ./gui/app_gui.app/`)
 
 ### Build for Development
 
