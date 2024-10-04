@@ -1,5 +1,5 @@
 # App configuration
-VERSION: "0.3.5"
+VERSION: "0.3.4"
 EXCLUDED_FILES:
   [
     ".*",
