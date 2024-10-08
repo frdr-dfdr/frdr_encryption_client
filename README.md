@@ -150,10 +150,6 @@ The **Grant Access** menu option allows you to grant access to a package's encry
 
 ### As Requester
 
-![shares](doc/img/request_access.png) 
-
-You need **Request Access** to retrieve your uuid on key server when you fill out the access request form for a sensitive dataset on FRDR.
-
 ![decrypt](doc/img/decrypt.png)
 
 The **Decrypt** menu option allows you to decrypt an encrypted package for access. Assuming you've already downloaded the package, clicking `Decrypt Data` will retrieve its encrypted dataset key from a Vault API endpoint URL (which will be normally be provided to you upon acceptance of an access request), decrypt the key with your private key (saved on your local machine) and then decrypt the package with the dataset key. You should only decrypt packages on trusted computers, as their contents may be very sensitive.
