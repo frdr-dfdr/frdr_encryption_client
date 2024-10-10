@@ -1,5 +1,5 @@
 # App configuration
-VERSION: "0.3.4"
+VERSION: "1.0.0"
 EXCLUDED_FILES:
   [
     ".*",
@@ -22,11 +22,11 @@ APP_LOG_FILENAME: "frdr-encryption-application_log.txt"
 GLOBUS_DATA_PUBLICATION_CLIENT_ID: "7dbc22b3-60c1-4e75-b148-3ee89f95792d"
 GLOBUS_DATA_PUBLICATION_CLIENT_NAME: "DataPublication Client v0.1"
 GLOBUS_LOGOUT_URL: "https://auth.globus.org/v2/web/logout"
-FRDR_API_BASE_URL: "https://test.frdr.ca/v1/api"
+FRDR_API_BASE_URL: "https://www.frdr-dfdr.ca/v1/api"
 FRDR_API_LOGIN_TIMEOUT: 60
-FRDR_PROFILE_URL: "https://test.frdr.ca/repo/settings/sensitive"
-FRDR_CONTACTUS_URL: "https://test.frdr.ca/repo/contactus?locale="
-FRDR_DEPOSIT_DASHBOARD_URL: "https://test.frdr.ca/repo/PublishDashboard"
+FRDR_PROFILE_URL: "https://www.frdr-dfdr.ca/repo/settings/sensitive"
+FRDR_CONTACTUS_URL: "https://www.frdr-dfdr.ca/repo/contactus?locale="
+FRDR_DEPOSIT_DASHBOARD_URL: "https://www.frdr-dfdr.ca/repo/PublishDashboard"
 
 # Dataset key server configuration
 VAULT_DATASET_KEY_PATH: "dataset"
