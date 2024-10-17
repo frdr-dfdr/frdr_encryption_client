@@ -71,7 +71,7 @@
     "app-grant-access-done-title": "Access Granted",
     "app-grant-access-error": "Error granting access. $1",
     "app-grant-access-expire": "Access Expiration Date",
-    "app-grant-access-expire-tooltip": "Your approval to is time-sensitive. The applicant must download and decrypt the data before $1.",
+    "app-grant-access-expire-tooltip": "Your approval is time-sensitive. The applicant must download and decrypt the data before $1.",
     "app-grant-access-find-dataset-error": "Error finding the dataset in FRDR. Please ensure the Dataset ID you included on the Grant Access page is correct. You can find the Dataset ID in the access request email sent by FRDR. \n$1.",
     "app-grant-access-find-user-error": "Error finding the user in Vault. Please ensure the Requester ID you included on the Grant Access page is correct. You can find the Requester ID in the access request email sent by FRDR. \n$1.",
     "app-grant-access-requester": "Requester ID",
