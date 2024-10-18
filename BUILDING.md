@@ -6,7 +6,7 @@ The Python code needs to be built on its target platform using `pyinstaller`:
 
 (Install `pyinstaller` if not installed: `pip install pyinstaller`)
 
-`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml;./config'` (Windows)
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config'` (Windows)
 
 `pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config'` (Mac)
 
