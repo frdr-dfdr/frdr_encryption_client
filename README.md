@@ -4,7 +4,7 @@ FRDR Encryption Application allows users to encrypt dataset saved on their local
 
 ## Running
 
-If you just want to download and run the full application on MacOS or Windows, please see the "Releases" link.
+If you just want to download and run the full application on MacOS or Windows, please see the [Releases](https://github.com/frdr-dfdr/frdr_encryption_client/releases) section.
 
 ## Running from Command Line
 
