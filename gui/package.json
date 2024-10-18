@@ -31,7 +31,7 @@
   "author": "Digital Research Alliance of Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)",
   "devDependencies": {
     "@electron/notarize": "^2.4.0",
-    "@electron/packager": "^18.3.4",
+    "@electron/packager": "^18.3.5",
     "electron": "^31.2.1",
     "electron-builder": "^24.13.3"
   },
@@ -42,7 +42,9 @@
       "artifactName": "${name}-${platform}-${arch}-${version}.${ext}",
       "icon": "resources/icon.ico",
       "sign": "../codesign_scripts/windowsSign.js",
-      "signingHashAlgorithms": ["sha256"]
+      "signingHashAlgorithms": [
+        "sha256"
+      ]
     },
     "dmg": {
       "title": "${productName} ${version}",
@@ -66,14 +68,17 @@
       ]
     },
     "mac": {
-      "target": ["dmg","zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "artifactName": "${name}-${platform}-${arch}-${version}.${ext}",
       "icon": "resources/icon.icns",
       "hardenedRuntime": true,
       "entitlements": "entitlements.plist",
       "entitlementsInherit": "entitlements.plist",
       "notarize": {
-        "teamId": "CHANGE ME: FRDR DEVELOPER TEAM ID"
+        "teamId": "CHANGE ME: DEVELOPER APPLE TEAM ID"
       }
     },
     "asar": true,
