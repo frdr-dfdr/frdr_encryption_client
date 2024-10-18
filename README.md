@@ -8,7 +8,7 @@ If you just want to download and run the full application on MacOS or Windows, p
 
 ## Running from Command Line
 
-Python 3 is required to run the FRDR Encryption Application from the command line. Ensure that the output of `python3 --version` shows 3.6 or higher.  
+Python 3.8 is required to run the FRDR Encryption Application from the command line. Ensure that the output of `python3 --version` shows 3.8 or higher.  
 
 Run inside a virtual environment:
 ```sh
