@@ -142,6 +142,7 @@ cython_debug/
 gui/FRDR-Crypto.dmg
 gui/FRDR-Encryption-Client.dmg
 gui/frdr-encryption-application-darwin-x64/
+gui/FRDR Encryption-darwin-arm64/
 gui/app_gui/
 gui/frdr-encryption-application-win32-x64/
 gui/install/
