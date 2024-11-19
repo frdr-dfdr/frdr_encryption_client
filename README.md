@@ -8,7 +8,7 @@ If you want to download and run the full application on MacOS or Windows, please
 
 ## Command Line Usage
 
-Please see [COMMANDLINE](https://github.com/frdr-dfdr/frdr_encryption_client/blob/master/doc/COMMANDLINE.md).
+Please see [Command Line Usage](https://github.com/frdr-dfdr/frdr_encryption_client/blob/master/doc/COMMANDLINE.md).
 
 ## Developers
 
