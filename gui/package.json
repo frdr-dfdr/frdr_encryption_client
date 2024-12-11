@@ -1,7 +1,7 @@
 {
   "name": "frdr-encryption-application",
   "productName": "FRDR Encryption",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "homepage": "https://github.com/frdr-dfdr/frdr_encryption_client",
   "main": "main.js",
   "description": "A local application to encrypt and decrypt data.",

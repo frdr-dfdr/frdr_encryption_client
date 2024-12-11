@@ -3,7 +3,7 @@
         "authors": [
             "Digital Research Alliance of Canada <support@frdr.ca> (https://www.frdr-dfdr.ca)"
         ],
-        "last-updated": "2024-09-06",
+        "last-updated": "2024-12-11",
         "locale": "en"
     },
     "app-cancel-btn": "Cancel",
@@ -54,7 +54,7 @@
     "app-encrypt-selected": "Selected: $1",
     "app-encrypt-title": "Encrypt Dataset",
     "app-footer-copyright": "© 2024 Digital Research Alliance of Canada",
-    "app-footer-version": "FRDR Encryption Application 0.4.0",
+    "app-footer-version": "FRDR Encryption Application 0.4.1",
     "app-get-entity-id-error": "Error getting user entity id on Vault. \n$1.",
     "app-get-entity-id-from-frdr-error": "Your Vault ID is not retrieved from FRDR successfully. Please go to Settings page and make sure it is set correctly on FRDR",
     "app-get-entity-name-error": "Error getting user email on Vault. \n$1.",

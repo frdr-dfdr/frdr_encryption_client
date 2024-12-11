@@ -29,6 +29,10 @@ if (!gotTheLock) {
 }
 
 // Auto Update
+
+// Disabled for demo version
+
+/*
 const log = require("electron-log");
 if (process.platform === 'win32') {
     const {autoUpdater}  = require('electron-updater');
@@ -42,6 +46,7 @@ if (process.platform === 'darwin') {
         logger: log
     });
 }
+*/
 
 const openAboutWindow = require('electron-about-window').default;
 
