@@ -10,15 +10,15 @@ These instructions are for repository owners interested in building and deployin
 
 1. Encrypt
 
-* The depositor logs into the encryption app
-* The depositor uses the encryption app to encrypt the source data
+* The submitter logs into the encryption app
+* The submitter uses the encryption app to encrypt the source data
 
 2. Deposit
 
-* The depositor logs into the data repository
-* The depositor starts a new dataset submission
-* The depositor supplies all relevant metadata for the dataset
-* The depositor uploads the encrypted data package
+* The submitter logs into the data repository
+* The submitter starts a new dataset submission
+* The submitter supplies all relevant metadata for the dataset
+* The submitter uploads the encrypted data package
 * The repository curation process is executed and the dataset is published
 
 3. Request access
@@ -29,12 +29,12 @@ These instructions are for repository owners interested in building and deployin
 
 4. Email notification
 
-* The depositor receives email that the requester wants access
-* The depositor reviews all documentation and signs the data access agreement
+* The submitter receives email that the requester wants access
+* The submitter reviews all documentation and signs the data access agreement
 
 5. Grant access to encrypted data
 
-* The depositor grants the requester access to the encrypted data package within the repository
+* The submitter grants the requester access to the encrypted data package within the repository
 
 ## Related Documents
 
