@@ -25,9 +25,9 @@ Users need to log into the key server (Hashicorp Vault) first before using the a
 
 ![login](doc/img/login.png)
 
-You can use the app as a despostior or a requester. As a depositor, you can encrypt a dataset and grant access of the dataset's key to other users. As a requester, you can generate access request and decrypt encrypted packages downloaded from FRDR. 
+You can use the app as a despostior or a requester. As a submitter, you can encrypt a dataset and grant access of the dataset's key to other users. As a requester, you can generate access request and decrypt encrypted packages downloaded from FRDR. 
 
-### As Depositor
+### As Submitter
 
 ![encrypt](doc/img/encrypt.png)
 

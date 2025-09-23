@@ -54,7 +54,7 @@ public class RestAPI
         if (apiUser == null) {
             throw new AuthorizeException("Authorization credentials were not supplied or expired");
         } else if (!apiUser.equals(reqSubmitter) && !apiUser.equals(reqRequester) && !AuthorizeManager.isStaff(context)) {
-            throw new AuthorizeException("Authorization denied - you must be the depositor or requester to view this requestitem");
+            throw new AuthorizeException("Authorization denied - you must be the submitter or requester to view this requestitem");
         }
 
         return req;
@@ -98,7 +98,7 @@ public class RestAPI
         if (apiUser == null) {
             throw new AuthorizeException("Authorization credentials were not supplied or expired");
         } else if (status.equals(RequestItem.STATUS_PENDING_WITH_DEPOSITOR) && !apiUser.equals(itemSubmitter) && !AuthorizeManager.isStaff(context)) {
-            throw new AuthorizeException("Authorization denied - you must be the depositor to update this requestitem");
+            throw new AuthorizeException("Authorization denied - you must be the submitter to update this requestitem");
         } else if (status.equals(RequestItem.STATUS_GRANTED) && !apiUser.equals(reqRequester) && !AuthorizeManager.isStaff(context)) {
             throw new AuthorizeException("Authorization denied - you must be the requester to update this requestitem");
         }
