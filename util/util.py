@@ -64,11 +64,24 @@ class Util(object):
     @classmethod
     def get_key_dir(cls, subdir):
         home = str(Path.home())
-        local_key_dir = config.LOCAL_KEY_DIR_NAME + "_" + urlparse(config.VAULT_HOSTNAME).hostname
-        key_dir = os.path.join(home, local_key_dir, subdir)
-        if not os.path.exists(key_dir):
-            Util.make_dir(key_dir)
-        return key_dir
+        
+        # New directory structure using / separator
+        hostname = urlparse(config.VAULT_HOSTNAME).hostname
+        new_key_dir = os.path.join(home, config.LOCAL_KEY_DIR_NAME, hostname, subdir)
+
+        # Old directory structure using _ connector
+        old_local_key_dir = config.LOCAL_KEY_DIR_NAME + "_" + hostname
+        old_key_dir = os.path.join(home, old_local_key_dir, subdir)
+
+        # Use old directory if it exists
+        if os.path.exists(old_key_dir):
+            return old_key_dir
+    
+        # Otherwise use use new directory structure
+        if not os.path.exists(new_key_dir):
+            Util.make_dir(new_key_dir)
+
+        return new_key_dir
 
     @classmethod
     def check_dir_exists(cls, path):
