@@ -2,6 +2,11 @@
 path "secret/data/dataset/{{identity.entity.id}}/*" {
     capabilities = [ "create", "update", "read", "delete", "list" ]
 }
+
+# Grant create permissions on all dataset paths for ownership transfer
+path "secret/data/dataset/*" {
+    capabilities = [ "create"]
+}
 # Grant permissions on user specific path for public key management
 path "secret/data/public_key/{{identity.entity.id}}" {
     capabilities = [ "create", "update", "read", "delete", "list" ]

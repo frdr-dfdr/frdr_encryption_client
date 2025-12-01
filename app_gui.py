@@ -209,6 +209,27 @@ class EncryptionClientGui(object):
         except Exception as e:
             self._logger.error(e, exc_info=True)
             return (False, str(e))
+        
+    def transfer_ownership(self, dataset_uuid, new_owner_uuid, expire_date=None):
+        try:
+            if expire_date is None:
+                expire_date = (datetime.date.today() + datetime.timedelta(days=30*6)).strftime("%Y-%m-%d")
+            
+            # TODO: we need some workflow on FRDR, verify there is such request
+            # self._frdr_api_client.verify_requestitem_grant_access(dataset_uuid, new_owner_uuid)
+            dataset_key_manager = DatasetKeyManager(self._vault_client)
+            person_key_manager = PersonKeyManager(self._vault_client)
+            encryptor = EncryptionClient(
+                dataset_key_manager, person_key_manager)
+            encryptor.transfer_ownership(new_owner_uuid, dataset_uuid)
+            # TODO: we need to send some data back to FRDR to finish the workflow
+            # data = {"expires": expire_date, "vault_dataset_id": dataset_uuid,
+            #         "vault_requester_id": new_owner_uuid}
+            # self._frdr_api_client.update_requestitem_grant_access(data)
+            return (True, None)
+        except Exception as e:
+            self._logger.error(e, exc_info=True)
+            return (False, str(e))
     
     def verify_local_keys(self):
         person_key_manager = PersonKeyManager(self._vault_client)

@@ -229,6 +229,34 @@ class EncryptionClient(object):
             path_on_vault, expiry_date)
         self._dataset_key_manager.save_key(path_on_vault)
 
+    def transfer_ownership(self, new_owner_entity_id, dataset_uuid):
+        """Share the dataset key to another user by decrypting the key with the 
+           owner's private key first then encrypting it with the requester's public key 
+
+
+        Args:
+            new_owner_entity_id (string): The new owner's vault user ID
+            dataset_uuid (string): The unique id for the dataset 
+        """
+
+        # read encrypted data key from Vault
+        encrypted_data_key_path = "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid])
+        self._dataset_key_manager.read_key(encrypted_data_key_path)
+
+        # decrypt the encrypted data key with the original depositor private key
+        private_key_path = os.path.join(Util.get_key_dir(
+            self._dataset_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
+        depositor_private_key = self._person_key_manager.read_private_key(
+            private_key_path)
+        self._dataset_key_manager.decrypt_key(depositor_private_key)
+
+        # encrypt the encrypted data key with the new owner public key
+        new_owner_public_key = self._person_key_manager.read_public_key_from_vault(
+            new_owner_entity_id)
+        self._dataset_key_manager.encrypt_key(new_owner_public_key)
+        path_on_vault = "/".join([config.VAULT_DATASET_KEY_PATH, new_owner_entity_id, dataset_uuid])
+        self._dataset_key_manager.save_key(path_on_vault)
+
     # TODO: keep for future feature
     def list_shares(self):
         members = {}
