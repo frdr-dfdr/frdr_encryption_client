@@ -237,6 +237,7 @@ class FRDRAPIClient():
                 params = parse.parse_qs(self.path.split('?')[1])
                 self.server.token = params['code'][0]
                 self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.end_headers()
                 self.wfile.write(str.encode(
                     "<div>{}</div>".format(success_msg)))
