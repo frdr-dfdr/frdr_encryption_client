@@ -62,7 +62,28 @@
       </span>
     </div>
 
-    <!-- Option 1: View Key Location -->
+    <!-- Option 1: Export to Password-Protected ZIP -->
+    <div class="row">
+      <div class="col-12">
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-export-key-file-title"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-export-key-file-desc">
+        </p>
+        <button 
+          class="btn btn-success mt-2" 
+          type="button" 
+          id="export-to-file-btn" 
+          data-toggle="modal" 
+          data-target="#passwordModal"
+          data-i18n="app-export-key-export-file">
+        </button>
+      </div>
+    </div>
+
+    <hr/>
+    
+    <!-- Option 2: View Key Location -->
     <div class="row">
       <div class="col-12">
         <h4 class="mb-0">
@@ -96,7 +117,7 @@
 
     <hr/>
 
-    <!-- Option 2: Copy Key Content -->
+    <!-- Option 3: Copy Key Content -->
     <div class="row">
       <div class="col-12">
         <h4 class="mb-0">
@@ -129,26 +150,6 @@
       </div>
     </div>
 
-    <hr/>
-
-    <!-- Option 3: Export to Password-Protected ZIP -->
-    <div class="row">
-      <div class="col-12">
-        <h4 class="mb-0">
-          <label class="mb-0 font-weight-normal" data-i18n="app-export-key-file-title"></label>
-        </h4>
-        <p class="mb-0" data-i18n="app-export-key-file-desc">
-        </p>
-        <button 
-          class="btn btn-success mt-2" 
-          type="button" 
-          id="export-to-file-btn" 
-          data-toggle="modal" 
-          data-target="#passwordModal"
-          data-i18n="app-export-key-export-file">
-        </button>
-      </div>
-    </div>
   </div>
 
   <!-- Password Modal -->
