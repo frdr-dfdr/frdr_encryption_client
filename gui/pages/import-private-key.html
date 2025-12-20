@@ -52,11 +52,26 @@
   <!--end of Navigation bar-->
   
   <div class="container">
-    <h2 data-i18n="app-import-key-title">Import Private Key</h2> 
-    <p data-i18n="app-import-key-info">
-    </p>
+    <h2 data-i18n="app-import-key-title"></h2> 
+    <p data-i18n="app-import-key-info"></p>
 
-    <!-- Import from File Section -->
+    <!-- Option 1: Import from Protected ZIP (Recommended) -->
+    <div class="row">
+      <div class="col-12">
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-import-key-from-zip"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-import-key-from-zip-desc">
+        </p>
+        <button class="btn btn-success mt-2" type="button" id="import-from-zip-btn" data-i18n="app-import-key-select-and-import-zip">
+        </button>
+        <p class="d-inline ml-2 font-weight-bolder text-success" id="selected-zip-path"></p>
+      </div>
+    </div>
+
+    <hr/>
+
+    <!-- Option 2: Import from PEM File -->
     <div class="row">
       <div class="col-12">
         <h4 class="mb-0">
@@ -64,16 +79,15 @@
         </h4>
         <p class="mb-0" data-i18n="app-import-key-from-file-desc">
         </p>
-        <button class="btn btn-secondary" type="button" id="import-from-file-btn" data-i18n="app-import-key-select-file">
-          Select File
+        <button class="btn btn-secondary mt-2" type="button" id="import-from-file-btn" data-i18n="app-import-key-select-and-import-file">
         </button>
-        <p class="d-inline font-weight-bolder text-success" id="selected-file-path"></p>
+        <p class="d-inline ml-2 font-weight-bolder text-success" id="selected-file-path"></p>
       </div>
     </div>
 
     <hr/>
 
-    <!-- Import from Text Section -->
+    <!-- Option 3: Import from Text -->
     <div class="row">
       <div class="col-12">
         <h4 class="mb-0">
@@ -90,19 +104,62 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC...
 ...
 -----END PRIVATE KEY-----"
         ></textarea>
+        <button class="btn btn-secondary mt-2" type="button" id="import-from-text-btn" data-i18n="app-import-key-import-from-text">
+        </button>
       </div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="button">
-      <button class="btn btn-primary" type="button" id="import-btn" data-i18n="app-import-key-import-btn">
-        Import Key
-      </button>
-      <button class="btn btn-secondary ml-2" id="cancel-import-btn" data-i18n="app-import-key-cancel">
-        Cancel
+    <!-- Cancel Button -->
+    <div class="button mt-4">
+      <button class="btn btn-secondary" id="cancel-import-btn" data-i18n="app-import-key-cancel">
       </button>
     </div>
     <br/>
+  </div>
+
+  <!-- Password Modal for ZIP -->
+  <div class="modal fade" id="zipPasswordModal" tabindex="-1" role="dialog" aria-labelledby="zipPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="zipPasswordModalLabel" data-i18n="app-import-key-zip-password-title"></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p data-i18n="app-import-key-zip-password-desc">
+          </p>
+          
+          <div class="form-group">
+            <label for="zip-password" data-i18n="app-import-key-zip-password-label"></label>
+            <input 
+              type="password" 
+              class="form-control" 
+              id="zip-password" 
+              data-i18n="[placeholder]app-import-key-zip-password-placeholder"
+            >
+          </div>
+
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="show-zip-password-checkbox">
+            <label class="custom-control-label" for="show-zip-password-checkbox" data-i18n="app-import-key-show-password">
+            </label>
+          </div>
+
+          <!-- Error message area -->
+          <div id="zip-modal-error-message" class="alert alert-danger mt-3" role="alert" style="display: none;">
+            <span id="zip-modal-error-text"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" data-i18n="app-import-key-zip-cancel">
+          </button>
+          <button type="button" class="btn btn-success" id="confirm-import-zip-btn" data-i18n="app-import-key-zip-import">
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!--Footer-->

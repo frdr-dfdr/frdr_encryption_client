@@ -18,11 +18,102 @@
  */
 
 const {ipcMain, dialog} = require('electron');
-const fs = require('fs').promises;
 const {sendMessage} = require('../main.js');
+const Seven = require('node-7z');
+const sevenBin = require('7zip-bin');
+const path = require('path');
+const fs = require('fs').promises;
+const os = require('os');
 
-ipcMain.on('import-private-key-select-file', async (event) => {
-  
+// Select ZIP file
+ipcMain.on('import-private-key-select-zip', async (event) => {
+  try {
+    const result = await dialog.showOpenDialog({
+      title: 'Select Protected ZIP File',
+      properties: ['openFile'],
+      filters: [
+        { name: 'ZIP Files', extensions: ['zip'] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+      event.reply('notify-import-private-key-cancelled');
+      return;
+    }
+
+    const zipPath = result.filePaths[0];
+    event.reply('notify-import-private-key-zip-selected', zipPath);
+    
+  } catch (error) {
+    event.reply('notify-import-private-key-error', error.message);
+  }
+});
+
+ipcMain.on('import-private-key-from-zip', async (event, data) => {
+  try {
+    const { zipPath, password } = data;
+    
+    // Create a temporary directory for extraction
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'key-import-'));
+    
+    const extractStream = Seven.extractFull(zipPath, tempDir, {
+      password: password,
+      $bin: sevenBin.path7za
+    });
+    
+    extractStream.on('end', async () => {
+      try {
+        // Find .pem file in extracted files
+        const files = await fs.readdir(tempDir);
+        const pemFile = files.find(file => file.endsWith('.pem'));
+        
+        if (!pemFile) {
+          // Clean up
+          await fs.rm(tempDir, { recursive: true, force: true });
+          event.reply('notify-import-private-key-error', 'app-import-key-error-no-pem-in-zip');
+          return;
+        }
+        
+        const keyPath = path.join(tempDir, pemFile);
+        const keyContent = await fs.readFile(keyPath, 'utf8');
+        
+        // Clean up temp directory
+        await fs.rm(tempDir, { recursive: true, force: true });
+        
+        const { result } = await sendMessage("import_private_key_from_text", [keyContent]);
+        const success = result[0];
+        const message = result[1];
+        
+        if (success) {
+          event.reply('notify-import-private-key-success', message);
+        } else {
+          event.reply('notify-import-private-key-error', message);
+        }
+      } catch (error) {
+        await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
+        event.reply('notify-import-private-key-error', error.message);
+      }
+    });
+    
+    extractStream.on('error', async (err) => {
+      // Clean up
+      await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
+      
+      // Check if it's a password error
+      if (err.message.includes('Wrong password') || err.message.includes('Can not open encrypted archive')) {
+        event.reply('notify-import-private-key-error', 'app-import-key-error-wrong-password');
+      } else {
+        event.reply('notify-import-private-key-error', err.message);
+      }
+    });
+    
+  } catch (error) {
+    event.reply('notify-import-private-key-error', error.message);
+  }
+});
+
+ipcMain.on('import-private-key-select-and-import-file', async (event) => {
   try {
     const result = await dialog.showOpenDialog({
       title: 'Select Private Key File',
@@ -41,68 +132,31 @@ ipcMain.on('import-private-key-select-file', async (event) => {
     const keyPath = result.filePaths[0];
     event.reply('notify-import-private-key-file-selected', keyPath);
     
+    const { result: importResult } = await sendMessage("import_private_key_from_file", [keyPath]);
+    var success = importResult[0];
+    var message = importResult[1];
+    
+    if (success) {
+      event.reply('notify-import-private-key-success', message);
+    } else {
+      event.reply('notify-import-private-key-error', message);
+    }
+    
   } catch (error) {
     event.reply('notify-import-private-key-error', error.message);
   }
 });
 
-ipcMain.on('import-private-key', async (event, data) => {
-  
+ipcMain.on('import-private-key-from-text', async (event, keyText) => {
   try {
-    var hasFile = data.filePath !== null && data.filePath !== undefined;
-    var hasText = data.textContent !== null && data.textContent !== undefined;
+    const { result } = await sendMessage("import_private_key_from_text", [keyText]);
+    var success = result[0];
+    var message = result[1];
     
-    // Case 1: Only file provided
-    if (hasFile && !hasText) {
-      const { result } = await sendMessage("import_private_key_from_file", [data.filePath]);
-      var success = result[0];
-      var message = result[1];
-      
-      if (success) {
-        event.reply('notify-import-private-key-success', message);
-      } else {
-        event.reply('notify-import-private-key-error', message);
-      }
-    }
-    // Case 2: Only text provided
-    else if (!hasFile && hasText) {
-      const { result } = await sendMessage("import_private_key_from_text", [data.textContent]);
-      var success = result[0];
-      var message = result[1];
-      
-      if (success) {
-        event.reply('notify-import-private-key-success', message);
-      } else {
-        event.reply('notify-import-private-key-error', message);
-      }
-    }
-    // Case 3: Both file and text provided - need to verify they match
-    else if (hasFile && hasText) {
-      // Read the file content
-      const fileContent = await fs.readFile(data.filePath, 'utf8');
-      
-      // Normalize whitespace for comparison
-      const normalizeKey = (key) => key.trim().replace(/\s+/g, '\n');
-      const normalizedFile = normalizeKey(fileContent);
-      const normalizedText = normalizeKey(data.textContent);
-      
-      if (normalizedFile === normalizedText) {
-        const { result } = await sendMessage("import_private_key_from_file", [data.filePath]);
-        var success = result[0];
-        var message = result[1];
-        
-        if (success) {
-          event.reply('notify-import-private-key-success', message);
-        } else {
-          event.reply('notify-import-private-key-error', message);
-        }
-      } else {
-          event.reply('notify-import-private-key-error', 'app-import-key-error-mismatch');
-      }
-    }
-    // Case 4: Neither provided (shouldn't happen due to frontend validation)
-    else {
-      event.reply('notify-import-private-key-error', 'app-import-key-error-no-input');
+    if (success) {
+      event.reply('notify-import-private-key-success', message);
+    } else {
+      event.reply('notify-import-private-key-error', message);
     }
     
   } catch (error) {
