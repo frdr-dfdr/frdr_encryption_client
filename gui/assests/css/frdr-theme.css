@@ -1392,3 +1392,7 @@ input[type=number] {
   .navbar-nav { line-height: 26px; }
   .nav-item { background-color: white;padding-top: 8px; padding-bottom: 8px; }
 }
+
+.container {
+  padding-bottom: 80px;
+}

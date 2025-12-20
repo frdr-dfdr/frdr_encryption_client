@@ -1,0 +1,225 @@
+<!--
+ Copyright (c) 2025 Digital Research Alliance of Canada
+
+ This file is part of FRDR Encryption Application.
+
+ FRDR Encryption Application is free software: you can redistribute it
+ and/or modify it under the terms of the GNU General Public License as
+ published by the FRDR Encryption Application Software Foundation,
+ either version 3 of the License, or (at your option) any later version.
+
+ FRDR Encryption Application is distributed in the hope that it will be
+ useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with FRDR Encryption Application. If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>FRDR Encryption Application</title>
+  <script>window.jQuery = window.$ = require('jquery'); </script>
+  <script src="../assests/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/css/bootstrap-theme.min.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/css/frdr-theme.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/fonts/fontawesome-5.15.4/css/all.min.css" type="text/css" />
+  <script src="../assests/js/jquery_i18n/CLDRPluralRuleParser.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.messagestore.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.fallbacks.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.language.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.parser.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.bidi.js"></script>
+</head>
+
+<body>
+  <!--Navigation bar-->
+  <div id="nav-placeholder">
+  </div>
+
+  <script>
+  $(function(){
+    $("#nav-placeholder").load("../components/navbar.html");
+  });
+  </script>
+  <!--end of Navigation bar-->
+  
+  <div class="container">
+    <h2 data-i18n="app-export-key-title"></h2> 
+    <p data-i18n="app-export-key-info"></p>
+
+    <!-- Security Warning -->
+    <div class="alert alert-danger" role="alert">
+      <strong data-i18n="app-export-key-warning-title"></strong>
+      <span data-i18n="app-export-key-warning-text">
+      </span>
+    </div>
+
+    <!-- Option 1: View Key Location -->
+    <div class="row">
+      <div class="col-12">
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-export-key-location-title"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-export-key-location-desc">
+        </p>
+        <button class="btn btn-secondary" type="button" id="toggle-location-btn" data-i18n="app-export-key-show-location">
+        </button>
+      </div>
+    </div>
+
+    <div id="key-location" style="display: none; margin-top: 15px;">
+      <div class="row">
+        <div class="col-12">
+          <p class="mb-2"><strong data-i18n="app-export-key-location-label"></strong></p>
+          <div class="input-group">
+            <input type="text" class="form-control" id="key-location-path" readonly>
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" type="button" id="copy-location-btn" data-i18n="app-export-key-copy">
+                Copy
+              </button>
+              <button class="btn btn-outline-secondary" type="button" id="open-folder-btn" data-i18n="app-export-key-open-folder">
+                Open Folder
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr/>
+
+    <!-- Option 2: Copy Key Content -->
+    <div class="row">
+      <div class="col-12">
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-export-key-copy-title"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-export-key-copy-desc">
+        </p>
+        <button class="btn btn-secondary" type="button" id="reveal-key-btn" data-i18n="app-export-key-reveal">
+        </button>
+      </div>
+    </div>
+
+    <div id="key-content-section" style="display: none; margin-top: 15px;">
+      <div class="row">
+        <div class="col-12">
+          <textarea 
+            class="form-control" 
+            id="key-content-textarea" 
+            rows="8" 
+            readonly
+            style="font-family: monospace; font-size: 0.85rem;"
+          ></textarea>
+          <div class="mt-2">
+            <button class="btn btn-primary" type="button" id="copy-key-btn" data-i18n="app-export-key-copy-key">
+            </button>
+            <button class="btn btn-secondary ml-2" type="button" id="hide-key-btn" data-i18n="app-export-key-hide">
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr/>
+
+    <!-- Option 3: Export to Password-Protected ZIP -->
+    <div class="row">
+      <div class="col-12">
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-export-key-file-title"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-export-key-file-desc">
+        </p>
+        <button 
+          class="btn btn-success mt-2" 
+          type="button" 
+          id="export-to-file-btn" 
+          data-toggle="modal" 
+          data-target="#passwordModal"
+          data-i18n="app-export-key-export-file">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password Modal -->
+  <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="passwordModalLabel" data-i18n="app-export-key-modal-title"></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p data-i18n="app-export-key-modal-desc">
+          </p>
+          
+          <div class="form-group">
+            <label for="export-password" data-i18n="app-export-key-password-label"></label>
+            <input 
+              type="password" 
+              class="form-control" 
+              id="export-password" 
+              placeholder="Enter a strong password"
+              data-i18n="[placeholder]app-export-key-password-placeholder"
+            >
+            <small class="form-text text-muted" data-i18n="app-export-key-password-hint">
+            </small>
+          </div>
+          
+          <div class="form-group">
+            <label for="export-password-confirm" data-i18n="app-export-key-password-confirm-label"></label>
+            <input 
+              type="password" 
+              class="form-control" 
+              id="export-password-confirm" 
+              placeholder="Re-enter password"
+              data-i18n="[placeholder]app-export-key-password-confirm-placeholder"
+            >
+          </div>
+
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="show-password-checkbox">
+            <label class="custom-control-label" for="show-password-checkbox" data-i18n="app-export-key-show-password">
+            </label>
+          </div>
+
+          <!-- Error message area -->
+          <div id="modal-error-message" class="alert alert-danger mt-3" role="alert" style="display: none;">
+            <span id="modal-error-text"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" data-i18n="app-export-key-modal-cancel">
+          </button>
+          <button type="button" class="btn btn-success" id="confirm-export-btn" data-i18n="app-export-key-modal-export">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--Footer-->
+  <div id="footer-placeholder"></div>
+  <script>
+  $(function(){
+    $("#footer-placeholder").load("../components/footer.html");
+  });
+  </script>
+  <!--end of Footer-->  
+
+  <script src="../renderer_process/export_private_key.js" charset="utf-8"></script>
+
+</body>
+</html>

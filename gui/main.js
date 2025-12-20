@@ -155,16 +155,33 @@ function createWindow() {
     });
 
     // Load an error page when user is authenticated but local keys verification fails.
-    ipcMain.on("verification-failed", (_event, dialogOptions) => {
-        mainWindow.loadURL(require('url').format({
-            pathname: path.join(__dirname, 'pages/local-keys-error.html'),
-            protocol: 'file:',
-            slashes: true,
-        }))
-        mainWindow.webContents.on('did-finish-load', function() {
-            mainWindow.show();
-        });
-        dialog.showMessageBox(mainWindow, dialogOptions);
+
+    ipcMain.on("verification-failed", async (_event, dialogOptions) => {
+        try {
+            const result = await dialog.showMessageBox(mainWindow, dialogOptions);
+            
+            if (result.response === 0) {
+                // User clicked "Yes, Import Key"
+                await mainWindow.loadURL(require('url').format({
+                    pathname: path.join(__dirname, 'pages/import-private-key.html'),
+                    protocol: 'file:',
+                    slashes: true
+                }));
+            } else {
+                // User clicked "Cancel"
+                await mainWindow.loadURL(require('url').format({
+                    pathname: path.join(__dirname, 'pages/local-keys-error.html'),
+                    protocol: 'file:',
+                    slashes: true,
+                }));
+            }
+            
+            if (!mainWindow.isVisible()) {
+                mainWindow.show();
+            }
+        } catch (error) {
+            console.error('Error in verification-failed handler:', error);
+        }
     });
 
     mainWindow.on('close', (_event) => {

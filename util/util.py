@@ -31,6 +31,8 @@ import hashlib
 import time
 import pytz
 import magic
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 logger = logging.getLogger("frdr-encryption-application.util")
 
@@ -254,3 +256,50 @@ class Util(object):
                 os.remove(sums_fullpath)
             raise Exception("Problems with generating sums and types file.") from e
         return sums_fullpath
+
+    @classmethod
+    def verify_key_pair_match(cls, public_key, private_key):
+        """
+        Verify that a private key matches a public key.
+        :param public_key: Public key (string, bytes, or cryptography public key object)
+        :param private_key: Private key (string, bytes, or cryptography private key object)
+        :return: True if keys match, False otherwise
+        """
+        try:
+            
+            # Load private key if it's not already a key object
+            if isinstance(private_key, str):
+                private_key_obj = serialization.load_pem_private_key(
+                    private_key.encode('utf-8'),
+                    password=None,
+                    backend=default_backend()
+                )
+            elif isinstance(private_key, bytes):
+                private_key_obj = serialization.load_pem_private_key(
+                    private_key,
+                    password=None,
+                    backend=default_backend()
+                )
+            else:
+                private_key_obj = private_key
+            
+            # Load public key if it's not already a key object
+            if isinstance(public_key, str):
+                public_key_obj = serialization.load_pem_public_key(
+                    public_key.encode('utf-8'),
+                    backend=default_backend()
+                )
+            elif isinstance(public_key, bytes):
+                public_key_obj = serialization.load_pem_public_key(
+                    public_key,
+                    backend=default_backend()
+                )
+            else:
+                public_key_obj = public_key
+            
+            # Extract public key from private key
+            return public_key_obj == private_key_obj.public_key()
+            
+        except Exception as e:
+            logger.error(str(e))
+            return False

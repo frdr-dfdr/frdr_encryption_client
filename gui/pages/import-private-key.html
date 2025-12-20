@@ -1,0 +1,121 @@
+<!--
+ Copyright (c) 2025 Digital Research Alliance of Canada
+
+ This file is part of FRDR Encryption Application.
+
+ FRDR Encryption Application is free software: you can redistribute it
+ and/or modify it under the terms of the GNU General Public License as
+ published by the FRDR Encryption Application Software Foundation,
+ either version 3 of the License, or (at your option) any later version.
+
+ FRDR Encryption Application is distributed in the hope that it will be
+ useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with FRDR Encryption Application. If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>FRDR Encryption Application</title>
+  <script>window.jQuery = window.$ = require('jquery'); </script>
+  <script src="../assests/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/css/bootstrap-theme.min.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/css/frdr-theme.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/fonts/fontawesome-5.15.4/css/all.min.css" type="text/css" />
+  <script src="../assests/js/jquery_i18n/CLDRPluralRuleParser.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.messagestore.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.fallbacks.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.language.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.parser.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.bidi.js"></script>
+</head>
+
+<body>
+  <!--Navigation bar-->
+  <div id="nav-placeholder">
+  </div>
+
+  <script>
+  $(function(){
+    $("#nav-placeholder").load("../components/navbar-limited.html");
+  });
+  </script>
+  <!--end of Navigation bar-->
+  
+  <div class="container">
+    <h2 data-i18n="app-import-key-title">Import Private Key</h2> 
+    <p data-i18n="app-import-key-info">
+    </p>
+
+    <!-- Import from File Section -->
+    <div class="row">
+      <div class="col-12">
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-import-key-from-file"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-import-key-from-file-desc">
+        </p>
+        <button class="btn btn-secondary" type="button" id="import-from-file-btn" data-i18n="app-import-key-select-file">
+          Select File
+        </button>
+        <p class="d-inline font-weight-bolder text-success" id="selected-file-path"></p>
+      </div>
+    </div>
+
+    <hr/>
+
+    <!-- Import from Text Section -->
+    <div class="row">
+      <div class="col-12">
+        <h4 class="mb-0">
+          <label class="mb-0 font-weight-normal" data-i18n="app-import-key-from-text"></label>
+        </h4>
+        <p class="mb-0" data-i18n="app-import-key-from-text-desc">
+        </p>
+        <textarea 
+          class="form-control mt-3" 
+          id="key-text-input" 
+          rows="5" 
+          placeholder="-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC...
+...
+-----END PRIVATE KEY-----"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="button">
+      <button class="btn btn-primary" type="button" id="import-btn" data-i18n="app-import-key-import-btn">
+        Import Key
+      </button>
+      <button class="btn btn-secondary ml-2" id="cancel-import-btn" data-i18n="app-import-key-cancel">
+        Cancel
+      </button>
+    </div>
+    <br/>
+  </div>
+
+  <!--Footer-->
+  <div id="footer-placeholder"></div>
+  <script>
+  $(function(){
+    $("#footer-placeholder").load("../components/footer.html");
+  });
+  </script>
+  <!--end of Footer-->  
+
+  <script src="../renderer_process/import_private_key.js" charset="utf-8"></script>
+
+</body>
+
+</html>
