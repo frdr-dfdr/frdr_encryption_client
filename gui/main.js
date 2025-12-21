@@ -18,6 +18,7 @@
  */
 
 const { app, BrowserWindow, ipcMain, dialog, shell, Menu} = require("electron");
+const notifier = require('node-notifier');
 // Does not allow a second instance
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -337,6 +338,6 @@ app.on('will-quit', ev => {
 })
 
 function loadMainProcessJs() {
-    const files = glob.sync(path.join(__dirname, 'main_process/*.js'))
+    const files = glob.sync(path.join(__dirname, 'main_process', '*.js').replace(/\\/g, '/'));
     files.forEach((file) => { require(file) })
 }
