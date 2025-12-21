@@ -54,7 +54,7 @@
     "app-encrypt-selected": "Vous avez sélectionné: $1",
     "app-encrypt-title": "Crypter l'ensemble de données",
     "app-footer-copyright": "© 2024 Digital Research Alliance of Canada",
-    "app-footer-version": "FRDR Encryption Application 1.0.1",
+    "app-footer-version": "FRDR Encryption Application 1.1.0",
     "app-get-entity-id-error": "Erreur lors de la récupération de l’identifiant d’entité utilisateur dans Vault.\n$1.",
     "app-get-entity-id-from-frdr-error": "Votre identifiant Vault n’a pas été récupéré correctement depuis le DFDR. Veuillez retourner à la page Paramètres et vous assurer que celui-ci est correctement configuré dans le DFDR.",
     "app-get-entity-name-error": "Erreur lors de la récupération du courriel de l’utilisateur dans Vault.\n$1.",
