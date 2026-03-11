@@ -27,6 +27,8 @@ FRDR_API_LOGIN_TIMEOUT: 60
 FRDR_PROFILE_URL: "https://www.frdr-dfdr.ca/repo/settings/sensitive"
 FRDR_CONTACTUS_URL: "https://www.frdr-dfdr.ca/repo/contactus?locale="
 FRDR_DEPOSIT_DASHBOARD_URL: "https://www.frdr-dfdr.ca/repo/PublishDashboard"
+FRDR_SURVEY_URL_EN: "https://questionnaire.simplesurvey.com/f/s.aspx?s=f8cb7a1f-2d67-4f20-9ec7-b3095e944f95"
+FRDR_SURVEY_URL_FR: "https://questionnaire.simplesondage.com/f/s.aspx?s=f8cb7a1f-2d67-4f20-9ec7-b3095e944f95&lang=FR"
 
 # Dataset key server configuration
 VAULT_DATASET_KEY_PATH: "dataset"
