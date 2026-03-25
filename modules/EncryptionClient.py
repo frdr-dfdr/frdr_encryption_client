@@ -238,6 +238,7 @@ class EncryptionClient(object):
             new_owner_entity_id (string): The new owner's vault user ID
             dataset_uuid (string): The unique id for the dataset 
         """
+        logger = logging.getLogger('frdr-encryption-application.transfer-ownership')
 
         # read encrypted data key from Vault
         encrypted_data_key_path = "/".join([config.VAULT_DATASET_KEY_PATH, self._dataset_key_manager.get_vault_entity_id(), dataset_uuid])
@@ -255,7 +256,13 @@ class EncryptionClient(object):
             new_owner_entity_id)
         self._dataset_key_manager.encrypt_key(new_owner_public_key)
         path_on_vault = "/".join([config.VAULT_DATASET_KEY_PATH, new_owner_entity_id, dataset_uuid])
-        self._dataset_key_manager.save_key(path_on_vault)
+        # Check if key already exists by listing the path
+        existing_keys = self._dataset_key_manager.list(path_on_vault)
+        if existing_keys is None:
+            logger.info("Key already exists at path {}, skipping save.".format(path_on_vault))
+        else:
+            self._dataset_key_manager.save_key(path_on_vault)
+
 
     # TODO: keep for future feature
     def list_shares(self):

@@ -21,32 +21,49 @@ const {BrowserWindow, dialog, ipcMain} = require('electron');
 const path = require('path');
 const {sendMessage} = require('../main.js');
 
-ipcMain.on('transfer-ownership', async(event, new_owner, dataset, dialogOptions) => {
-  const {result} = await sendMessage("get_request_info", [new_owner, dataset]);
-  var entity_success = result[0];
-  var entity_result = result[1];
-  var dataset_success = result[2];
-  var dataset_result = result[3];
-  if (entity_success && entity_result != null && dataset_success) {
-    dialogOptions['message'] = dialogOptions['message'].replaceAll("$1", entity_result).replace("$2", dataset_result);
-    const response = dialog.showMessageBoxSync(dialogOptions);
-    if (response == 0) {
-      const {result: transfer_ownership_result} = await sendMessage("transfer_ownership", [dataset, new_owner])
-      var successTransferOwnership = transfer_ownership_result[0];
-      var errMessageTransferOwnership = transfer_ownership_result[1];
-      if (successTransferOwnership){
-        event.reply('notify-transfer-ownership-done');
-      } else {
-        event.reply('notify-transfer-ownership-error', errMessageTransferOwnership);
-      }
+ipcMain.on('get-pending-key-transfers', async (event) => {
+  try {
+    const {result} = await sendMessage("get_pending_key_transfers", []);
+    var success = result[0];
+    var transfers = result[1];
+    if (success) {
+      event.reply('notify-pending-key-transfers', transfers);
+    } else {
+      event.reply('notify-pending-key-transfers-error');
+    }
+  } catch (e) {
+    event.reply('notify-pending-key-transfers-error');
+  }
+});
+
+ipcMain.on('transfer-ownership', async (event, req, dialogOptions) => {
+  // req already has titles and IDs from the API, no need to call get_request_info
+  const isBulk = req.items.length > 1;
+  const datasetDisplay = isBulk
+    ? req.items.map(i => i.title || i.vault_dataset_id).join(', ')
+    : (req.items[0].title || req.items[0].vault_dataset_id);
+
+  dialogOptions['message'] = dialogOptions['message']
+    .replaceAll("$1", req.recipient_email)
+    .replace("$2", datasetDisplay)
+    .replaceAll("$3", req.recipient_name);
+
+  const response = dialog.showMessageBoxSync(dialogOptions);
+  if (response !== 0) return;
+
+  event.reply('notify-transfer-ownership-started', req.request_id);
+
+  // For bulk, transfer each dataset sequentially
+  for (const item of req.items) {
+    const {result} = await sendMessage("transfer_ownership", [req.request_id, item.vault_dataset_id, req.vault_recipient_id]);
+    var success = result[0];
+    var errMessage = result[1];
+    if (!success) {
+      event.reply('notify-transfer-ownership-error', req.request_id, errMessage);
+      return;
     }
   }
-  else if (!entity_success || entity_result == null){
-    event.reply('notify-get-entity-name-error', entity_result);
-  }
-  else if (!dataset_success){
-    event.reply('notify-get-dataset-title-error', dataset_result);
-  }
+  event.reply('notify-transfer-ownership-done');
 });
 
 ipcMain.on('transfer-ownership-done-show-next-step', (_event) => {

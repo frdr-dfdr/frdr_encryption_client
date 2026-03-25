@@ -56,41 +56,36 @@
   <div class="container">
     <h2 data-i18n="app-transfer-ownership-title"></h2>
     <p data-i18n="app-transfer-ownership-desc"></p>
-    <div class="row">
-      <div class="col-12">
-        <h4 class="mb-0">
-          <label class="mb-0 font-weight-normal" data-i18n="app-transfer-ownership-dataset"></label>
-        </h4>
-        <input class="form-control" name="dataset" id="dataset" type="text"/>
-      </div>
+
+    <!-- Loading state -->
+    <div id="loading-state" class="text-center py-4">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 text-muted" data-i18n="app-transfer-ownership-loading"></p>
     </div>
 
-    <br/>
-
-    <div class="row">
-      <div class="col-12">
-        <h4 class="mb-0">
-          <label class="mb-0 font-weight-normal" data-i18n="app-transfer-ownership-new-owner"></label>
-        </h4>
-        <input class="form-control" name="new_owner" id="new_owner" type="text"/>
-      </div>
+    <!-- Empty state -->
+    <div id="empty-state" class="text-center py-4" style="display:none;">
+      <p class="text-muted" data-i18n="app-transfer-ownership-empty"></p>
     </div>
 
-    <br/>
+    <!-- Error state -->
+    <div id="error-state" class="alert alert-danger" style="display:none;">
+      <span data-i18n="app-transfer-ownership-load-error"></span>
+    </div>
 
-    <!-- <div class="row">
-      <div class="col-12">
-        <h4 class="mb-0">
-          <label class="mb-0 font-weight-normal" data-i18n="app-transfer-ownership-expire"></label>
-        </h4>
-        <p class="mb-0" id="access-expire"></p>
+    <!-- Transfer request list -->
+    <div id="transfer-list" style="display:none;"></div>
+  </div>
+
+  <!-- Please Wait Modal -->
+  <div id="pleasewaitmodal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content w-100">
+        <div class="modal-body text-center p-4">
+          <div class="spinner-border text-primary mb-3" role="status"></div>
+          <h4 data-i18n="app-transfer-ownership-button-loading"></h4>
+        </div>
       </div>
-    </div> -->
-    
-    <br/><br/>
-
-    <div class="button">
-      <button class="btn btn-primary" type="submit" id="transfer_ownership" data-i18n="app-transfer-ownership-button"></button>
     </div>
   </div>
 
