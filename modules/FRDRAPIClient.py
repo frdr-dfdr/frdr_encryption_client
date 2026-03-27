@@ -38,6 +38,9 @@ class DataPublicationClient(BaseClient):
         BaseClient.__init__(self, base_url=base_url,
                             app_name=app_name, **kwargs)
         self._headers = {'Content-Type': 'application/json'}
+    
+    def list_pending_grant_access_requests(self):
+        return self.get('requestitem/grant-access/pending')
 
     def verify_requestitem_grant_access(self, dataset_uuid, requester_uuid):
         params = {
@@ -197,6 +200,23 @@ class FRDRAPIClient():
             [string]: REST API call response 
         """
         return self._pub_client.update_user_vault_id(data)
+    
+    def get_pending_grant_access_requests(self):
+        """Get all pending grant access requests for the current user.
+    
+        Returns:
+            list: Each requestitem contains vault_dataset_id, vault_requester_id,
+                dataset title, requester info, etc. (as returned by requestitemToJson)
+        """
+        try:
+            resp = self._pub_client.list_pending_grant_access_requests()
+            return list(resp)
+        except GlobusAPIError as e:
+            self._logger.error("Error getting pending grant access requests: {}".format(str(e)))
+            raise Exception(str(e))
+        except Exception as e:
+            self._logger.error("Error getting pending grant access requests: {}".format(str(e)))
+            raise Exception(str(e))
 
     def get_pending_key_transfers(self):
         """Get ownership transfer requests pending key transfer for current user.
