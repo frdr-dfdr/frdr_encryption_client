@@ -256,12 +256,16 @@ class EncryptionClient(object):
             new_owner_entity_id)
         self._dataset_key_manager.encrypt_key(new_owner_public_key)
         path_on_vault = "/".join([config.VAULT_DATASET_KEY_PATH, new_owner_entity_id, dataset_uuid])
-        # Check if key already exists by listing the path
-        existing_keys = self._dataset_key_manager.list(path_on_vault)
-        if existing_keys is None:
-            logger.info("Key already exists at path {}, skipping save.".format(path_on_vault))
-        else:
+        try:
             self._dataset_key_manager.save_key(path_on_vault)
+            logger.info("Key saved to {}".format(path_on_vault))
+        except hvac.exceptions.Forbidden:
+            # Create-only capability on an existing path returns 403
+            # Treat as "already existed", skip silently
+            logger.info("Key already exists at path {}, skipping transfer.".format(path_on_vault))
+        except Exception as e:
+            logger.error("Failed to transfer ownership to {}: {}".format(new_owner_entity_id, e))
+            raise
 
 
     # TODO: keep for future feature
