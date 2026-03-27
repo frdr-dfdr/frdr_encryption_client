@@ -53,7 +53,7 @@
   </script>
   <!--end of Navigation bar-->
 
-  <div class="container">
+  <div class="container pb-5">
     <h2 data-i18n="app-transfer-ownership-title"></h2>
     <p data-i18n="app-transfer-ownership-desc"></p>
 
@@ -64,17 +64,17 @@
     </div>
 
     <!-- Empty state -->
-    <div id="empty-state" class="text-center py-4" style="display:none;">
+    <div id="empty-state" class="text-center py-4 d-none">
       <p class="text-muted" data-i18n="app-transfer-ownership-empty"></p>
     </div>
 
     <!-- Error state -->
-    <div id="error-state" class="alert alert-danger" style="display:none;">
+    <div id="error-state" class="alert alert-danger d-none">
       <span data-i18n="app-transfer-ownership-load-error"></span>
     </div>
 
     <!-- Transfer request list -->
-    <div id="transfer-list" style="display:none;"></div>
+    <div id="transfer-list" class="d-none"></div>
   </div>
 
   <!-- Please Wait Modal -->

@@ -116,18 +116,18 @@ ipcRenderer.on('notify-pending-key-transfers', function (_event, transfers) {
   $('#loading-state').hide();
  
   if (!transfers || transfers.length === 0) {
-    $('#empty-state').show();
+    $('#empty-state').removeClass("d-none").show();
     return;
   }
  
   pendingTransfers = transfers;
   renderTransferList(transfers);
-  $('#transfer-list').show();
+  $('#transfer-list').removeClass("d-none").show();
 });
  
 ipcRenderer.on('notify-pending-key-transfers-error', function (_event) {
   $('#loading-state').hide();
-  $('#error-state').show();
+  $('#error-state').removeClass("d-none").show();
 });
  
 $(document).on('click', '.transfer-btn', function () {
