@@ -49,6 +49,10 @@ $('#import-from-text-btn').on("click", function(){
   ipcRenderer.send('import-private-key-from-text', keyText);
 });
 
+$('#clear-text-btn').on("click", function(){
+  document.getElementById('key-text-input').value = '';
+});
+
 // Show/hide ZIP password
 document.getElementById('show-zip-password-checkbox').addEventListener('change', (e) => {
   const passwordInput = document.getElementById('zip-password');
@@ -86,8 +90,6 @@ $('#cancel-import-btn').on("click", function(){
 
 ipcRenderer.on('notify-import-private-key-zip-selected', function (_event, zipPath) {
   selectedZipPath = zipPath;
-  document.getElementById('selected-zip-path').innerHTML = zipPath;
-  
   $('#zipPasswordModal').modal('show');
 });
 
@@ -101,7 +103,6 @@ ipcRenderer.on('notify-import-private-key-success', function (_event, message) {
   // Clear form
   document.getElementById('key-text-input').value = '';
   document.getElementById('selected-file-path').innerHTML = '';
-  document.getElementById('selected-zip-path').innerHTML = '';
   selectedZipPath = null;
   
   // Redirect after user clicks OK
@@ -123,7 +124,6 @@ ipcRenderer.on('notify-import-private-key-error', (event, errMessage) => {
 
 ipcRenderer.on('notify-import-private-key-cancelled', function (_event) {
   document.getElementById('selected-file-path').innerHTML = '';
-  document.getElementById('selected-zip-path').innerHTML = '';
   selectedZipPath = null;
 });
 

@@ -11,6 +11,31 @@ document.getElementById('show-password-checkbox').addEventListener('change', (e)
   confirmInput.type = type;
 });
 
+// Real-time mismatch feedback
+function checkPasswordMatch() {
+  const password = document.getElementById('export-password').value;
+  const confirm  = document.getElementById('export-password-confirm').value;
+  const msg = document.getElementById('password-mismatch-msg');
+  const confirmInput = document.getElementById('export-password-confirm');
+
+  if (confirm.length === 0) {
+    msg.style.display = 'none';
+    confirmInput.classList.remove('is-invalid');
+    return;
+  }
+
+  if (password !== confirm) {
+    msg.style.display = 'block';
+    confirmInput.classList.add('is-invalid');
+  } else {
+    msg.style.display = 'none';
+    confirmInput.classList.remove('is-invalid');
+  }
+}
+
+document.getElementById('export-password-confirm').addEventListener('input', checkPasswordMatch);
+document.getElementById('export-password').addEventListener('input', checkPasswordMatch);
+
 document.getElementById('toggle-location-btn').addEventListener('click', () => {
   const locationDiv = document.getElementById('key-location');
   const toggleBtn = document.getElementById('toggle-location-btn');
@@ -84,6 +109,8 @@ $('#passwordModal').on('hidden.bs.modal', function () {
   document.getElementById('export-password-confirm').value = '';
   document.getElementById('show-password-checkbox').checked = false;
   document.getElementById('modal-error-message').style.display = 'none';
+  document.getElementById('password-mismatch-msg').style.display = 'none';
+  document.getElementById('export-password-confirm').classList.remove('is-invalid');
 });
 
 // Confirm export from modal
@@ -104,11 +131,11 @@ document.getElementById('confirm-export-btn').addEventListener('click', () => {
     return;
   }
   
+  // Mismatch is surfaced in real time — block submit if still mismatched
   if (password !== confirmPassword) {
-    showModalError($.i18n('app-export-key-error-password-mismatch'));
     return;
   }
-  
+
   if (!isStrongPassword(password)) {
     showModalError($.i18n('app-export-key-error-password-weak'));
     return;

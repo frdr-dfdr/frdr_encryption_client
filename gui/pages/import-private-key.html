@@ -53,59 +53,111 @@
   
   <div class="container">
     <h2 data-i18n="app-import-key-title"></h2> 
-    <p data-i18n="app-import-key-info"></p>
 
-    <!-- Option 1: Import from Protected ZIP (Recommended) -->
-    <div class="row">
-      <div class="col-12">
-        <h4 class="mb-0">
-          <label class="mb-0 font-weight-normal" data-i18n="app-import-key-from-zip"></label>
-        </h4>
-        <p class="mb-0" data-i18n="app-import-key-from-zip-desc">
-        </p>
-        <button class="btn btn-success mt-2" type="button" id="import-from-zip-btn" data-i18n="app-import-key-select-and-import-zip">
-        </button>
-        <p class="d-inline ml-2 font-weight-bolder text-success" id="selected-zip-path"></p>
-      </div>
+    <div class="alert alert-info">
+      <p class="mb-1" data-i18n="app-import-key-info"></p>
     </div>
 
-    <hr/>
+    <h4 class="mt-4 mb-3" data-i18n="app-import-key-options-title"></h4>
 
-    <!-- Option 2: Import from PEM File -->
-    <div class="row">
-      <div class="col-12">
-        <h4 class="mb-0">
-          <label class="mb-0 font-weight-normal" data-i18n="app-import-key-from-file"></label>
-        </h4>
-        <p class="mb-0" data-i18n="app-import-key-from-file-desc">
-        </p>
-        <button class="btn btn-secondary mt-2" type="button" id="import-from-file-btn" data-i18n="app-import-key-select-and-import-file">
-        </button>
-        <p class="d-inline ml-2 font-weight-bolder text-success" id="selected-file-path"></p>
+    <div id="importAccordion">
+
+      <!-- Option 1: Import from Protected ZIP (open by default) -->
+      <div class="card mb-3">
+        <div class="card-header d-flex align-items-center justify-content-between alert-success"
+             data-toggle="collapse"
+             data-target="#collapseZip"
+             aria-expanded="true"
+             aria-controls="collapseZip"
+             style="cursor: pointer;">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-upload mr-2 text-success"></i>
+            <strong data-i18n="app-import-key-from-zip"></strong>
+          </div>
+          <div class="d-flex align-items-center">
+            <span class="badge badge-success mr-3" data-i18n="app-import-key-recommended-badge"></span>
+            <i class="fas fa-chevron-up chevron-icon"></i>
+          </div>
+        </div>
+        <div id="collapseZip" class="collapse show">
+          <div class="card-body">
+            <p class="text-muted" data-i18n="app-import-key-from-zip-desc"></p>
+            <button class="btn btn-secondary btn-block" type="button" id="import-from-zip-btn">
+              <i class="fas fa-upload mr-2"></i>
+              <span data-i18n="app-import-key-select-and-import-zip"></span>
+            </button>
+            <div class="alert alert-success mt-3 mb-0">
+              <strong data-i18n="app-import-key-why-recommended-title"></strong>
+              <ul class="mb-0 mt-1 pl-4">
+                <li data-i18n="app-import-key-why-recommended-1"></li>
+                <li data-i18n="app-import-key-why-recommended-2"></li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <hr/>
+      <!-- Option 2: Import from PEM File (collapsed by default) -->
+      <div class="card mb-3">
+        <div class="card-header d-flex align-items-center justify-content-between"
+             data-toggle="collapse"
+             data-target="#collapseFile"
+             aria-expanded="false"
+             aria-controls="collapseFile"
+             style="cursor: pointer;">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-file-alt mr-2"></i>
+            <span data-i18n="app-import-key-from-file"></span>
+          </div>
+          <i class="fas fa-chevron-down chevron-icon"></i>
+        </div>
+        <div id="collapseFile" class="collapse">
+          <div class="card-body">
+            <p class="text-muted" data-i18n="app-import-key-from-file-desc"></p>
+            <button class="btn btn-secondary btn-block" type="button" id="import-from-file-btn">
+              <i class="fas fa-file-alt mr-2"></i>
+              <span data-i18n="app-import-key-select-and-import-file"></span>
+            </button>
+            <p class="mt-2 mb-0 font-weight-bold text-success" id="selected-file-path"></p>
+          </div>
+        </div>
+      </div>
 
-    <!-- Option 3: Import from Text -->
-    <div class="row">
-      <div class="col-12">
-        <h4 class="mb-0">
-          <label class="mb-0 font-weight-normal" data-i18n="app-import-key-from-text"></label>
-        </h4>
-        <p class="mb-0" data-i18n="app-import-key-from-text-desc">
-        </p>
-        <textarea 
-          class="form-control mt-3" 
-          id="key-text-input" 
-          rows="5" 
-          placeholder="-----BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC...
-...
------END PRIVATE KEY-----"
-        ></textarea>
-        <button class="btn btn-secondary mt-2" type="button" id="import-from-text-btn" data-i18n="app-import-key-import-from-text">
-        </button>
+      <!-- Option 3: Import from Text (collapsed by default) -->
+      <div class="card mb-3">
+        <div class="card-header d-flex align-items-center justify-content-between"
+             data-toggle="collapse"
+             data-target="#collapseText"
+             aria-expanded="false"
+             aria-controls="collapseText"
+             style="cursor: pointer;">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-font mr-2"></i>
+            <span data-i18n="app-import-key-from-text"></span>
+          </div>
+          <i class="fas fa-chevron-down chevron-icon"></i>
+        </div>
+        <div id="collapseText" class="collapse">
+          <div class="card-body">
+            <p class="text-muted mb-1" data-i18n="app-import-key-from-text-desc"></p>
+            <p class="mb-3">
+              <strong class="text-danger" data-i18n="app-import-key-from-text-warning"></strong>
+            </p>
+            <label data-i18n="app-import-key-text-label"></label>
+            <textarea
+              class="form-control"
+              id="key-text-input"
+              rows="6"
+              data-i18n="[placeholder]app-import-key-text-placeholder"
+            ></textarea>
+            <div class="mt-3">
+              <button class="btn btn-primary mr-2" type="button" id="import-from-text-btn"
+                      data-i18n="app-import-key-import-from-text"></button>
+              <button class="btn btn-secondary" type="button" id="clear-text-btn"
+                      data-i18n="app-import-key-clear"></button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -114,7 +166,6 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC...
       <button class="btn btn-secondary" id="cancel-import-btn" data-i18n="app-import-key-cancel">
       </button>
     </div>
-    <br/>
   </div>
 
   <!-- Password Modal for ZIP -->
@@ -170,6 +221,16 @@ MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC...
   });
   </script>
   <!--end of Footer-->  
+
+  <script>
+    $('#collapseZip, #collapseFile, #collapseText').on('show.bs.collapse', function () {
+      $(this).prev('.card-header').find('.chevron-icon')
+        .removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    }).on('hide.bs.collapse', function () {
+      $(this).prev('.card-header').find('.chevron-icon')
+        .removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
+  </script>
 
   <script src="../renderer_process/import_private_key.js" charset="utf-8"></script>
 

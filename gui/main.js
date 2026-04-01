@@ -185,6 +185,14 @@ function createWindow() {
         }
     });
 
+    ipcMain.on('import-key', function() {
+        mainWindow.loadURL(require('url').format({
+            pathname: path.join(__dirname, 'pages/import-private-key.html'),
+            protocol: 'file:',
+            slashes: true
+        }));
+    });
+
     mainWindow.on('close', (_event) => {
         if (mainWindow != null) {
             mainWindow.hide();
