@@ -38,6 +38,9 @@ class DataPublicationClient(BaseClient):
         BaseClient.__init__(self, base_url=base_url,
                             app_name=app_name, **kwargs)
         self._headers = {'Content-Type': 'application/json'}
+    
+    def list_pending_grant_access_requests(self):
+        return self.get('requestitem/grant-access/pending')
 
     def verify_requestitem_grant_access(self, dataset_uuid, requester_uuid):
         params = {
@@ -60,7 +63,20 @@ class DataPublicationClient(BaseClient):
 
     def update_user_vault_id(self, data):
         return self.put('uservaultid', data=data, headers=self._headers)
+    
+    def list_pending_key_transfers(self):
+        return self.get('requestitem/transferownership/pending-key-transfer')
 
+    def verify_transfer_ownership(self, request_id, vault_dataset_id, vault_recipient_id):
+        params = {
+            "request_id": request_id,
+            "vault_dataset_id": vault_dataset_id,
+            "vault_recipient_id": vault_recipient_id
+        }
+        return self.get('requestitem/transferownership/verify', query_params=params)
+
+    def complete_transfer_ownership(self, data):
+        return self.put('requestitem/transferownership/complete', data=data, headers=self._headers)
 
 class FRDRAPIClient():
 
@@ -184,6 +200,61 @@ class FRDRAPIClient():
             [string]: REST API call response 
         """
         return self._pub_client.update_user_vault_id(data)
+    
+    def get_pending_grant_access_requests(self):
+        """Get all pending grant access requests for the current user.
+    
+        Returns:
+            list: Each requestitem contains vault_dataset_id, vault_requester_id,
+                dataset title, requester info, etc. (as returned by requestitemToJson)
+        """
+        try:
+            resp = self._pub_client.list_pending_grant_access_requests()
+            return list(resp)
+        except GlobusAPIError as e:
+            self._logger.error("Error getting pending grant access requests: {}".format(str(e)))
+            raise Exception(str(e))
+        except Exception as e:
+            self._logger.error("Error getting pending grant access requests: {}".format(str(e)))
+            raise Exception(str(e))
+
+    def get_pending_key_transfers(self):
+        """Get ownership transfer requests pending key transfer for current user.
+
+        Returns:
+            list: Each item contains request_id, transfer_mode, request_date,
+                recipient_email, vault_recipient_id, and items list
+                (each item has item_id, vault_dataset_id, title)
+        """
+        try:
+            resp = self._pub_client.list_pending_key_transfers()
+            return list(resp)
+        except GlobusAPIError as e:
+            self._logger.error("Error getting pending key transfers: {}".format(e.message))
+            raise Exception(e.message)
+        except Exception as e:
+            self._logger.error("Error getting pending key transfers: {}".format(e))
+            raise Exception(e)
+
+    def verify_transfer_ownership(self, request_id, vault_dataset_id, vault_recipient_id):
+        try:
+            self._pub_client.verify_transfer_ownership(request_id, vault_dataset_id, vault_recipient_id)
+        except GlobusAPIError as e:
+            self._logger.error("No pending key transfer request found. {}".format(e.message))
+            raise Exception("No pending key transfer request found. {}".format(e.message))
+        except Exception as e:
+            self._logger.error("No pending key transfer request found. {}".format(e))
+            raise Exception("No pending key transfer request found. {}".format(e))
+
+    def update_transfer_ownership_complete(self, data):
+        try:
+            self._pub_client.complete_transfer_ownership(data)
+        except GlobusAPIError as e:
+            self._logger.error("Error completing transfer ownership. {}".format(str(e)))
+            raise Exception(str(e))
+        except Exception as e:
+            self._logger.error("Error completing transfer ownership. {}".format(e))
+            raise Exception(e)
 
     def _load_auth_client(self):
         return NativeAppAuthClient(

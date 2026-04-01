@@ -193,6 +193,13 @@ class EncryptionClientGui(object):
             self._logger.info(str(e))
             return (False, str(e))
 
+    def get_pending_grant_access_requests(self):
+        try:
+            return (True, self._frdr_api_client.get_pending_grant_access_requests())
+        except Exception as e:
+            self._logger.error(e, exc_info=True)
+            return (False, str(e))    
+    
     def grant_access(self, dataset_uuid, requester_uuid, expire_date=None):
         try:
             if expire_date is None:
@@ -207,6 +214,35 @@ class EncryptionClientGui(object):
             data = {"expires": expire_date, "vault_dataset_id": dataset_uuid,
                     "vault_requester_id": requester_uuid}
             self._frdr_api_client.update_requestitem_grant_access(data)
+            return (True, None)
+        except Exception as e:
+            self._logger.error(e, exc_info=True)
+            return (False, str(e))
+        
+    def get_pending_key_transfers(self):
+        try:
+            return (True, self._frdr_api_client.get_pending_key_transfers())
+        except Exception as e:
+            self._logger.error(e, exc_info=True)
+            return (False, str(e))
+
+    def transfer_ownership(self, request_id, dataset_uuid, new_owner_uuid, expire_date=None):
+        try:
+            if expire_date is None:
+                expire_date = (datetime.date.today() + datetime.timedelta(days=30*6)).strftime("%Y-%m-%d")
+
+            # Verify there is a pending_key_transfer request on FRDR for this dataset + recipient
+            self._frdr_api_client.verify_transfer_ownership(request_id, dataset_uuid, new_owner_uuid)
+
+            dataset_key_manager = DatasetKeyManager(self._vault_client)
+            person_key_manager = PersonKeyManager(self._vault_client)
+            encryptor = EncryptionClient(dataset_key_manager, person_key_manager)
+            encryptor.transfer_ownership(new_owner_uuid, dataset_uuid)
+
+            # Notify FRDR that key transfer is complete; updates status to completed
+            data = {"request_id": request_id}
+            self._frdr_api_client.update_transfer_ownership_complete(data)
+
             return (True, None)
         except Exception as e:
             self._logger.error(e, exc_info=True)

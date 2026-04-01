@@ -54,27 +54,27 @@
   <!--end of Navigation bar-->
 
   <div class="container pb-5">
-    <h2 data-i18n="app-grant-access-title"></h2>
-    <p data-i18n="app-grant-access-desc"></p>
+    <h2 data-i18n="app-transfer-ownership-title"></h2>
+    <p data-i18n="app-transfer-ownership-desc"></p>
 
     <!-- Loading state -->
     <div id="loading-state" class="text-center py-4">
       <div class="spinner-border text-primary" role="status"></div>
-      <p class="mt-2 text-muted" data-i18n="app-grant-access-loading"></p>
+      <p class="mt-2 text-muted" data-i18n="app-transfer-ownership-loading"></p>
     </div>
 
     <!-- Empty state -->
     <div id="empty-state" class="text-center py-4 d-none">
-      <p class="text-muted" data-i18n="app-grant-access-empty"></p>
+      <p class="text-muted" data-i18n="app-transfer-ownership-empty"></p>
     </div>
 
     <!-- Error state -->
     <div id="error-state" class="alert alert-danger d-none">
-      <span data-i18n="app-grant-access-load-error"></span>
+      <span data-i18n="app-transfer-ownership-load-error"></span>
     </div>
 
-    <!-- Grant access request list -->
-    <div id="request-list" class="d-none"></div>
+    <!-- Transfer request list -->
+    <div id="transfer-list" class="d-none"></div>
   </div>
 
   <!-- Please Wait Modal -->
@@ -83,7 +83,7 @@
       <div class="modal-content w-100">
         <div class="modal-body text-center p-4">
           <div class="spinner-border text-primary mb-3" role="status"></div>
-          <h4 data-i18n="app-grant-access-button-loading"></h4>
+          <h4 data-i18n="app-transfer-ownership-button-loading"></h4>
         </div>
       </div>
     </div>
@@ -101,7 +101,7 @@
   </script>
   <!--end of Footer-->  
 
-  <script src="../renderer_process/grant_access.js" charset="utf-8"></script> 
+  <script src="../renderer_process/transfer_ownership.js" charset="utf-8"></script> 
 
 </body>
 

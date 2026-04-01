@@ -106,6 +106,9 @@ class DatasetKeyManager(object):
         self._key_encrypted = self._vault_client.retrive_key_from_vault(path)
         self._logger.info("key is read from vault")
 
+    def list(self, path):
+        return self._vault_client.list_secrets(path)
+    
     def decrypt_key(self, user_private_key):
         """Decrypt the encrypted dataset key using the user's private key.
 
