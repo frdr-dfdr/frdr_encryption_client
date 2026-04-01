@@ -183,6 +183,59 @@ class PersonKeyManager(object):
             if public_key_local != public_key_on_vault:
                 raise ValueError("The public key saved locally does not match the key saved on Vault.")
             return public_key_on_vault
+    
+    def get_public_key(self):
+        """Get the public key without creating a new key pair
+        
+        Returns:
+            bytes: The public key in PEM format (bytes), or None if not found
+        
+        Raises:
+            ValueError: If public keys don't match between vault and local
+        """
+        public_key_on_vault = self.read_public_key_from_vault(
+            self.get_vault_entity_id())
+        
+        # Convert vault public key to bytes if it exists
+        if public_key_on_vault is not None:
+            public_key_on_vault = Util.base64_to_byte(public_key_on_vault)
+        
+        public_key_path = os.path.join(Util.get_key_dir(
+            self.get_vault_entity_id()), config.LOCAL_PUBLIC_KEY_FILENAME)
+        
+        # Read local public key
+        public_key_local = None
+        if os.path.exists(public_key_path):
+            public_key_local = self.read_public_key_locally(public_key_path)
+            # Ensure it's bytes
+            if not isinstance(public_key_local, bytes):
+                public_key_local = public_key_local.encode('utf-8')
+        
+        # Case 1: Both vault and local have public keys
+        if public_key_on_vault is not None and public_key_local is not None:
+            if public_key_local != public_key_on_vault:
+                raise ValueError("The public key saved locally does not match the key saved on Vault.")
+            self._logger.info("Public key found on both vault and local, and they match")
+            return public_key_on_vault
+        
+        # Case 2: Only local has public key, vault doesn't
+        elif public_key_local is not None and public_key_on_vault is None:
+            self._logger.info("Public key found locally but not on vault, saving to vault")
+            # Convert to base64 for vault storage
+            public_key_local_base64 = Util.byte_to_base64(public_key_local)
+            self.save_public_key_to_vault(public_key_local_base64)
+            return public_key_local
+        
+        # Case 3: Only vault has public key, local doesn't
+        elif public_key_on_vault is not None and public_key_local is None:
+            self._logger.info("Public key found on vault but not locally, saving locally")
+            self.save_key_locally(public_key_on_vault, public_key_path)
+            return public_key_on_vault
+        
+        # Case 4: Neither vault nor local has public key
+        else:
+            self._logger.warning("No public key found on vault or locally")
+            return None
 
     @property
     def my_public_key(self):

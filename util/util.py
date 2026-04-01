@@ -18,7 +18,9 @@
 #
 import datetime
 import os
+import platform
 import re
+import shutil
 import sys
 import logging
 from base64 import b64encode, b64decode
@@ -31,6 +33,8 @@ import hashlib
 import time
 import pytz
 import magic
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 logger = logging.getLogger("frdr-encryption-application.util")
 
@@ -67,22 +71,36 @@ class Util(object):
         
         # New directory structure using / separator
         hostname = urlparse(config.VAULT_HOSTNAME).hostname
+        
+        # New hidden directory structure
         new_key_dir = os.path.join(home, config.LOCAL_KEY_DIR_NAME, hostname, subdir)
-
-        # Old directory structure using _ connector
-        old_local_key_dir = config.LOCAL_KEY_DIR_NAME + "_" + hostname
-        old_key_dir = os.path.join(home, old_local_key_dir, subdir)
-
-        # Use old directory if it exists
-        if os.path.exists(old_key_dir):
-            return old_key_dir
-    
-        # Otherwise use use new directory structure
+        
+        # Old directory structures to check for migration
+        # Old structure 1: Using _ connector (e.g., frdr_keys_vault.example.com)
+        old_local_key_dir = config.LOCAL_KEY_DIR_NAME.lstrip('.') + "_" + hostname
+        old_connector_key_dir = os.path.join(home, old_local_key_dir, subdir)
+        
+        # Old structure 2: Visible directory (e.g., frdr_keys/vault.example.com)
+        old_visible_dir_name = config.LOCAL_KEY_DIR_NAME.lstrip('.')
+        old_visible_key_dir = os.path.join(home, old_visible_dir_name, hostname, subdir)
+        
+        # Check and migrate from old structures
+        if os.path.exists(old_connector_key_dir):
+            cls._migrate_to_hidden(old_connector_key_dir, new_key_dir)
+            return new_key_dir
+        elif os.path.exists(old_visible_key_dir):
+            cls._migrate_to_hidden(old_visible_key_dir, new_key_dir)
+            return new_key_dir
+        
+        # No old folder found, create use new hidden directory
         if not os.path.exists(new_key_dir):
             Util.make_dir(new_key_dir)
+            
+            # Set hidden attribute on Windows
+            key_folder = os.path.join(home, config.LOCAL_KEY_DIR_NAME)
+            _set_hidden_attribute(key_folder)
 
         return new_key_dir
-
     @classmethod
     def check_dir_exists(cls, path):
         return os.path.isdir(path)
@@ -254,3 +272,86 @@ class Util(object):
                 os.remove(sums_fullpath)
             raise Exception("Problems with generating sums and types file.") from e
         return sums_fullpath
+
+    @classmethod
+    def verify_key_pair_match(cls, public_key, private_key):
+        """
+        Verify that a private key matches a public key.
+        :param public_key: Public key (string, bytes, or cryptography public key object)
+        :param private_key: Private key (string, bytes, or cryptography private key object)
+        :return: True if keys match, False otherwise
+        """
+        try:
+            
+            # Load private key if it's not already a key object
+            if isinstance(private_key, str):
+                private_key_obj = serialization.load_pem_private_key(
+                    private_key.encode('utf-8'),
+                    password=None,
+                    backend=default_backend()
+                )
+            elif isinstance(private_key, bytes):
+                private_key_obj = serialization.load_pem_private_key(
+                    private_key,
+                    password=None,
+                    backend=default_backend()
+                )
+            else:
+                private_key_obj = private_key
+            
+            # Load public key if it's not already a key object
+            if isinstance(public_key, str):
+                public_key_obj = serialization.load_pem_public_key(
+                    public_key.encode('utf-8'),
+                    backend=default_backend()
+                )
+            elif isinstance(public_key, bytes):
+                public_key_obj = serialization.load_pem_public_key(
+                    public_key,
+                    backend=default_backend()
+                )
+            else:
+                public_key_obj = public_key
+            
+            # Extract public key from private key
+            return public_key_obj == private_key_obj.public_key()
+            
+        except Exception as e:
+            logger.error(str(e))
+            return False
+    
+    @staticmethod
+    def _migrate_to_hidden(old_dir, new_dir):
+        """Helper function: Migrate keys from old folder to new hidden folder"""
+        try:
+            if not os.path.exists(new_dir):
+                Util.make_dir(new_dir)
+            
+            # Copy all files from old to new
+            for filename in os.listdir(old_dir):
+                old_file = os.path.join(old_dir, filename)
+                new_file = os.path.join(new_dir, filename)
+                
+                if os.path.isfile(old_file):
+                    shutil.copy2(old_file, new_file)
+                    # Set restrictive permissions
+                    os.chmod(new_file, 0o600)
+            
+            # Set hidden attribute on Windows
+            home = str(Path.home())
+            key_folder = os.path.join(home, config.LOCAL_KEY_DIR_NAME)
+            _set_hidden_attribute(key_folder)
+            
+            logger.info(f"Migrated keys from {old_dir} to {new_dir}")
+        except Exception as e:
+            logger.error(f"Failed to migrate keys: {e}")
+
+def _set_hidden_attribute(folder_path):
+    """Set hidden attribute on Windows"""
+    if platform.system() == 'Windows':
+        try:
+            import ctypes
+            # FILE_ATTRIBUTE_HIDDEN = 0x02
+            ctypes.windll.kernel32.SetFileAttributesW(folder_path, 0x02)
+        except Exception as e:
+            logger.error(f"Could not set hidden attribute on Windows: {e}")

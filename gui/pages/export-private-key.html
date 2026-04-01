@@ -1,0 +1,286 @@
+<!--
+ Copyright (c) 2025 Digital Research Alliance of Canada
+
+ This file is part of FRDR Encryption Application.
+
+ FRDR Encryption Application is free software: you can redistribute it
+ and/or modify it under the terms of the GNU General Public License as
+ published by the FRDR Encryption Application Software Foundation,
+ either version 3 of the License, or (at your option) any later version.
+
+ FRDR Encryption Application is distributed in the hope that it will be
+ useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with FRDR Encryption Application. If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>FRDR Encryption Application</title>
+  <script>window.jQuery = window.$ = require('jquery'); </script>
+  <script src="../assests/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="../assests/css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/css/bootstrap-theme.min.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/css/frdr-theme.css" type="text/css" />
+  <link rel="stylesheet" href="../assests/fonts/fontawesome-5.15.4/css/all.min.css" type="text/css" />
+  <script src="../assests/js/jquery_i18n/CLDRPluralRuleParser.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.messagestore.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.fallbacks.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.language.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.parser.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.js"></script>
+  <script src="../assests/js/jquery_i18n/jquery.i18n.emitter.bidi.js"></script>
+</head>
+
+<body>
+  <!--Navigation bar-->
+  <div id="nav-placeholder">
+  </div>
+
+  <script>
+  $(function(){
+    $("#nav-placeholder").load("../components/navbar.html");
+  });
+  </script>
+  <!--end of Navigation bar-->
+  
+  <div class="container">
+    <h2 data-i18n="app-export-key-title"></h2> 
+    <p data-i18n="app-export-key-info1"></p>
+    <p data-i18n="app-export-key-info2"></p>
+
+    <!-- Security warning -->
+    <div class="alert alert-warning" role="alert">
+      <strong><i class="fas fa-exclamation-triangle mr-1"></i>
+        <span data-i18n="app-export-key-warning-title"></span>
+      </strong>
+      <p class="mb-0 mt-1" data-i18n="app-export-key-warning-text"></p>
+    </div>
+
+    <!-- Section heading -->
+    <h3 class="mt-4 mb-3" data-i18n="app-export-key-options-title"></h3>
+
+    <!-- ── Option 1: Export to password-protected ZIP (open by default) ── -->
+    <div class="card mb-3">
+      <div class="card-header d-flex align-items-center justify-content-between alert-success"
+           data-toggle="collapse"
+           data-target="#collapseZip"
+           aria-expanded="true"
+           aria-controls="collapseZip"
+           style="cursor: pointer;">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-upload mr-2 text-success"></i>
+          <strong data-i18n="app-export-key-file-title"></strong>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="badge badge-success mr-3" data-i18n="app-export-key-recommended-badge"></span>
+          <i class="fas fa-chevron-up chevron-icon" id="chevron-zip"></i>
+        </div>
+      </div>
+      <div id="collapseZip" class="collapse show">
+        <div class="card-body">
+          <p class="text-muted" data-i18n="app-export-key-file-desc"></p>
+          <button
+            class="btn btn-secondary btn-block"
+            type="button"
+            id="export-to-file-btn"
+            data-toggle="modal"
+            data-target="#passwordModal">
+            <i class="fas fa-upload mr-2"></i>
+            <span data-i18n="app-export-key-export-file"></span>
+          </button>
+          <!-- Why recommended -->
+          <div class="alert alert-success mt-3 mb-0">
+            <strong data-i18n="app-export-key-why-recommended-title"></strong>
+            <ul class="mb-0 mt-1 pl-4">
+              <li data-i18n="app-export-key-why-recommended-1"></li>
+              <li data-i18n="app-export-key-why-recommended-2"></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Option 2: View private key location (collapsed by default) ── -->
+    <div class="card mb-3">
+      <div class="card-header d-flex align-items-center justify-content-between"
+           data-toggle="collapse"
+           data-target="#collapseLocation"
+           aria-expanded="false"
+           aria-controls="collapseLocation"
+           style="cursor: pointer;">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-file-alt mr-2"></i>
+          <span data-i18n="app-export-key-location-title"></span>
+        </div>
+        <i class="fas fa-chevron-down chevron-icon" id="chevron-location"></i>
+      </div>
+      <div id="collapseLocation" class="collapse">
+        <div class="card-body">
+          <p class="text-muted" data-i18n="app-export-key-location-desc"></p>
+          <button class="btn btn-secondary" type="button" id="toggle-location-btn">
+            <i class="fas fa-file-alt mr-2"></i>
+            <span data-i18n="app-export-key-show-location"></span>
+          </button>
+          <!-- Revealed location path -->
+          <div id="key-location" style="display: none;" class="mt-3">
+            <p class="mb-2"><strong data-i18n="app-export-key-location-label"></strong></p>
+            <div class="input-group">
+              <input type="text" class="form-control" id="key-location-path" readonly>
+              <div class="input-group-append">
+                <button class="btn btn-secondary" type="button" id="copy-location-btn">
+                  <i class="fas fa-copy mr-1"></i>
+                  <span data-i18n="app-export-key-copy"></span>
+                </button>
+                <button class="btn btn-secondary" type="button" id="open-folder-btn">
+                  <i class="fas fa-folder-open mr-1"></i>
+                  <span data-i18n="app-export-key-open-folder"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Option 3: Reveal and copy private key (collapsed by default) ── -->
+    <div class="card mb-3">
+      <div class="card-header d-flex align-items-center justify-content-between"
+           data-toggle="collapse"
+           data-target="#collapseReveal"
+           aria-expanded="false"
+           aria-controls="collapseReveal"
+           style="cursor: pointer;">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-eye mr-2"></i>
+          <span data-i18n="app-export-key-copy-title"></span>
+        </div>
+        <div class="d-flex align-items-center">
+          <span class="badge badge-danger mr-3" data-i18n="app-export-key-least-secure-badge"></span>
+          <i class="fas fa-chevron-down chevron-icon" id="chevron-reveal"></i>
+        </div>
+      </div>
+      <div id="collapseReveal" class="collapse">
+        <div class="card-body">
+          <p class="mb-3">
+            <span data-i18n="app-export-key-copy-desc"></span>
+            <strong class="text-danger" data-i18n="app-export-key-copy-warning"></strong>
+            <span data-i18n="app-export-key-copy-desc-suffix"></span>
+          </p>
+          <!-- Reveal button (hidden once key is shown) -->
+          <button class="btn btn-secondary" type="button" id="reveal-key-btn">
+            <i class="fas fa-eye mr-2"></i>
+            <span data-i18n="app-export-key-reveal"></span>
+          </button>
+          <!-- Key content (hidden until revealed) -->
+          <div id="key-content-section" style="display: none;">
+            <label class="mt-2" data-i18n="app-export-key-key-content-label"></label>
+            <textarea
+              class="form-control"
+              id="key-content-textarea"
+              rows="8"
+              readonly
+              style="font-family: monospace; font-size: 0.85rem;"
+            ></textarea>
+            <div class="mt-2">
+              <button class="btn btn-secondary mr-2" type="button" id="copy-key-btn">
+                <span data-i18n="app-export-key-copy-key"></span>
+              </button>
+              <button class="btn btn-secondary" type="button" id="hide-key-btn">
+                <span data-i18n="app-export-key-hide"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Password Modal -->
+  <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="passwordModalLabel" data-i18n="app-export-key-modal-title"></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info mb-3">
+            <p class="mb-1" data-i18n="app-export-key-modal-desc"></p>
+            <p class="mb-0 mt-2"><strong data-i18n="app-export-key-modal-pwd-rules"></strong></p>
+          </div>
+          <div class="form-group">
+            <label for="export-password" data-i18n="app-export-key-password-label"></label>
+            <input
+              type="password"
+              class="form-control"
+              id="export-password"
+              data-i18n="[placeholder]app-export-key-password-placeholder">
+ 
+          </div>
+          <div class="form-group">
+            <label for="export-password-confirm"
+                   data-i18n="app-export-key-password-confirm-label"></label>
+            <input
+              type="password"
+              class="form-control"
+              id="export-password-confirm"
+              data-i18n="[placeholder]app-export-key-password-confirm-placeholder">
+            <small id="password-mismatch-msg" class="form-text text-danger" style="display:none;"
+                   data-i18n="app-export-key-error-password-mismatch"></small>
+          </div>
+
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="show-password-checkbox">
+            <label class="custom-control-label" for="show-password-checkbox" data-i18n="app-export-key-show-password">
+            </label>
+          </div>
+
+          <!-- Error message area -->
+          <div id="modal-error-message" class="alert alert-danger mt-3" role="alert" style="display: none;">
+            <span id="modal-error-text"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" data-i18n="app-export-key-modal-cancel">
+          </button>
+          <button type="button" class="btn btn-success" id="confirm-export-btn" data-i18n="app-export-key-modal-export">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--Footer-->
+  <div id="footer-placeholder"></div>
+  <script>
+  $(function(){
+    $("#footer-placeholder").load("../components/footer.html");
+  });
+  </script>
+  <!--end of Footer-->  
+
+  <script>
+    $('#collapseZip, #collapseLocation, #collapseReveal').on('show.bs.collapse', function () {
+      $(this).prev('.card-header').find('.chevron-icon')
+        .removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    }).on('hide.bs.collapse', function () {
+      $(this).prev('.card-header').find('.chevron-icon')
+        .removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
+  </script>
+
+  <script src="../renderer_process/export_private_key.js" charset="utf-8"></script>
+
+</body>
+</html>
