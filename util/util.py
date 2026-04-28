@@ -67,9 +67,13 @@ class Util(object):
 
     @classmethod
     def get_key_dir(cls, subdir):
-        home = str(Path.home())
-        
-        # New directory structure using / separator
+        # Use USERPROFILE on Windows to get the real user's home dir,
+        # avoiding Administrator path when the app is run with elevated privileges
+        if sys.platform == 'win32':
+            home = os.environ.get('USERPROFILE') or str(Path.home())
+        else:
+            home = str(Path.home())
+
         hostname = urlparse(config.VAULT_HOSTNAME).hostname
         
         # New hidden directory structure
@@ -83,16 +87,13 @@ class Util(object):
         # Old structure 2: Visible directory (e.g., frdr_keys/vault.example.com)
         old_visible_dir_name = config.LOCAL_KEY_DIR_NAME.lstrip('.')
         old_visible_key_dir = os.path.join(home, old_visible_dir_name, hostname, subdir)
-        
-        # Check and migrate from old structures
-        if os.path.exists(old_connector_key_dir):
-            cls._migrate_to_hidden(old_connector_key_dir, new_key_dir)
-            return new_key_dir
-        elif os.path.exists(old_visible_key_dir):
-            cls._migrate_to_hidden(old_visible_key_dir, new_key_dir)
-            return new_key_dir
-        
-        # No old folder found, create use new hidden directory
+
+        for old_key_dir in [old_connector_key_dir, old_visible_key_dir]:
+            if os.path.exists(old_key_dir):
+                cls._migrate_to_hidden(old_key_dir, new_key_dir)
+                # Return new path only if migration actually succeeded
+                return new_key_dir if os.path.exists(new_key_dir) else old_key_dir
+
         if not os.path.exists(new_key_dir):
             Util.make_dir(new_key_dir)
             
