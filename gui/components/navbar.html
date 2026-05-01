@@ -21,68 +21,93 @@
 <html lang="en" dir="ltr">
 
 <body>
-  <nav class="navbar navbar-dark sticky-top navbar-expand-md">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="../pages/home.html"><span class="navbar-highlight"><img src="../resources/icon.png" id="brandlogo" alt="FRDR Encryption Application"></span></a>
-      
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+  <header id="header" class="header">
 
-      <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-        <ul class="nav navbar-nav">
-          <li class="nav-item">
-          <a id="contactus" href="#" class="d-md-flex text-center" data-i18n="app-navbar-contact-us"></a>
-          </li>
-        </ul>
+    <nav class="navbar navbar-dark navbar-expand-md">
+      <div class="container-fluid">
 
-        <ul class="nav navbar-nav">
-          <li class="nav-item dropdown">
-            <a href="#" id="account-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
-            <ul class="dropdown-menu">
-              <li class="dropdown-item"><a href="../pages/profile.html" data-i18n="app-navbar-account-profile"></a></li>
-              <li role="separator" class="dropdown-divider"></li>
-              <li class="dropdown-item"><a id="logout" href="#" data-i18n="app-navbar-account-logout"></a></li>
-            </ul>
-          </li>
-        </ul>
+        <a class="navbar-brand" href="../pages/home.html">
+          <span class="navbar-highlight">
+            <img src="../resources/icon.png" id="brandlogo" alt="FRDR Encryption Application">
+          </span>
+        </a>
 
-        <ul class="nav navbar-nav">
-          <li class="nav-item">
-            <a href="../pages/encrypt.html" class="d-md-flex text-center" data-i18n="app-navbar-encrypt"></a>
-          </li>
-        </ul>
+        <button class="navbar-toggler" type="button"
+                data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <ul class="nav navbar-nav">
-          <li class="nav-item">
-            <a href="../pages/decrypt.html" class="d-md-flex text-center" data-i18n="app-navbar-decrypt"></a>
-          </li>
-        </ul>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
-        <ul class="nav navbar-nav">
-          <li class="nav-item">
-            <a href="../pages/grant-access.html" class="d-md-flex text-center" data-i18n="app-navbar-grant-access"></a>
-          </li>
-        </ul>
+          <div class="d-none d-md-flex justify-content-end">
+            <a href="#"
+               id="locale-dropdown"
+               class="btn lang-btn lang-switch locale-toggle-btn"
+               data-locale="fr">Français</a>
+          </div>
 
-        <ul class="nav navbar-nav">
-          <li class="nav-item">
-            <a href="../pages/transfer-ownership.html" class="d-md-flex text-center" data-i18n="app-navbar-transfer-ownership"></a>
-          </li>
-        </ul>
+          <ul class="nav navbar-nav">
 
-        <ul class="nav navbar-nav">
-          <li class="nav-item dropdown">
-            <a href="#" id="locale-dropdown" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
-            <ul class="dropdown-menu dropdown-menu-right" id="locale-menu" role="menu">
-              <li class="dropdown-item"><a class="lang-switch" href="#" data-locale="en" data-i18n="app-navbar-locale-english"></a></li>
-              <li class="dropdown-item"><a class="lang-switch" href="#" data-locale="fr" data-i18n="app-navbar-locale-french"></a></li>
-            </ul>
-          </li>
-        </ul>
-      </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
-  </nav>
+            <li class="nav-item d-md-none">
+              <a href="#"
+                 class="btn lang-btn lang-switch locale-toggle-btn"
+                 data-locale="fr">Français</a>
+            </li>
+
+            <!-- Contact Us -->
+            <li class="nav-item">
+              <a id="contactus" href="#" data-i18n="app-navbar-contact-us"></a>
+            </li>
+
+            <!-- Encrypt Dataset -->
+            <li class="nav-item">
+              <a href="../pages/encrypt.html" data-i18n="app-navbar-encrypt"></a>
+            </li>
+
+            <!-- Decrypt Dataset -->
+            <li class="nav-item">
+              <a href="../pages/decrypt.html" data-i18n="app-navbar-decrypt"></a>
+            </li>
+
+            <!-- Transfer Ownership -->
+            <li class="nav-item">
+              <a href="../pages/transfer-ownership.html" data-i18n="app-navbar-transfer-ownership"></a>
+            </li>
+
+            <!-- Grant Access -->
+            <li class="nav-item">
+              <a href="../pages/grant-access.html" data-i18n="app-navbar-grant-access"></a>
+            </li>
+
+            <!-- Account dropdown -->
+            <li class="nav-item dropdown">
+              <a href="#"
+                 id="account-dropdown"
+                 class="dropdown-toggle"
+                 data-toggle="dropdown"
+                 aria-haspopup="true"
+                 aria-expanded="false">
+              </a>
+              <ul class="dropdown-menu dropdown-menu-right">
+                <li class="dropdown-item">
+                  <a href="../pages/profile.html" data-i18n="app-navbar-account-profile"></a>
+                </li>
+                <li role="separator" class="dropdown-divider"></li>
+                <li class="dropdown-item">
+                  <a id="logout" href="#" data-i18n="app-navbar-account-logout"></a>
+                </li>
+              </ul>
+            </li>
+
+          </ul>
+        </div>
+
+      </div>
+    </nav>
+
+  </header>
 
   <script src="../renderer_process/logout.js" charset="utf-8"></script>
   <script src="../renderer_process/contactus.js" charset="utf-8"></script>
