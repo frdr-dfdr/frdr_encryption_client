@@ -126,12 +126,12 @@ class FRDRAPIClient():
         try:
             self._pub_client.verify_requestitem_grant_access(dataset_uuid, requester_uuid)
         except GlobusAPIError as e:
-            self._logger.error("No pending requests for this dataset from this requester. {}".format(e.message))
-            raise Exception("No pending requests for this dataset from this requester. {}".format(e.message))
+            self._logger.error("Failed to verify pending grant access request: {}".format(e.message))
+            raise Exception("Failed to verify pending grant access request: {}".format(e.message))
         except Exception as e:
-            self._logger.error("No pending requests for this dataset from this requester. {}".format(e))
-            raise Exception("No pending requests for this dataset from this requester. {}".format(e))
-    
+            self._logger.error("Failed to verify pending grant access request: {}".format(e))
+            raise Exception("Failed to verify pending grant access request: {}".format(e))    
+
     def update_requestitem_grant_access(self, data):
         """Update requestitem data on FRDR when depositors grant access
            to the key on FRDR Encryption Application.

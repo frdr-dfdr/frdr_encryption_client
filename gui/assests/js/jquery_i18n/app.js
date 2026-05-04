@@ -10,7 +10,11 @@ var update_texts = function() {
       $('body').i18n();
       // navbar
       $('#account-dropdown').html($.i18n('app-navbar-account') + '<span class="caret"></span>');
-      $('#locale-dropdown').html($.i18n('app-navbar-locale') + '<span class="caret"></span>');
+      var targetLocale = i18n.locale === 'en' ? 'fr' : 'en';
+      var targetLabel  = i18n.locale === 'en' ? 'Français' : 'English';
+      $('.locale-toggle-btn').text(targetLabel)
+                             .attr('data-locale', targetLocale)
+                             .data('locale', targetLocale);
 
       // Add hyperlink to open FRDR profile page on request access page
       $('#vault-id-intro').html($.i18n('app-request-access-intro1') 
