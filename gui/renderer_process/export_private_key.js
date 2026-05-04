@@ -11,18 +11,27 @@ document.getElementById('show-password-checkbox').addEventListener('change', (e)
   confirmInput.type = type;
 });
 
-// Real-time mismatch feedback
+// Called on every keystroke in the confirm field, clears the error
 function checkPasswordMatch() {
+  const confirm = document.getElementById('export-password-confirm').value;
+  const msg = document.getElementById('password-mismatch-msg');
+  const confirmInput = document.getElementById('export-password-confirm');
+
+  // If the user clears the field, reset validation state
+  if (confirm.length === 0) {
+    msg.style.display = 'none';
+    confirmInput.classList.remove('is-invalid');
+  }
+}
+
+// Called when the confirm field loses focus, shows the mismatch error
+function validatePasswordMatch() {
   const password = document.getElementById('export-password').value;
   const confirm  = document.getElementById('export-password-confirm').value;
   const msg = document.getElementById('password-mismatch-msg');
   const confirmInput = document.getElementById('export-password-confirm');
 
-  if (confirm.length === 0) {
-    msg.style.display = 'none';
-    confirmInput.classList.remove('is-invalid');
-    return;
-  }
+  if (confirm.length === 0) return; // Don't validate an empty field on blur
 
   if (password !== confirm) {
     msg.style.display = 'block';
@@ -33,8 +42,20 @@ function checkPasswordMatch() {
   }
 }
 
-document.getElementById('export-password-confirm').addEventListener('input', checkPasswordMatch);
-document.getElementById('export-password').addEventListener('input', checkPasswordMatch);
+const confirmInput = document.getElementById('export-password-confirm');
+const passwordInput = document.getElementById('export-password');
+
+// Keystroke: only clears the error once the user fixes the mismatch
+confirmInput.addEventListener('input', checkPasswordMatch);
+
+// Blur: defers the mismatch error until the user leaves the field
+confirmInput.addEventListener('blur', validatePasswordMatch);
+
+// If the user edits the original password after confirm is already filled,
+// re-validate immediately so the error state stays in sync
+passwordInput.addEventListener('input', () => {
+  if (confirmInput.value.length > 0) validatePasswordMatch();
+});
 
 document.getElementById('toggle-location-btn').addEventListener('click', () => {
   const locationDiv = document.getElementById('key-location');
@@ -185,7 +206,7 @@ function isStrongPassword(password) {
   const hasUpperCase = /[A-Z]/.test(password);
   const hasLowerCase = /[a-z]/.test(password);
   const hasNumbers = /\d/.test(password);
-  const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+  const hasSpecialChar = /[^a-zA-Z0-9]/.test(password); // any non-alphanumeric character
   
   return hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
 }

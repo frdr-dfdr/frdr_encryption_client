@@ -86,7 +86,7 @@
     "app-export-key-modal-cancel": "Cancel",
     "app-export-key-modal-desc": "This password protects your exported private key. You'll need it to restore access on another device. FRDR cannot recover it if you lose it.",
     "app-export-key-modal-export": "Export",
-    "app-export-key-modal-pwd-rules": "A strong password must be at least 12 characters and include at least one number and one special character.",
+    "app-export-key-modal-pwd-rules": "A strong password must be at least 12 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
     "app-export-key-modal-title": "Set Export Password",
     "app-export-key-open-folder": "Open Folder",
     "app-export-key-open-folder-confirm": "Do you want to open the folder containing the exported file?",
