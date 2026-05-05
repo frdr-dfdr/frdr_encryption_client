@@ -114,7 +114,7 @@
     "app-export-key-why-recommended-2": "Ensures the correct key format and pairing",
     "app-export-key-why-recommended-title": "Why this is recommended:",
     "app-footer-copyright": "© 2026 Digital Research Alliance of Canada",
-    "app-footer-version": "FRDR Encryption Application 1.2.0",
+    "app-footer-version": "FRDR Encryption Application 1.2.1",
     "app-get-entity-id-error": "Error getting user entity id on Vault. \n$1.",
     "app-get-entity-id-from-frdr-error": "Your Vault ID is not retrieved from FRDR successfully. Please go to Settings page and make sure it is set correctly on FRDR",
     "app-get-entity-name-error": "Error getting user email on Vault. \n$1.",
