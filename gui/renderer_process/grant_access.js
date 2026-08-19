@@ -21,6 +21,7 @@ const {ipcRenderer} = require('electron');
 
 // Request list fetched from API
 let pendingRequests = [];
+let currentGrantReq = null;
 
 function renderRequestList(requests) {
   const container = $('#request-list');
@@ -44,8 +45,9 @@ function renderRequestList(requests) {
               <p class="mb-0 small text-muted">
                 <span data-i18n="app-grant-access-requester"></span>: ${requesterDisplay}
               </p>
+              ${req.doi ? `<p class="mb-0 small text-muted"><span data-i18n="app-grant-access-doi"></span>: ${req.doi}</p>` : ''}
               <p class="mb-0 small text-muted">
-                <span data-i18n="app-transfer-ownership-date"></span>: ${req.request_date}
+                <span data-i18n="app-grant-access-request-date"></span> ${req.request_date}
               </p>
             </div>
             <button class="btn btn-primary btn-sm ml-3 grant-access-btn"
@@ -71,6 +73,7 @@ function triggerGrantAccess(vaultDatasetId, vaultRequesterId) {
     r => r.vault_dataset_id === vaultDatasetId && r.vault_requester_id === vaultRequesterId
   );
   if (!req) return;
+  currentGrantReq = req;
 
   const dialogOptions = {
     type: "question",
@@ -105,6 +108,21 @@ $(function () {
   ipcRenderer.send('get-pending-grant-access-requests');
 });
 
+$(function () {
+  if ($('#grant-access-done-text').length) {
+    const stored = localStorage.getItem('grantedDatasetInfo');
+    let datasetDisplay = '';
+    if (stored) {
+      try {
+        const info = JSON.parse(stored);
+        datasetDisplay = info.doi ? `${info.title} (${info.doi})` : info.title;
+      } catch (e) {}
+      localStorage.removeItem('grantedDatasetInfo');
+    }
+    $('#grant-access-done-text').text($.i18n('app-grant-access-done-text', datasetDisplay));
+  }
+});
+
 ipcRenderer.on('notify-pending-grant-access-requests', function (_event, requests) {
   $('#loading-state').hide();
 
@@ -135,6 +153,12 @@ ipcRenderer.on('notify-grant-access-started', function (_event) {
 
 ipcRenderer.on('notify-grant-access-done', function (_event) {
   hidePleaseWait();
+  if (currentGrantReq) {
+    localStorage.setItem('grantedDatasetInfo', JSON.stringify({
+      title: currentGrantReq.title || currentGrantReq.vault_dataset_id,
+      doi: currentGrantReq.doi || null
+    }));
+  }
   ipcRenderer.send('grant-access-done-show-next-step');
 });
 
