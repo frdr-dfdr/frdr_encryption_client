@@ -193,6 +193,13 @@ class EncryptionClientGui(object):
             self._logger.info(str(e))
             return (False, str(e))
 
+    def get_pending_grant_access_requests(self):
+        try:
+            return (True, self._frdr_api_client.get_pending_grant_access_requests())
+        except Exception as e:
+            self._logger.error(e, exc_info=True)
+            return (False, str(e))    
+    
     def grant_access(self, dataset_uuid, requester_uuid, expire_date=None):
         try:
             if expire_date is None:

@@ -53,44 +53,39 @@
   </script>
   <!--end of Navigation bar-->
 
-  <div class="container">
+  <div class="container pb-5">
     <h2 data-i18n="app-grant-access-title"></h2>
     <p data-i18n="app-grant-access-desc"></p>
-    <div class="row">
-      <div class="col-12">
-        <h4 class="mb-0">
-          <label class="mb-0 font-weight-normal" data-i18n="app-grant-access-dataset"></label>
-        </h4>
-        <input class="form-control" name="dataset" id="dataset" type="text"/>
-      </div>
+
+    <!-- Loading state -->
+    <div id="loading-state" class="text-center py-4">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 text-muted" data-i18n="app-grant-access-loading"></p>
     </div>
 
-    <br/>
-
-    <div class="row">
-      <div class="col-12">
-        <h4 class="mb-0">
-          <label class="mb-0 font-weight-normal" data-i18n="app-grant-access-requester"></label>
-        </h4>
-        <input class="form-control" name="requester" id="requester" type="text"/>
-      </div>
+    <!-- Empty state -->
+    <div id="empty-state" class="text-center py-4 d-none">
+      <p class="text-muted" data-i18n="app-grant-access-empty"></p>
     </div>
 
-    <br/>
-
-    <div class="row">
-      <div class="col-12">
-        <h4 class="mb-0">
-          <label class="mb-0 font-weight-normal" data-i18n="app-grant-access-expire"></label>
-        </h4>
-        <p class="mb-0" id="access-expire"></p>
-      </div>
+    <!-- Error state -->
+    <div id="error-state" class="alert alert-danger d-none">
+      <span data-i18n="app-grant-access-load-error"></span>
     </div>
-    
-    <br/><br/>
 
-    <div class="button">
-      <button class="btn btn-primary" type="submit" id="grant_access" data-i18n="app-grant-access-button"></button>
+    <!-- Grant access request list -->
+    <div id="request-list" class="d-none"></div>
+  </div>
+
+  <!-- Please Wait Modal -->
+  <div id="pleasewaitmodal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content w-100">
+        <div class="modal-body text-center p-4">
+          <div class="spinner-border text-primary mb-3" role="status"></div>
+          <h4 data-i18n="app-grant-access-button-loading"></h4>
+        </div>
+      </div>
     </div>
   </div>
 
