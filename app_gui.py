@@ -36,6 +36,8 @@ from util.util import Util
 import uuid
 from modules.DatasetKeyManager import DatasetKeyManager
 from modules.FRDRAPIClient import FRDRAPIClient
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 import zmq
 
@@ -234,6 +236,167 @@ class EncryptionClientGui(object):
 
         return error_msg
 
+    def import_private_key_from_file(self, source_file_path):
+        """
+        Import and save a private key from a file.
+
+        Args:
+            source_file_path (str): Path to the source private key file.
+
+        Returns:
+            tuple: (success: bool, message: str)
+        """
+        person_key_manager = PersonKeyManager(self._vault_client)
+        
+        try:
+            entity_id = person_key_manager.get_vault_entity_id()
+            if not entity_id:
+                return (False, "Unable to retrieve vault entity ID.")
+            
+            public_key = person_key_manager.get_public_key()
+            if public_key is None:
+                return (False, "No public key found on vault or locally.")
+            
+            if not os.path.exists(source_file_path):
+                return (False, f"Source file not found: {source_file_path}")
+            
+            # Determine destination path
+            key_dir = Util.get_key_dir(entity_id)
+            os.makedirs(key_dir, exist_ok=True)
+            
+            dest_file_path = os.path.join(key_dir, config.LOCAL_PRIVATE_KEY_FILENAME)
+            
+            # Backup existing key if present
+            if os.path.exists(dest_file_path):
+                backup_path = dest_file_path + '.backup'
+                shutil.copy2(dest_file_path, backup_path)
+                self._logger.info(f"Backed up existing private key to {backup_path}")
+            
+            # Copy the file
+            shutil.copy2(source_file_path, dest_file_path)
+            
+            # Set permissions
+            os.chmod(dest_file_path, 0o600)
+            
+            # Verify the key
+            private_key = person_key_manager.read_private_key(dest_file_path)
+            if not Util.verify_key_pair_match(public_key, private_key):
+                # Verification failed, remove the imported key
+                os.remove(dest_file_path)
+                return (False, "The imported private key does not match the public key on vault.")
+            
+            self._logger.info(f"Private key imported successfully from {source_file_path}")
+            return (True, "Private key imported and verified successfully.")
+            
+        except Exception as e:
+            self._logger.error(f"Error importing private key from file: {e}", exc_info=True)
+            return (False, f"Error importing private key: {str(e)}")
+
+
+    def import_private_key_from_text(self, key_content):
+        """
+        Import and save a private key from text content
+        
+        Args:
+            key_content (str): The private key content as a string
+            
+        Returns:
+            tuple: (success: bool, message: str)
+        """
+        person_key_manager = PersonKeyManager(self._vault_client)
+        
+        try:
+            entity_id = person_key_manager.get_vault_entity_id()
+            if not entity_id:
+                return (False, "Unable to retrieve vault entity ID.")
+
+            public_key = person_key_manager.get_public_key()
+            if public_key is None:
+                return (False, "No public key found on vault or locally.")
+            
+            # Validate the private key format
+            try:
+                serialization.load_pem_private_key(
+                    key_content.encode('utf-8'),
+                    password=None,
+                    backend=default_backend()
+                )
+            except Exception as e:
+                self._logger.error(f"Invalid private key format: {e}", exc_info=True)
+                return (False, f"Invalid private key format: {str(e)}")
+            
+            # Save the key
+            key_dir = Util.get_key_dir(entity_id)
+            os.makedirs(key_dir, exist_ok=True)
+            
+            private_key_path = os.path.join(key_dir, config.LOCAL_PRIVATE_KEY_FILENAME)
+            
+            # Backup existing key if present
+            if os.path.exists(private_key_path):
+                backup_path = private_key_path + '.backup'
+                os.rename(private_key_path, backup_path)
+                self._logger.info(f"Backed up existing private key to {backup_path}")
+            
+            # Write new key
+            person_key_manager.save_key_locally(key_content.encode("utf-8"), private_key_path)
+            
+            # Set permissions
+            os.chmod(private_key_path, 0o600)
+            
+            # Verify the key
+            private_key = person_key_manager.read_private_key(private_key_path)
+            if not Util.verify_key_pair_match(public_key, private_key):
+                # Verification failed, remove the imported key
+                # os.remove(private_key_path)
+                return (False, "The imported private key does not match the public key on vault.")
+            
+            self._logger.info("Private key imported successfully from text")
+            return (True, "Private key imported and verified successfully.")
+            
+        except Exception as e:
+            self._logger.error(f"Error importing private key: {e}", exc_info=True)
+            return (False, f"Error importing private key: {str(e)}")
+
+    def get_private_key_path(self):
+        """Get the path where private key is stored"""
+        try:
+            person_key_manager = PersonKeyManager(self._vault_client)
+            private_key_path = os.path.join(Util.get_key_dir(
+                person_key_manager.get_vault_entity_id()), config.LOCAL_PRIVATE_KEY_FILENAME)
+            return private_key_path
+        except Exception as e:
+            self._logger.error(e, exc_info=True)
+            raise ValueError(f"Failed to get private key path: {str(e)}")
+
+    def get_private_key_content(self):
+        """Get the private key content as string"""
+        try:
+            person_key_manager = PersonKeyManager(self._vault_client)
+            key_content = person_key_manager.read_private_key(self.get_private_key_path())
+            
+            # Ensure it's a string, not bytes
+            if isinstance(key_content, bytes):
+                key_content = key_content.decode('utf-8')
+            
+            return key_content
+        except Exception as e:
+            self._logger.error(e, exc_info=True)
+            raise ValueError(f"Failed to read private key: {str(e)}")
+    
+    def get_export_key_info(self):
+        """Get all info needed for export: entity_id and key_content"""
+        try:
+            # Get entity ID
+            entity_id = self._vault_client.entity_id
+            
+            # Get key content            
+            key_content = self.get_private_key_content()
+            
+            return (entity_id, key_content)
+        except Exception as e:
+            self._logger.error(e, exc_info=True)
+            raise ValueError(f"Failed to get export info: {str(e)}")
+
     # TODO: keep for future feature
     def review_shares(self):
         try:
@@ -253,7 +416,6 @@ class EncryptionClientGui(object):
     def get_entity_id(self):
         try:
             entity_id = self._vault_client.entity_id
-            person_key_manager = PersonKeyManager(self._vault_client)
             return (True, entity_id)
         except Exception as e:
             return (False, str(e))
