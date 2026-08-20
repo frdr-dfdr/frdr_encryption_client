@@ -6,11 +6,13 @@ The Python code needs to be built on its target platform using `pyinstaller`:
 
 (Install `pyinstaller` if not installed: `pip install pyinstaller`)
 
-`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config'` (Windows)
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools` (Windows)
 
-`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config'` (Mac)
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools` (Mac)
 
 We need to include the config file when generating the bundle.
+
+`--collect-all setuptools` is required because `bagit` imports `pkg_resources` at import time, and `pkg_resources`'s vendored `jaraco` dependency isn't picked up by PyInstaller's static analysis on its own (fails with `ModuleNotFoundError: No module named 'jaraco'` at runtime otherwise). This also requires `setuptools<81` to be installed (see `requirements_mac_silicon.txt`/`requirements_windows.txt`), since `pkg_resources` was removed from `setuptools` starting with version 81.
 
 (On Mac, this also builds a .app version of the Python code, which you'll actually want to delete -- just keep the folder of CLI tools. Run this command: `rm -rf ./gui/app_gui.app/`)
 
