@@ -99,6 +99,9 @@
       "notarize": true
     },
     "asar": true,
+    "asarUnpack": [
+      "**/node_modules/7zip-bin/**/*"
+    ],
     "extraResources": [
       {
         "from": "app_gui",

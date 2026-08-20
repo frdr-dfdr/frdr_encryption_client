@@ -24,6 +24,7 @@ const sevenBin = require('7zip-bin');
 const path = require('path');
 const fs = require('fs').promises;
 const os = require('os');
+const sevenZipBinaryPath = sevenBin.path7za.replace('app.asar', 'app.asar.unpacked');
 
 // Select ZIP file
 ipcMain.on('import-private-key-select-zip', async (event) => {
@@ -59,7 +60,7 @@ ipcMain.on('import-private-key-from-zip', async (event, data) => {
     
     const extractStream = Seven.extractFull(zipPath, tempDir, {
       password: password,
-      $bin: sevenBin.path7za
+      $bin: sevenZipBinaryPath
     });
     
     extractStream.on('end', async () => {
