@@ -108,21 +108,6 @@ $(function () {
   ipcRenderer.send('get-pending-grant-access-requests');
 });
 
-$(function () {
-  if ($('#grant-access-done-text').length) {
-    const stored = localStorage.getItem('grantedDatasetInfo');
-    let datasetDisplay = '';
-    if (stored) {
-      try {
-        const info = JSON.parse(stored);
-        datasetDisplay = info.doi ? `${info.title} (${info.doi})` : info.title;
-      } catch (e) {}
-      localStorage.removeItem('grantedDatasetInfo');
-    }
-    $('#grant-access-done-text').text($.i18n('app-grant-access-done-text', datasetDisplay));
-  }
-});
-
 ipcRenderer.on('notify-pending-grant-access-requests', function (_event, requests) {
   $('#loading-state').hide();
 
