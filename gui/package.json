@@ -49,7 +49,7 @@
       "artifactName": "${name}-${platform}-${arch}-${version}.${ext}",
       "icon": "resources/icon.ico",
       "signtoolOptions": {
-        "sign": "../codesign_scripts/windowsSign.js",
+        "sign": "./codesign_scripts/windowsSign.js",
         "signingHashAlgorithms": [
           "sha256"
         ]
