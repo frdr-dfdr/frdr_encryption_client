@@ -30,7 +30,7 @@ try {
     configPath = path.join(__dirname, '..', '..','config', 'config.yml');
   }
   else if (process.platform === 'win32') {
-    configPath = path.join(__dirname, '..', 'app_gui', 'config', 'config.yml');
+    configPath = path.join(process.resourcesPath, 'app_gui', '_internal', 'config', 'config.yml');
   }
   else {
     configPath = path.join(__dirname, '..', 'app_gui', '_internal', 'config', 'config.yml');
