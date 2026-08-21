@@ -1,7 +1,7 @@
 appdirs==1.4.4
 bagit==1.8.1
 certifi==2024.7.4
-cffi==1.15.1
+cffi==2.1.1
 charset-normalizer==3.3.2
 click==8.1.7
 colorclass==2.2.2
@@ -22,6 +22,7 @@ pytz==2023.3
 PyYAML==6.0.1
 pyzmq==26.0.3
 requests==2.33.0
+setuptools<81
 terminaltables==3.1.10
 types-cryptography==3.3.23.2
 typing-extensions==4.7.1

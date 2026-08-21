@@ -60,7 +60,7 @@ function decrypt() {
 }
 
 ipcRenderer.on('notify-decrypt-done', function (_event) {
-  alert($.i18n('app-decrypt-done'), "");
+  window.location.href = '../pages/decrypt-done.html';
 });
 
 ipcRenderer.on('notify-decrypt-error', function (_event, errMessage) {

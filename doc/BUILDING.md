@@ -1,16 +1,23 @@
 # FRDR Encryption Application
 
+## Requirements
+
+- Python >= 3.10 (required by `cffi`/`cryptography`/other pinned versions in `requirements_windows.txt`/`requirements_mac_intel.txt`/`requirements_mac_silicon.txt`)
+- Node.js >= 22.9 (required by `electron-builder` 26.x and its dependencies; older Node versions fail with `ERR_REQUIRE_ESM` when running `npm run dist`)
+
 ## Building 
 
 The Python code needs to be built on its target platform using `pyinstaller`:
 
 (Install `pyinstaller` if not installed: `pip install pyinstaller`)
 
-`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config'` (Windows)
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools` (Windows)
 
-`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config'` (Mac)
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools` (Mac)
 
 We need to include the config file when generating the bundle.
+
+`--collect-all setuptools` is required because `bagit` imports `pkg_resources` at import time, and `pkg_resources`'s vendored `jaraco` dependency isn't picked up by PyInstaller's static analysis on its own (fails with `ModuleNotFoundError: No module named 'jaraco'` at runtime otherwise). This also requires `setuptools<81` to be installed (see `requirements_mac_silicon.txt`/`requirements_windows.txt`), since `pkg_resources` was removed from `setuptools` starting with version 81.
 
 (On Mac, this also builds a .app version of the Python code, which you'll actually want to delete -- just keep the folder of CLI tools. Run this command: `rm -rf ./gui/app_gui.app/`)
 
@@ -46,7 +53,7 @@ To package for install:
 
 ##### Option 2: build with `electron-builder`
 
-Remove `"sign": "./windowsSign.js"` from the package.json file, and run command: 
+Remove `"sign": "./codesign_scripts/windowsSign.js"` from the package.json file, and run command: 
 
 `npm run dist`
 
@@ -69,7 +76,7 @@ On Mac, you can sign for distribution with `electron-osx-sign` and `electron-not
 
 `IFS=$'\n' && electron-osx-sign FRDR\ Encryption-darwin-x64/FRDR\ Encryption.app/ $(find FRDR\ Encryption-darwin-x64/FRDR\ Encryption.app/Contents/ -type f -perm -u+x) --identity='[DISTRIBUTION CERTIFICATE COMMON NAME]' --entitlements=entitlements.plist --entitlements-inherit=entitlements.plist --hardenedRuntime`
 
-`APPLE_ID=[DEVELOPER APPLE ID] APPLE_APP_SPECIFIC_PASSWORD=[APP SPECIFIC PASSWORD] APPLE_TEAM_ID=[APPLE DEVELOPER TEAM ID] node ../codesign_scripts/notarize.js`
+`APPLE_ID=[DEVELOPER APPLE ID] APPLE_APP_SPECIFIC_PASSWORD=[APP SPECIFIC PASSWORD] APPLE_TEAM_ID=[APPLE DEVELOPER TEAM ID] node ./codesign_scripts/notarize.js`
 
 #### Windows
 Set the path to your Host and client authentication certificate in SMCTL:
@@ -79,7 +86,7 @@ set SM_HOST=<host URL>
 set SM_CLIENT_CERT_FILE=<P12 client authentication certificate file path>
 ```
 
-Run the command to build the app, make sure `"sign": "./windowsSign.js"` is included in the package.json file to sign the binaries. 
+Run the command to build the app, make sure `"sign": "./codesign_scripts/windowsSign.js"` is included in the package.json file to sign the binaries. 
 
 `npm run dist`
 

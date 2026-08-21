@@ -30,7 +30,7 @@ try {
     configPath = path.join(__dirname, '..', '..','config', 'config.yml');
   }
   else if (process.platform === 'win32') {
-    configPath = path.join(__dirname, '..', 'app_gui', 'config', 'config.yml');
+    configPath = path.join(process.resourcesPath, 'app_gui', '_internal', 'config', 'config.yml');
   }
   else {
     configPath = path.join(__dirname, '..', 'app_gui', '_internal', 'config', 'config.yml');
@@ -81,9 +81,12 @@ ipcRenderer.on('notify-login-oidc-error', function (_event, errMessage) {
 ipcRenderer.on('notify-verify-local-user-keys-error', function (_event, errMessage) {
   var dialogOptions = {
     type: "warning",
-    buttons: [$.i18n("app-cancel-btn")],
-    title: "Error",
-    message: errMessage
+    title: $.i18n('app-verify-keys-error-title'),
+    message: $.i18n('app-verify-keys-error-title'),
+    detail: $.i18n('app-verify-keys-error-detail'),
+    buttons: [$.i18n('app-verify-keys-error-btn-yes'), $.i18n('app-verify-keys-error-btn-cancel')],
+    defaultId: 0,
+    cancelId: 1
   };
   ipcRenderer.send("verification-failed", dialogOptions);
 });

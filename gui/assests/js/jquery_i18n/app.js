@@ -28,6 +28,20 @@ var update_texts = function() {
       date.setMonth(date.getMonth() + 6);
       $('#access-expire').html($.i18n('app-grant-access-expire-tooltip', date.toISOString().split('T')[0]));
       
+      // Grant access done page
+      if ($('#grant-access-done-text').length) {
+        var stored = localStorage.getItem('grantedDatasetInfo');
+        var datasetDisplay = '';
+        if (stored) {
+          try {
+            var info = JSON.parse(stored);
+            datasetDisplay = info.doi ? info.title + ' (' + info.doi + ')' : info.title;
+          } catch (e) {}
+          localStorage.removeItem('grantedDatasetInfo');
+        }
+        $('#grant-access-done-text').text($.i18n('app-grant-access-done-text', datasetDisplay));
+      }
+
       $('#open-frdr-dashboard').on("click", function(){
         openFRDRDepositDashboard();
       });

@@ -40,34 +40,73 @@
 
 <body>
   <!--Navigation bar-->
-  <div id="nav-placeholder">
-  </div>
-
+  <div id="nav-placeholder"></div>
   <script>
-  $(function(){
-    $("#nav-placeholder").load("../components/navbar.html");
-  });
+    $(function () {
+      $("#nav-placeholder").load("../components/navbar.html");
+    });
   </script>
   <!--end of Navigation bar-->
-  
+
   <div class="container">
-    <h2 data-i18n="app-grant-access-done-title"></h2>
-    <p id="grant-access-done-text"></p>
+    <h2 data-i18n="app-decrypt-done-title"></h2>
+    <p data-i18n="app-decrypt-done-text1"></p>
+
+    <hr/>
+
+    <h4 data-i18n="app-decrypt-survey-title"></h4>
+    <p data-i18n="app-decrypt-survey-text"></p>
+    <p id="survey-link-container">
+      <a id="survey-link" href="#" data-i18n="app-decrypt-survey-link-label"></a>
+    </p>
   </div>
 
   <!--Footer-->
   <div id="footer-placeholder"></div>
   <script>
-  $(function(){
-    $("#footer-placeholder").load("../components/footer.html");
-  });
-  const path = require('path');
-  const fs = require('fs');
-  const yaml = require('js-yaml');
+    $(function () {
+      $("#footer-placeholder").load("../components/footer.html");
+    });
   </script>
-  <!--end of Footer-->  
+  <!--end of Footer-->
 
-  <script src="../renderer_process/grant_access.js" charset="utf-8"></script>
+  <script src="../renderer_process/decrypt.js" charset="utf-8"></script>
+  <script>
+    $(function () {
+      const { shell } = require('electron');
+      const path = require('path');
+      const fs = require('fs');
+      const yaml = require('js-yaml');
+
+      // Read survey URL lazily on click so that i18n locale is fully initialized
+      $('#survey-link').on('click', function (e) {
+        e.preventDefault();
+
+        var surveyURL = "";
+        try {
+          var configPath = "";
+          if (process.env.NODE_ENV == "development") {
+            configPath = path.join(__dirname, '..', '..', 'config', 'config.yml');
+          } else if (process.platform === 'win32') {
+            configPath = path.join(process.resourcesPath, 'app_gui', '_internal', 'config', 'config.yml');
+          } else {
+            configPath = path.join(__dirname, '..', 'app_gui', '_internal', 'config', 'config.yml');
+          }
+          let fileContents = fs.readFileSync(configPath, 'utf8');
+          let config = yaml.load(fileContents);
+
+          const lang = $.i18n().locale.startsWith('fr') ? 'fr' : 'en';
+          surveyURL = lang === 'fr' ? config["FRDR_SURVEY_URL_FR"] : config["FRDR_SURVEY_URL_EN"];
+        } catch (e) {
+          console.log(e);
+        }
+
+        if (surveyURL) {
+          shell.openExternal(surveyURL);
+        }
+      });
+    });
+  </script>
 
 </body>
 
