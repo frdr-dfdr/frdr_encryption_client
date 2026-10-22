@@ -1,4 +1,4 @@
-## How to install and configure a Hashicorp Vault stack on AWS using CloudFormation ##
+## How to install, configure,and upgrade a Hashicorp Vault stack on AWS using CloudFormation ##
 
 This directory contains a AWS CloudFormation template to install a 'production hardened' open-source licensed Hashicorp Vault installation and instructions on how to how to correctly use it.
 
@@ -56,4 +56,16 @@ SSL Certificate ARN: Get ARN from the SSL certificate manager for the certificat
 
 5. Login to Vault instance at your domain, the root key can be accessed from your [AWS Secrets Store](https://us-west-2.console.aws.amazon.com/secretsmanager/listsecrets?region=us-west-2). No more basic configuration is necessary as the Vault is auto-unsealed as part of the deployment.
 
- 
+ ### Upgrading ###
+
+prod-vault-bastion and prod-vault-node-[1-3] all need to have monthly security patches performed using 'sudo apt update && sudo apt dist-upgrade'. Only do one vault instance at a time so that the master node can rotate. Tearing down all three servers for an extended period of time may cause data loss and the instances to be terminated.
+
+The vault binaries themselves have to be manually updated on each prod-vault-node[1-3] host:
+
+1. Check https://releases.hashicorp.com/vault/ to see if there is a new release of Vault available. ('vault status' or going to the Web UI will show you the current running version)
+2. Use wget to get the *linux_amd64* zip file for the new release onto your host.
+3. Stop the current running version: sudo systemctl stop vault
+4. Unzip the new zip file.
+5. Copy the new vault binary to /usr/local/bin ('sudo cp vault /usr/local/bin')
+6. Start vault: sudo systemctl vault
+7. Ensure the version is correct by typing 'vault status' again.
