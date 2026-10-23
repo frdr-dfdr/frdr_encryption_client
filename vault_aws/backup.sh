@@ -12,5 +12,6 @@ fi
 echo "Active node found: ${ACTIVE_NODE}"
 
 export VAULT_ADDR="${ACTIVE_NODE}"
-vault operator raft snapshot save /tmp/vault-backup-$(date +%Y%m%d%H%M%S).snap
-aws s3 cp /tmp/vault-backup-*.snap s3://frdrvault-backup-bucket/raft/
+ts=$(date +%Y%m%d%H%M%S)
+vault operator raft snapshot save /tmp/vault-backup-${ts}.snap
+aws s3 cp /tmp/vault-backup-${ts}.snap s3://frdrvault-backup-bucket/raft/
