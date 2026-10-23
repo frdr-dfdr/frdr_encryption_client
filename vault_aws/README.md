@@ -1,4 +1,4 @@
-## How to install, configure,and upgrade a Hashicorp Vault stack on AWS using CloudFormation ##
+## How to install, configure, backup, and upgrade a Hashicorp Vault stack on AWS using CloudFormation ##
 
 This directory contains a AWS CloudFormation template to install a 'production hardened' open-source licensed Hashicorp Vault installation and instructions on how to how to correctly use it.
 
@@ -69,3 +69,36 @@ The vault binaries themselves have to be manually updated on each prod-vault-nod
 5. Copy the new vault binary to /usr/local/bin ('sudo cp vault /usr/local/bin')
 6. Start vault: sudo systemctl vault
 7. Ensure the version is correct by typing 'vault status' again.
+
+### Backups ###
+
+The backup script is run from prod-vault-node-1 in /home/ubuntu/backup.sh on an hourly cron (this needs to be added to the AWS CloudFormation template or Ansible). The backup has to make an API call to the Raft leader so it uses the 'vault status' command to find the current leader and then dump the encrypted raft storage contents out to disk. The script then copies the contents of the backup to a s3 bucket:
+
+https://us-west-2.console.aws.amazon.com/s3/buckets/frdrvault-backup-bucket?region=us-west-2
+
+Note that the bucket creation and IAM security role have to be added to the AWS template script. The extra IAM permissions look like this and need to be added to the IAM permissions file that is attached to each Vault instance on creation:
+
+{
+      "Sid": "ListBucketContents",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": "arn:aws:s3:::frdrvault-backup-bucket"
+    },
+    {
+      "Sid": "ReadWriteBucketObjects",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::frdrvault-backup-bucket/*"
+    }
+    
+## Restoring from Backups ##
+
+1. Get snapshot from the AWS S3 vault backup bucket onto the local filesystem of the leader.
+2. Run: vault operator raft snapshot restore -force /path/to/snapshot.snap
+3. Use recovery and root keys from the AWS KMS or FRDR secrets store to authorize new vault. This will overwrite the current vault contents.
