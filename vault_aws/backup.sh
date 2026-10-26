@@ -15,3 +15,4 @@ export VAULT_ADDR="${ACTIVE_NODE}"
 ts=$(date +%Y%m%d%H%M%S)
 vault operator raft snapshot save /tmp/vault-backup-${ts}.snap
 aws s3 cp /tmp/vault-backup-${ts}.snap s3://frdrvault-backup-bucket/raft/
+rm /tmp/vault-backup-${ts}.snap
