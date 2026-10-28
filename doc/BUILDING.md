@@ -128,11 +128,27 @@ Run `pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml;./
 ## Upgrade Dependencies
 
 ### Upgrade Python Packages
-Upgrade packages and update requirements.txt or requirements_windows.txt.
+Upgrade packages and update requirements_mac_silicon.txt, requirements_mac_intel.txt or requirements_windows.txt.
 ```
-pip-upgrade (Mac)
+pip-upgrade requirements_mac_silicon.txt (Mac)
 pip-upgrade .\requirements_windows.txt (Windows)
 ```
+
+#### After upgrading Python packages (or the Python version)
+
+1. Recreate the virtualenv. This is required after changing the Python version, and recommended after upgrading packages with native extensions (`cffi`, `cryptography`, `pyzmq`, `PyNaCl`):
+   ```
+   rm -rf env
+   /Library/Frameworks/Python.framework/Versions/3.15/bin/python3.15 -m venv env
+   source env/bin/activate
+   pip install --upgrade pip
+   pip install -r requirements_mac_silicon.txt
+   pip check
+   ```
+2. Make sure `setuptools` is still `<81` (see the note on `--collect-all setuptools` above). `pip-upgrade` and dependabot will happily bump it past 81, which breaks `bagit` at runtime.
+3. Run `python app_gui.py` from source to confirm there are no import errors.
+4. Rebuild the Python bundle with `pyinstaller` (see [Building](#building)) and remove `./gui/app_gui.app/`. Otherwise the Electron app keeps running the old `gui/app_gui/` built with the old dependencies.
+5. Keep the three requirements files in sync. Only the file for the current platform can be verified locally; rebuild and test on Windows as well.
 
 ### Update Electron App Dependencies
 Upgrade dependencies in package.json and update it.
@@ -145,3 +161,36 @@ npm install -g npm-check-updates
 ncu -u
 npm install
 ```
+
+#### After upgrading Node.js
+
+1. Check `node -v` is >= 22.9 (required by `electron-builder` 26.x).
+2. Reinstall dependencies from scratch, since native modules (`zeromq`) are built against a specific Node/Electron ABI:
+   ```
+   cd gui
+   rm -rf node_modules
+   npm ci
+   ```
+   The `postinstall` script restores the execute permission on `node_modules/7zip-bin/mac/arm64/7za`; run it manually if you installed with `--ignore-scripts`.
+
+#### After upgrading npm packages
+
+1. Reinstall and rebuild native modules against the installed Electron version:
+   ```
+   cd gui
+   rm -rf node_modules
+   npm install
+   npx electron-builder install-app-deps
+   ```
+2. Run `NODE_ENV=development npm start` and test the full encrypt / decrypt / grant access workflow.
+
+Things to watch for:
+
+* `electron` major upgrade: `zeromq` must be rebuilt, otherwise the app fails with a `NODE_MODULE_VERSION` mismatch. Check the Electron breaking changes.
+* `electron-builder` / `@electron/notarize` upgrade: signing and notarization options may change; confirm `npm run dist` actually notarizes the app.
+* `glob`, `archiver`, `js-yaml` major upgrades: these often switch to ESM-only or change their API; test encryption and zip packaging.
+
+### Before Releasing
+
+* Keep `VERSION` in `config/config.yml` in sync with `version` in `gui/package.json`.
+* Check that the URLs in `config/config.yml` (`FRDR_API_BASE_URL`, `FRDR_PROFILE_URL`, etc.) point to the production environment.
