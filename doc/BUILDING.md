@@ -11,11 +11,13 @@ The Python code needs to be built on its target platform using `pyinstaller`:
 
 (Install `pyinstaller` if not installed: `pip install pyinstaller`)
 
-`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools` (Windows)
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools --copy-metadata bagit` (Windows)
 
-`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools` (Mac)
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools --copy-metadata bagit` (Mac)
 
 We need to include the config file when generating the bundle.
+
+`--copy-metadata bagit` is required because `bagit` (>= 1.9) calls `importlib.metadata.version("bagit")` at import time, and PyInstaller doesn't bundle package metadata by default (fails with `PackageNotFoundError: No package metadata was found for bagit` at runtime otherwise).
 
 `--collect-all setuptools` is required because `bagit` imports `pkg_resources` at import time, and `pkg_resources`'s vendored `jaraco` dependency isn't picked up by PyInstaller's static analysis on its own (fails with `ModuleNotFoundError: No module named 'jaraco'` at runtime otherwise). This also requires `setuptools<81` to be installed (see `requirements_mac_silicon.txt`/`requirements_windows.txt`), since `pkg_resources` was removed from `setuptools` starting with version 81.
 
