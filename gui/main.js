@@ -308,7 +308,8 @@ portfinder.getPort(function(_err, port) {
         if (guessPackaged()) {
             pythonChild = require('child_process').spawn(script, [port])
         } else {
-            pythonChild = require('child_process').spawn('python3', [script, port])
+            const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+            pythonChild = require('child_process').spawn(pythonCmd, [script, port])
         }
 
         if (pythonChild != null) {
