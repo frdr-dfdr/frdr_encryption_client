@@ -31,6 +31,9 @@ if (!gotTheLock) {
 
 // Auto Update
 const log = require("electron-log");
+
+// Runs the update check in the background
+function checkForUpdates() {
 if (process.platform === 'win32') {
     const {autoUpdater}  = require('electron-updater');
     autoUpdater.logger = log;
@@ -42,6 +45,7 @@ if (process.platform === 'darwin') {
     updateElectronApp({
         logger: log
     });
+    }
 }
 
 const openAboutWindow = require('electron-about-window').default;
@@ -208,6 +212,8 @@ app.on('ready', () => {
     });
     createWindow();
     mainWindow.webContents.session.clearStorageData();
+    // Delay so a slow/unreachable update feed
+    setTimeout(checkForUpdates, 10000);
 
     const menu = Menu.buildFromTemplate([
         {
