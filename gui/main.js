@@ -53,6 +53,7 @@ const openAboutWindow = require('electron-about-window').default;
 const glob = require('glob');
 
 const zmq = require("zeromq");
+zmq.context.blocky = false;
 sock = new zmq.Request();
 
 const portfinder = require("portfinder");
