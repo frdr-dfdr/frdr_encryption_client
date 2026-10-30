@@ -2,7 +2,8 @@
 
 ## Requirements
 
-- Python >= 3.10 (required by `cffi`/`cryptography`/other pinned versions in `requirements_windows.txt`/`requirements_mac_intel.txt`/`requirements_mac_silicon.txt`)
+- Python >= 3.10 (required by `cffi`/`cryptography`/other pinned versions in `requirements_windows.txt`/`requirements_mac_intel.txt`/`requirements_mac_silicon.txt`; as of this release, built and validated against Python 3.15 on Mac and **Python 3.14 on Windows** — on Windows, use the `py` launcher (`py -0`) to confirm the right version is installed and use it to create the venv)
+  - On Windows, avoid Python 3.15 for now: `cryptography`'s PyInstaller-frozen build fails at runtime with `ImportError: DLL load failed while importing _rust: The specified module could not be found` (Dependencies tool shows a missing `python3t.dll`, the free-threaded-build stable-ABI stub), even with a standard (non-free-threaded) interpreter and a cleared PyInstaller cache — likely because `cryptography` doesn't yet ship a prebuilt wheel for 3.15 on Windows and falls back to a source build that links the wrong ABI stub. Running from source (`npm start` / `python app_gui.py`) works fine either way; only the frozen PyInstaller build is affected. Python 3.14 has prebuilt wheels and does not hit this.
 - Node.js >= 22.9 (required by `electron-builder` 26.x and its dependencies; older Node versions fail with `ERR_REQUIRE_ESM` when running `npm run dist`)
 
 ## Building 
@@ -139,6 +140,8 @@ pip-upgrade .\requirements_windows.txt (Windows)
 #### After upgrading Python packages (or the Python version)
 
 1. Recreate the virtualenv. This is required after changing the Python version, and recommended after upgrading packages with native extensions (`cffi`, `cryptography`, `pyzmq`, `PyNaCl`):
+
+   Mac:
    ```
    rm -rf env
    /Library/Frameworks/Python.framework/Versions/3.15/bin/python3.15 -m venv env
@@ -147,6 +150,17 @@ pip-upgrade .\requirements_windows.txt (Windows)
    pip install -r requirements_mac_silicon.txt
    pip check
    ```
+
+   Windows:
+   ```
+   rmdir /s /q env
+   py -3.14 -m venv env
+   env\Scripts\activate
+   pip install --upgrade pip
+   pip install -r requirements_windows.txt
+   pip check
+   ```
+   Make sure `python --version` inside the venv reports 3.14.x — an old system-wide Python (e.g. 3.7) on `PATH` will otherwise get picked up and fail to resolve newer build dependencies (e.g. `setuptools-scm>=8`). Use 3.14, not 3.15 (see the Requirements note above on the `python3t.dll` PyInstaller issue).
 2. Make sure `setuptools` is still `<81` (see the note on `--collect-all setuptools` above). `pip-upgrade` and dependabot will happily bump it past 81, which breaks `bagit` at runtime.
 3. Run `python app_gui.py` from source to confirm there are no import errors.
 4. Rebuild the Python bundle with `pyinstaller` (see [Building](#building)) and remove `./gui/app_gui.app/`. Otherwise the Electron app keeps running the old `gui/app_gui/` built with the old dependencies.
