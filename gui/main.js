@@ -34,17 +34,17 @@ const log = require("electron-log");
 
 // Runs the update check in the background
 function checkForUpdates() {
-if (process.platform === 'win32') {
+    if (process.platform === 'win32') {
     const {autoUpdater}  = require('electron-updater');
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-}
+        autoUpdater.logger = log;
+        autoUpdater.checkForUpdatesAndNotify();
+    }
 
-if (process.platform === 'darwin') {
-    const { updateElectronApp } = require('update-electron-app');
-    updateElectronApp({
-        logger: log
-    });
+    if (process.platform === 'darwin') {
+        const { updateElectronApp } = require('update-electron-app');
+        updateElectronApp({
+            logger: log
+        });
     }
 }
 
