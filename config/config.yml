@@ -1,5 +1,5 @@
 # App configuration
-VERSION: "1.1.0"
+VERSION: "1.1.1"
 EXCLUDED_FILES:
   [
     ".*",
@@ -40,7 +40,7 @@ VAULT_LOGIN_TIMEOUT: 60
 # Person key server configuration
 VAULT_PUBLIC_KEY_PATH: "public_key"
 VAULT_GENERATE_CERT_ROLE_NAME: "frdrvault-dot-net"
-VAULT_GENERATE_CERT_COMMON_NAME: "frdrvault.net"
+VAULT_GENERATE_CERT_COMMON_NAME: "client.frdrvault.net"
 VAULT_GENERATE_CERT_MOUNT_NAME: "pki_int"
 LOCAL_KEY_DIR_NAME: ".frdr_keys"
 LOCAL_PRIVATE_KEY_FILENAME: "private.key"

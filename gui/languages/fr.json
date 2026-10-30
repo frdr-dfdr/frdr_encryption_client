@@ -144,7 +144,7 @@
     "app-import-key-zip-password-placeholder": "Entrer le mot de passe du fichier ZIP",
     "app-import-key-zip-password-title": "Entrer le mot de passe du fichier ZIP",
     "app-footer-copyright": "© 2026 Digital Research Alliance of Canada",
-    "app-footer-version": "FRDR Encryption Application 1.1.0",
+    "app-footer-version": "FRDR Encryption Application 1.1.1",
     "app-get-entity-id-error": "Erreur lors de la récupération de l’identifiant d’entité utilisateur dans Vault.\n$1.",
     "app-get-entity-id-from-frdr-error": "Votre identifiant Vault n’a pas été récupéré correctement depuis le DFDR. Veuillez retourner à la page Paramètres et vous assurer que celui-ci est correctement configuré dans le DFDR.",
     "app-get-entity-name-error": "Erreur lors de la récupération du courriel de l’utilisateur dans Vault.\n$1.",

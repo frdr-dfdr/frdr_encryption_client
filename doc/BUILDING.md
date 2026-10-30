@@ -2,7 +2,8 @@
 
 ## Requirements
 
-- Python >= 3.10 (required by `cffi`/`cryptography`/other pinned versions in `requirements_windows.txt`/`requirements_mac_intel.txt`/`requirements_mac_silicon.txt`)
+- Python >= 3.10 (required by `cffi`/`cryptography`/other pinned versions in `requirements_windows.txt`/`requirements_mac_intel.txt`/`requirements_mac_silicon.txt`; as of this release, built and validated against Python 3.15 on Mac and **Python 3.14 on Windows** — on Windows, use the `py` launcher (`py -0`) to confirm the right version is installed and use it to create the venv)
+  - On Windows, avoid Python 3.15 for now: `cryptography`'s PyInstaller-frozen build fails at runtime with `ImportError: DLL load failed while importing _rust: The specified module could not be found` (Dependencies tool shows a missing `python3t.dll`, the free-threaded-build stable-ABI stub), even with a standard (non-free-threaded) interpreter and a cleared PyInstaller cache — likely because `cryptography` doesn't yet ship a prebuilt wheel for 3.15 on Windows and falls back to a source build that links the wrong ABI stub. Running from source (`npm start` / `python app_gui.py`) works fine either way; only the frozen PyInstaller build is affected. Python 3.14 has prebuilt wheels and does not hit this.
 - Node.js >= 22.9 (required by `electron-builder` 26.x and its dependencies; older Node versions fail with `ERR_REQUIRE_ESM` when running `npm run dist`)
 
 ## Building 
@@ -11,11 +12,13 @@ The Python code needs to be built on its target platform using `pyinstaller`:
 
 (Install `pyinstaller` if not installed: `pip install pyinstaller`)
 
-`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools` (Windows)
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools --copy-metadata bagit` (Windows)
 
-`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools` (Mac)
+`pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml:./config' --collect-all setuptools --copy-metadata bagit` (Mac)
 
 We need to include the config file when generating the bundle.
+
+`--copy-metadata bagit` is required because `bagit` (>= 1.9) calls `importlib.metadata.version("bagit")` at import time, and PyInstaller doesn't bundle package metadata by default (fails with `PackageNotFoundError: No package metadata was found for bagit` at runtime otherwise).
 
 `--collect-all setuptools` is required because `bagit` imports `pkg_resources` at import time, and `pkg_resources`'s vendored `jaraco` dependency isn't picked up by PyInstaller's static analysis on its own (fails with `ModuleNotFoundError: No module named 'jaraco'` at runtime otherwise). This also requires `setuptools<81` to be installed (see `requirements_mac_silicon.txt`/`requirements_windows.txt`), since `pkg_resources` was removed from `setuptools` starting with version 81.
 
@@ -128,11 +131,40 @@ Run `pyinstaller -w app_gui.py --distpath gui --add-data './config/config.yml;./
 ## Upgrade Dependencies
 
 ### Upgrade Python Packages
-Upgrade packages and update requirements.txt or requirements_windows.txt.
+Upgrade packages and update requirements_mac_silicon.txt, requirements_mac_intel.txt or requirements_windows.txt.
 ```
-pip-upgrade (Mac)
+pip-upgrade requirements_mac_silicon.txt (Mac)
 pip-upgrade .\requirements_windows.txt (Windows)
 ```
+
+#### After upgrading Python packages (or the Python version)
+
+1. Recreate the virtualenv. This is required after changing the Python version, and recommended after upgrading packages with native extensions (`cffi`, `cryptography`, `pyzmq`, `PyNaCl`):
+
+   Mac:
+   ```
+   rm -rf env
+   /Library/Frameworks/Python.framework/Versions/3.15/bin/python3.15 -m venv env
+   source env/bin/activate
+   pip install --upgrade pip
+   pip install -r requirements_mac_silicon.txt
+   pip check
+   ```
+
+   Windows:
+   ```
+   rmdir /s /q env
+   py -3.14 -m venv env
+   env\Scripts\activate
+   pip install --upgrade pip
+   pip install -r requirements_windows.txt
+   pip check
+   ```
+   Make sure `python --version` inside the venv reports 3.14.x — an old system-wide Python (e.g. 3.7) on `PATH` will otherwise get picked up and fail to resolve newer build dependencies (e.g. `setuptools-scm>=8`). Use 3.14, not 3.15 (see the Requirements note above on the `python3t.dll` PyInstaller issue).
+2. Make sure `setuptools` is still `<81` (see the note on `--collect-all setuptools` above). `pip-upgrade` and dependabot will happily bump it past 81, which breaks `bagit` at runtime.
+3. Run `python app_gui.py` from source to confirm there are no import errors.
+4. Rebuild the Python bundle with `pyinstaller` (see [Building](#building)) and remove `./gui/app_gui.app/`. Otherwise the Electron app keeps running the old `gui/app_gui/` built with the old dependencies.
+5. Keep the three requirements files in sync. Only the file for the current platform can be verified locally; rebuild and test on Windows as well.
 
 ### Update Electron App Dependencies
 Upgrade dependencies in package.json and update it.
@@ -145,3 +177,36 @@ npm install -g npm-check-updates
 ncu -u
 npm install
 ```
+
+#### After upgrading Node.js
+
+1. Check `node -v` is >= 22.9 (required by `electron-builder` 26.x).
+2. Reinstall dependencies from scratch, since native modules (`zeromq`) are built against a specific Node/Electron ABI:
+   ```
+   cd gui
+   rm -rf node_modules
+   npm ci
+   ```
+   The `postinstall` script restores the execute permission on `node_modules/7zip-bin/mac/arm64/7za`; run it manually if you installed with `--ignore-scripts`.
+
+#### After upgrading npm packages
+
+1. Reinstall and rebuild native modules against the installed Electron version:
+   ```
+   cd gui
+   rm -rf node_modules
+   npm install
+   npx electron-builder install-app-deps
+   ```
+2. Run `NODE_ENV=development npm start` and test the full encrypt / decrypt / grant access workflow.
+
+Things to watch for:
+
+* `electron` major upgrade: `zeromq` must be rebuilt, otherwise the app fails with a `NODE_MODULE_VERSION` mismatch. Check the Electron breaking changes.
+* `electron-builder` / `@electron/notarize` upgrade: signing and notarization options may change; confirm `npm run dist` actually notarizes the app.
+* `glob`, `archiver`, `js-yaml` major upgrades: these often switch to ESM-only or change their API; test encryption and zip packaging.
+
+### Before Releasing
+
+* Keep `VERSION` in `config/config.yml` in sync with `version` in `gui/package.json`.
+* Check that the URLs in `config/config.yml` (`FRDR_API_BASE_URL`, `FRDR_PROFILE_URL`, etc.) point to the production environment.
